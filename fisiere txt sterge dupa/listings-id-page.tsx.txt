@@ -1,0 +1,239 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import {
+  Calendar,
+  Gauge,
+  Car,
+  MapPin,
+  Euro,
+  Info,
+} from "lucide-react";
+
+import CarGallery from "@/components/listings/CarGallery"; // 🧩 Import galeria ta
+
+export const dynamic = "force-dynamic";
+
+/* 🧠 Helper universal pentru citirea valorilor din schemaData */
+function findValue(schemaData: any, key: string) {
+  if (!schemaData || typeof schemaData !== "object") return undefined;
+  const normalized = key.trim().toLowerCase();
+
+  for (const [sectionName, sectionData] of Object.entries(schemaData)) {
+    if (typeof sectionData === "object" && sectionData !== null) {
+      for (const [k, v] of Object.entries(sectionData)) {
+        if (k.trim().toLowerCase() === normalized) return v;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+export default function CarDetailsPage() {
+  const { id } = useParams();
+  const [car, setCar] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCar = async () => {
+      if (!id) return;
+      try {
+        const docRef = doc(db, "cars", id as string);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+          const carData = { id, ...snap.data() };
+          setCar(carData);
+          console.log("[CarDetails] Car loaded:", carData);
+        } else {
+          console.warn("[CarDetails] Car not found for id:", id);
+        }
+      } catch (err) {
+        console.error("[CarDetails] Error loading car:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCar();
+  }, [id]);
+
+  if (loading)
+    return <p className="text-center mt-6 text-gray-600">Se încarcă...</p>;
+
+  if (!car)
+    return (
+      <p className="text-center text-red-500">
+        Mașina nu a fost găsită.
+      </p>
+    );
+
+  // 🔹 Extragem valorile din schemaData
+  const title =
+    findValue(car.schemaData, "Title") ||
+    findValue(car.schemaData, "Titlu") ||
+    "Titlu necunoscut";
+
+  const price =
+    findValue(car.schemaData, "Price") ||
+    findValue(car.schemaData, "Preț") ||
+    undefined;
+
+  const make =
+    findValue(car.schemaData, "Make") ||
+    findValue(car.schemaData, "Marcă") ||
+    "—";
+
+  const model =
+    findValue(car.schemaData, "Model") ||
+    findValue(car.schemaData, "Modelul") ||
+    "—";
+
+  const year =
+    findValue(car.schemaData, "Year") ||
+    findValue(car.schemaData, "An fabricație") ||
+    undefined;
+
+  const mileage =
+    findValue(car.schemaData, "Mileage") ||
+    findValue(car.schemaData, "Kilometraj") ||
+    undefined;
+
+  const location =
+    findValue(car.schemaData, "Location") ||
+    findValue(car.schemaData, "Locație") ||
+    undefined;
+
+  // 🔍 Debug (opțional)
+  console.groupCollapsed(`[CarDetailsPage] ${car.id}`);
+  console.log("Title:", title);
+  console.log("Price:", price);
+  console.log("Make:", make);
+  console.log("Model:", model);
+  console.log("Year:", year);
+  console.log("Mileage:", mileage);
+  console.log("Location:", location);
+  console.groupEnd();
+
+  return (
+    <div className="max-w-[1600px] mx-auto p-6">
+      {/* 🔹 Titlu principal */}
+      <h1 className="text-3xl font-bold mb-2">{title}</h1>
+      <p className="text-gray-600 mb-6">
+        {year || "N/A"} • {mileage ? `${mileage} km` : "—"} •{" "}
+        {car.status === "available" ? (
+          <span className="text-green-600 font-medium">Disponibil</span>
+        ) : car.status === "pending" ? (
+          <span className="text-yellow-600 font-medium">
+            În așteptare
+          </span>
+        ) : (
+          <span className="text-red-600 font-medium">Vândut</span>
+        )}
+      </p>
+
+      {/* 🔹 Layout principal */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* 🖼️ Galerie completă */}
+        <div className="md:col-span-2">
+          <CarGallery schemaData={car.schemaData} />
+        </div>
+
+        {/* 🔹 Card detalii esențiale */}
+        <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100 space-y-3 h-fit">
+          <p className="text-3xl font-bold text-blue-600">
+            {price ? `${price} €` : "N/A"}
+          </p>
+
+          <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-700 mt-4">
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <Info className="w-4 h-4 text-gray-500" /> Marca:
+              </span>
+              <span className="font-medium">{make}</span>
+            </div>
+
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <Car className="w-4 h-4 text-gray-500" /> Model:
+              </span>
+              <span className="font-medium">{model}</span>
+            </div>
+
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <Calendar className="w-4 h-4 text-gray-500" /> An fabricație:
+              </span>
+              <span>{year || "—"}</span>
+            </div>
+
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <Gauge className="w-4 h-4 text-gray-500" /> Kilometraj:
+              </span>
+              <span>{mileage ? `${mileage} km` : "—"}</span>
+            </div>
+
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-4 h-4 text-gray-500" /> Locație:
+              </span>
+              <span>{location || "—"}</span>
+            </div>
+
+            <div className="col-span-2 flex justify-between">
+              <span className="flex items-center gap-1">
+                <Euro className="w-4 h-4 text-gray-500" /> Status:
+              </span>
+              <span
+                className={`font-medium ${
+                  car.status === "available"
+                    ? "text-green-600"
+                    : car.status === "pending"
+                    ? "text-yellow-600"
+                    : "text-red-600"
+                }`}
+              >
+                {car.status}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 🔹 Descriere / Secțiuni dinamice */}
+      <div className="mt-10 bg-white p-6 rounded-xl shadow-md space-y-8">
+        {car.schemaData &&
+          Object.entries(car.schemaData).map(([section, data]: any) => (
+            <div key={section}>
+              <h2 className="text-2xl font-semibold mb-3 border-b pb-1">
+                {section}
+              </h2>
+
+              {data.content && (
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {data.content}
+                </p>
+              )}
+
+              {data.images && data.images.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-3">
+                  {data.images.map((img: any, i: number) => (
+                    <img
+                      key={i}
+                      src={img.src}
+                      alt={`${section} ${i + 1}`}
+                      className="w-40 h-40 rounded-lg object-cover border"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+      </div>
+    </div>
+  );
+}
