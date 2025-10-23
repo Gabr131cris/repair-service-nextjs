@@ -1,23 +1,35 @@
-// lib/auth.ts
-import { auth, db } from "./firebase";
+
+
+import { getFirebaseAuth, getDb } from "./firebase";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
-  User,
   updateProfile,
+  User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
-// ✅ Înregistrare user nou + creare document în Firestore
-export async function registerUser(email: string, password: string, displayName: string) {
-  const { user } = await createUserWithEmailAndPassword(auth, email, password);
+/* ============================================================
+   🔹 Înregistrare utilizator nou + creare document în Firestore
+   ============================================================ */
+export async function registerUser(
+  email: string,
+  password: string,
+  displayName: string
+) {
+  if (typeof window === "undefined") {
+    console.warn("registerUser() called on server — skipped.");
+    return null;
+  }
 
-  // Actualizează profilul Firebase Auth (nume afisat)
+  const auth = await getFirebaseAuth();
+  const db = getDb();
+
+  const { user } = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(user, { displayName });
 
-  // Creează documentul user în Firestore cu rol implicit "user"
   await setDoc(doc(db, "users", user.uid), {
     uid: user.uid,
     email,
@@ -29,27 +41,67 @@ export async function registerUser(email: string, password: string, displayName:
   return user;
 }
 
-// ✅ Login utilizator existent
+/* ============================================================
+   🔹 Login utilizator existent
+   ============================================================ */
 export async function loginUser(email: string, password: string) {
+  if (typeof window === "undefined") {
+    console.warn("loginUser() called on server — skipped.");
+    return null;
+  }
+
+  const auth = await getFirebaseAuth();
   const { user } = await signInWithEmailAndPassword(auth, email, password);
   return user;
 }
 
-// ✅ Logout
+/* ============================================================
+   🔹 Logout utilizator
+   ============================================================ */
 export async function logoutUser() {
+  if (typeof window === "undefined") {
+    console.warn("logoutUser() called on server — skipped.");
+    return;
+  }
+
+  const auth = await getFirebaseAuth();
   await signOut(auth);
 }
 
-// ✅ Ascultă modificările de autentificare (ex: în Navbar)
-export function listenToAuthChanges(callback: (user: User | null) => void) {
+/* ============================================================
+   🔹 Ascultă modificările de autentificare
+   ============================================================ */
+export async function listenToAuthChanges(callback: (user: User | null) => void) {
+  if (typeof window === "undefined") {
+    console.warn("listenToAuthChanges() called on server — skipped.");
+    return () => {};
+  }
+
+  const auth = await getFirebaseAuth();
   return onAuthStateChanged(auth, callback);
 }
 
-// ✅ Obține rolul utilizatorului curent din Firestore (cu așteptare corectă)
+/* ============================================================
+   🔹 Obține rolul utilizatorului curent din Firestore
+   ============================================================ */
 export async function getUserRole(): Promise<string | null> {
+  // 🚫 Previne execuția în SSR (la build pe Vercel)
+  if (typeof window === "undefined") {
+    console.warn("getUserRole() called on server — skipped.");
+    return null;
+  }
+
+  const auth = await getFirebaseAuth();
+  const db = getDb();
+
+  if (!auth || !db) {
+    console.warn("Firebase not initialized properly in getUserRole()");
+    return null;
+  }
+
   return new Promise((resolve) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      unsubscribe(); // prevenim ascultarea infinită
+      unsubscribe();
 
       if (!user) {
         resolve(null);
@@ -64,7 +116,7 @@ export async function getUserRole(): Promise<string | null> {
           const data = snap.data();
           resolve(data.role || "user");
         } else {
-          // Dacă nu există documentul, îl creăm automat
+          // Creează userul în Firestore dacă nu există
           await setDoc(ref, {
             uid: user.uid,
             email: user.email,

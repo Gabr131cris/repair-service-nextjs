@@ -1,3 +1,4 @@
+"use client";
 export default function NotFound() {
   return (
     <div className="h-[70vh] flex flex-col items-center justify-center text-center">

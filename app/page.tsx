@@ -1,5 +1,5 @@
 "use client";
-
+export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -257,7 +257,7 @@ export default function HomePage() {
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-6 w-6 text-blue-600" />
             <div>
-              <p className="font-semibold">Verified Listings</p>
+              <p className="font-semibold">Verified Listingssssssssssssss</p>
               <p className="text-sm text-gray-600">Quality cars, vetted by us</p>
             </div>
           </div>

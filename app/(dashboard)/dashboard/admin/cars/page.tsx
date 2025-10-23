@@ -1,8 +1,9 @@
 "use client";
-
+export const dynamic = "force-dynamic";
 import { useEffect, useState } from "react";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+//import { db } from "@/lib/firebase";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { getUserRole } from "@/lib/auth";
 import { Car } from "@/lib/types";
 import Image from "next/image";
@@ -51,6 +52,19 @@ export default function AdminCarsPage() {
   const [loading, setLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+
+  const [db, setDb] = useState<any>(null);
+  const [auth, setAuth] = useState<any>(null);
+
+  // 🔹 Inițializează Firebase în browser
+  useEffect(() => {
+    (async () => {
+      const authInstance = await getFirebaseAuth();
+      const dbInstance = getDb();
+      setAuth(authInstance);
+      setDb(dbInstance);
+    })();
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {

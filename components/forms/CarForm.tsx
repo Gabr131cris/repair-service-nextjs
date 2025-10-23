@@ -1,7 +1,7 @@
-"use client";
+"use client"; // 🔹 trebuie să fie PRIMA linie
 
 import { useEffect, useState } from "react";
-import { db, auth } from "@/lib/firebase";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { getDocs, collection } from "firebase/firestore";
 import { addCar } from "@/lib/firestore";
 import { useRouter } from "next/navigation";
@@ -29,7 +29,19 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
   const [schema, setSchema] = useState<Section[]>([]);
   const [formData, setFormData] = useState<any>(initialData || {});
   const [loading, setLoading] = useState(true);
+  const [auth, setAuth] = useState<any>(null);
+  const [db, setDb] = useState<any>(null);
   const router = useRouter();
+
+  // 🟢 Inițializează Firebase (auth + db) doar în browser
+  useEffect(() => {
+    (async () => {
+      const authInstance = await getFirebaseAuth();
+      const dbInstance = getDb();
+      setAuth(authInstance);
+      setDb(dbInstance);
+    })();
+  }, []);
 
   // ✅ Încarcă schema din Firestore
   useEffect(() => {

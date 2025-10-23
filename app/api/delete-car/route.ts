@@ -1,5 +1,6 @@
+// app/api/delete-car/route.ts
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { getDb } from "@/lib/firebase";
 import { doc, getDoc, deleteDoc } from "firebase/firestore";
 import fs from "fs";
 import path from "path";
@@ -9,6 +10,9 @@ export const dynamic = "force-dynamic";
 
 export async function DELETE(req: Request) {
   try {
+    // 🟢 Inițializează Firestore doar la runtime
+    const db = getDb();
+
     const { searchParams } = new URL(req.url);
     const carId = searchParams.get("id");
 
@@ -17,7 +21,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Missing carId" }, { status: 400 });
     }
 
-    // 🔹 Citește documentul Firestore ca să aflăm tempId
+    // 🔹 Citește documentul Firestore
     const carRef = doc(db, "cars", carId);
     const snap = await getDoc(carRef);
 
@@ -27,17 +31,12 @@ export async function DELETE(req: Request) {
     }
 
     const carData = snap.data();
-    const tempId = carData?.tempId || carId; // dacă nu există tempId, folosește carId
+    const tempId = carData?.tempId || carId;
 
-    // 🔹 Path pentru ambele posibile foldere
+    // 🔹 Construiește path-urile
     const uploadDirFirestore = path.join(process.cwd(), "public", "uploads", carId);
     const uploadDirTemp = path.join(process.cwd(), "public", "uploads", tempId);
 
-    console.log("🧾 CWD:", process.cwd());
-    console.log("📁 Upload dir (Firestore):", uploadDirFirestore);
-    console.log("📁 Upload dir (Temp):", uploadDirTemp);
-
-    // 🔹 Funcție de ștergere sigură
     const tryDelete = (dir: string) => {
       if (fs.existsSync(dir)) {
         fs.rmSync(dir, { recursive: true, force: true });
@@ -47,11 +46,9 @@ export async function DELETE(req: Request) {
       }
     };
 
-    // 🔹 Ștergem ambele variante, în caz că există
     tryDelete(uploadDirFirestore);
     if (tempId !== carId) tryDelete(uploadDirTemp);
 
-    // 🔹 Șterge documentul din Firestore
     await deleteDoc(carRef);
     console.log("✅ Firestore doc deleted:", carId);
 

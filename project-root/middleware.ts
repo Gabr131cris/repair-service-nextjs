@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
+
+const auth = await getFirebaseAuth();
+
 import { getAuth } from "firebase/auth";
 
 // 🔹 Rute publice — fără autentificare

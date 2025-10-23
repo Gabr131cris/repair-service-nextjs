@@ -1,7 +1,7 @@
-"use client";
+"use client"; // 🔹 trebuie să fie PRIMA linie
 
 import { useState } from "react";
-import { auth, db } from "@/lib/firebase";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
@@ -19,6 +19,10 @@ export default function CreateUserPage() {
     setLoading(true);
 
     try {
+      // 🟢 Inițializează Firebase local (browser)
+      const auth = await getFirebaseAuth();
+      const db = getDb();
+
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(user, { displayName: name });
 

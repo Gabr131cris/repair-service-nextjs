@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+//
 import "./globals.css";
 
 import TopBar from "@/components/layout/TopBar";
@@ -8,11 +9,11 @@ import ScrollToTopButton from "@/components/ui/ScrollToTopButton";
 
 export const dynamic = "force-static";
 
-export const metadata: Metadata = {
+/*export const metadata: Metadata = {
   title: "Car Market | Buy & Sell Vintage Cars",
   description:
     "Discover, buy, and sell iconic classic and vintage cars — safely, easily, and with style.",
-};
+};*/
 
 export default function RootLayout({
   children,

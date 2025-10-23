@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { auth } from "@/lib/firebase";
+import { getFirebaseAuth } from "@/lib/firebase";
+
+const auth = await getFirebaseAuth();
+
 
 export default function DashboardHome() {
   const [user, setUser] = useState<any>(null);

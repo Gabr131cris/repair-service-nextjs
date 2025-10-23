@@ -1,8 +1,9 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db, auth } from "@/lib/firebase";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import Link from "next/link";
 import { Trash2, Eye } from "lucide-react";
@@ -28,21 +29,26 @@ export default function UserCarsPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  // 🔹 Încarcă anunțurile utilizatorului curent
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const q = query(collection(db, "cars"), where("ownerId", "==", user.uid));
-        const snapshot = await getDocs(q);
-        const data = snapshot.docs.map(
-          (doc) => ({ id: doc.id, ...doc.data() } as Car)
-        );
-        setCars(data);
-      }
-      setLoading(false);
-    });
+    (async () => {
+      // 🟢 Aici inițializezi corect Firebase Auth și Firestore
+      const auth = await getFirebaseAuth();
+      const db = getDb();
 
-    return () => unsubscribe();
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const q = query(collection(db, "cars"), where("ownerId", "==", user.uid));
+          const snapshot = await getDocs(q);
+          const data = snapshot.docs.map(
+            (doc) => ({ id: doc.id, ...doc.data() } as Car)
+          );
+          setCars(data);
+        }
+        setLoading(false);
+      });
+
+      return () => unsubscribe();
+    })();
   }, []);
 
   // 🔹 Ștergere anunț
