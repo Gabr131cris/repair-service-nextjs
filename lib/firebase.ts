@@ -17,21 +17,47 @@ export function getFirebaseApp() {
   }
 
   if (!app) {
+    // 🔹 Fallback complet: process.env + import.meta.env (Vercel Edge/Turbopack)
     const firebaseConfig = {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+      apiKey:
+        process.env.NEXT_PUBLIC_FIREBASE_API_KEY ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain:
+        process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId:
+        process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket:
+        process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId:
+        process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId:
+        process.env.NEXT_PUBLIC_FIREBASE_APP_ID ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_APP_ID,
+      measurementId:
+        process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     };
 
-    // 🔍 Log de siguranță
+    // 🔍 Log complet pentru debugging (vezi consola browserului)
+    console.groupCollapsed("🌍 Firebase Runtime Config Check");
+    console.log("NEXT_PUBLIC_FIREBASE_API_KEY:", firebaseConfig.apiKey);
+    console.log("NEXT_PUBLIC_FIREBASE_PROJECT_ID:", firebaseConfig.projectId);
+    console.log("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:", firebaseConfig.authDomain);
+    console.log("NEXT_PUBLIC_FIREBASE_APP_ID:", firebaseConfig.appId);
+    console.groupEnd();
+
+    // ❌ Dacă lipsesc variabile, log explicit
     if (!firebaseConfig.apiKey) {
-      console.error("❌ Firebase API key missing! Check your .env or Vercel environment variables.");
+      console.error(
+        "❌ Firebase API key missing! Check your .env or Vercel environment variables."
+      );
     }
 
+    // ✅ Inițializare Firebase (o singură dată)
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
   }
 
@@ -56,10 +82,13 @@ export async function getFirebaseAuth() {
     console.warn("⚠️ Firebase Auth requested on server — returning null.");
     return null;
   }
+
   const { getAuth } = await import("firebase/auth");
   return getAuth(getFirebaseApp());
 }
 
 // 🔹 Exporturi compatibile pentru codul existent
-export const db = typeof window !== "undefined" ? getDb() : (null as any);
-export const appInstance = typeof window !== "undefined" ? getFirebaseApp() : ({} as any);
+export const db =
+  typeof window !== "undefined" ? getDb() : (null as any);
+export const appInstance =
+  typeof window !== "undefined" ? getFirebaseApp() : ({} as any);
