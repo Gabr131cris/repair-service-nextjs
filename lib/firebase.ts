@@ -15,7 +15,7 @@ let firestoreDb: ReturnType<typeof getFirestore> | null = null;
 export function getFirebaseApp() {
   // 🚫 Evită rularea pe server (SSR)
   if (typeof window === "undefined") {
-    console.warn("⚠️ Firebase initialization skipped on server.");
+    
     return getApps().length ? getApp() : ({} as any);
   }
 
@@ -45,13 +45,7 @@ export function getFirebaseApp() {
         (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
     };
 
-    // 🔍 Log complet pentru debugging (vezi consola browserului)
-    console.groupCollapsed("🌍 Firebase Runtime Config Check");
-    console.log("NEXT_PUBLIC_FIREBASE_API_KEY:", firebaseConfig.apiKey);
-    console.log("NEXT_PUBLIC_FIREBASE_PROJECT_ID:", firebaseConfig.projectId);
-    console.log("NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN:", firebaseConfig.authDomain);
-    console.log("NEXT_PUBLIC_FIREBASE_APP_ID:", firebaseConfig.appId);
-    console.groupEnd();
+    
 
     // ❌ Dacă lipsesc variabile, log explicit
     if (!firebaseConfig.apiKey) {
