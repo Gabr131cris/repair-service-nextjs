@@ -2,14 +2,31 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Search } from "lucide-react";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [siteInfo, setSiteInfo] = useState<any>(null);
+
+  // 🔹 Load site info from Firestore
+  useEffect(() => {
+    const fetchSiteInfo = async () => {
+      try {
+        const refDoc = doc(db, "settings", "site_info");
+        const snap = await getDoc(refDoc);
+        if (snap.exists()) setSiteInfo(snap.data());
+      } catch (err) {
+        console.error("Error loading site info:", err);
+      }
+    };
+    fetchSiteInfo();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +37,6 @@ export default function Navbar() {
     }
   };
 
-  // 🔹 Added Finance page here
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/listings", label: "Listings" },
@@ -32,13 +48,27 @@ export default function Navbar() {
   return (
     <nav className="bg-white text-gray-800 shadow-sm sticky top-0 z-50 border-b border-gray-200">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
-        {/* LOGO */}
-        <Link href="/" className="flex items-center space-x-1">
-          <span className="text-2xl font-bold text-blue-600">Car</span>
-          <span className="text-2xl font-bold text-gray-900">Market</span>
+        {/* 🔹 LOGO or site name fallback */}
+        <Link href="/" className="flex items-center space-x-2">
+          {siteInfo?.logoUrl ? (
+            <img
+              src={siteInfo.logoUrl}
+              alt={siteInfo.siteName || "Logo"}
+              className="h-10 w-auto object-contain"
+            />
+          ) : (
+            <>
+              <span className="text-2xl font-bold text-blue-600">
+                {siteInfo?.siteName?.split(" ")[0] || "Car"}
+              </span>
+              <span className="text-2xl font-bold text-gray-900">
+                {siteInfo?.siteName?.split(" ")[1] || "Market"}
+              </span>
+            </>
+          )}
         </Link>
 
-        {/* SEARCH BAR (desktop) */}
+        {/* 🔹 SEARCH BAR (desktop) */}
         <form
           onSubmit={handleSearch}
           className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-1.5 w-96 border border-gray-200"
@@ -53,7 +83,7 @@ export default function Navbar() {
           />
         </form>
 
-        {/* NAV LINKS */}
+        {/* 🔹 NAV LINKS (desktop) */}
         <div className="hidden md:flex items-center space-x-6 font-medium">
           {navLinks.map((link) => (
             <Link
@@ -86,7 +116,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* MOBILE MENU BUTTON */}
+        {/* 🔹 MOBILE MENU BUTTON */}
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden text-gray-600 hover:text-blue-600"
@@ -95,10 +125,10 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* MOBILE DROPDOWN */}
+      {/* 🔹 MOBILE DROPDOWN */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-sm">
-          {/* SEARCH BAR MOBILE */}
+          {/* Search bar mobile */}
           <form
             onSubmit={handleSearch}
             className="flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-2 m-4 border border-gray-200"
@@ -113,7 +143,7 @@ export default function Navbar() {
             />
           </form>
 
-          {/* MENU ITEMS */}
+          {/* Menu items */}
           <ul className="flex flex-col space-y-2 px-6 pb-4 font-medium">
             {navLinks.map((link) => (
               <li key={link.href}>
