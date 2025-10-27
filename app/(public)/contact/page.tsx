@@ -1,9 +1,11 @@
 "use client";
 export const dynamic = "force-dynamic";
+
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { getUserRole } from "@/lib/auth";
+import Image from "next/image";
 
 interface ContactData {
   title: string;
@@ -36,7 +38,6 @@ export default function ContactPage() {
   const [role, setRole] = useState<string | null>(null);
   const [status, setStatus] = useState("");
 
-  // 🔹 Load Firestore data
   useEffect(() => {
     const fetchData = async () => {
       const role = await getUserRole();
@@ -46,12 +47,11 @@ export default function ContactPage() {
       const snap = await getDoc(docRef);
 
       if (snap.exists()) setContent(snap.data() as ContactData);
-      else await setDoc(docRef, content); // ✅ Create if missing
+      else await setDoc(docRef, content);
     };
     fetchData();
   }, []);
 
-  // 🔹 Save or create
   const handleSave = async () => {
     const docRef = doc(db, "pages", "contact");
     try {
@@ -66,37 +66,60 @@ export default function ContactPage() {
     setTimeout(() => setStatus(""), 3000);
   };
 
-  // 🔹 WhatsApp link
   const openWhatsApp = () => {
     const phoneClean = content.phone.replace(/[^0-9+]/g, "");
     window.open(`https://wa.me/${phoneClean}`, "_blank");
   };
 
   return (
-    <section className="bg-[#111] text-white min-h-screen py-12 px-6">
-      <div className="max-w-6xl mx-auto">
+    <main className="bg-white text-gray-800 min-h-screen">
+      {/* ---------- HERO SECTION ---------- */}
+      <section className="relative w-full h-[45vh] min-h-[420px]">
+        <Image
+          src="/images/hero-contact.jpg" // 👉 pune aici imaginea ta (ex: assets/hero-contact.jpg)
+          alt="Contact Car Market"
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
+            Get in Touch with Us
+          </h1>
+          <p className="mt-3 text-gray-700 max-w-xl mx-auto">
+            Have questions about a car, financing, or selling your vehicle?
+            We’re happy to help.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- CONTACT CONTENT ---------- */}
+      <section className="py-16 px-6 md:px-8 max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-10">
           {isEditing ? (
             <input
               type="text"
               value={content.title}
-              onChange={(e) => setContent({ ...content, title: e.target.value })}
-              className="text-4xl font-bold bg-transparent border-b border-gray-500 focus:outline-none"
+              onChange={(e) =>
+                setContent({ ...content, title: e.target.value })
+              }
+              className="text-4xl font-bold border-b border-gray-300 focus:outline-none"
             />
           ) : (
-            <h1 className="text-4xl font-extrabold uppercase tracking-wide">
+            <h2 className="text-4xl font-extrabold text-gray-900">
               {content.title}
-            </h1>
+            </h2>
           )}
 
           {role === "superadmin" && (
             <button
               onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-              className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition ${
                 isEditing
                   ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-gray-700 hover:bg-gray-600"
+                  : "bg-gray-100 hover:bg-gray-200 text-gray-700"
               }`}
             >
               {isEditing ? "💾 Save Changes" : "✏️ Edit Page"}
@@ -104,40 +127,49 @@ export default function ContactPage() {
           )}
         </div>
 
-        {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Left column */}
+        {/* Grid layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+          {/* LEFT column */}
           <div>
             {isEditing ? (
               <textarea
                 value={content.intro}
-                onChange={(e) => setContent({ ...content, intro: e.target.value })}
-                className="w-full bg-transparent border border-gray-500 rounded-lg p-3 text-gray-200 mb-8 h-40 resize-none"
+                onChange={(e) =>
+                  setContent({ ...content, intro: e.target.value })
+                }
+                className="w-full border border-gray-300 rounded-lg p-3 mb-6 h-40 resize-none"
               />
             ) : (
-              <p className="text-gray-300 mb-8 leading-relaxed">{content.intro}</p>
+              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                {content.intro}
+              </p>
             )}
 
-            {/* Address */}
-            <div className="space-y-3 text-sm">
+            {/* INFO blocks */}
+            <div className="space-y-6">
+              {/* Address */}
               <div>
-                <h3 className="font-bold text-white uppercase mb-1">Location</h3>
+                <h3 className="font-semibold text-gray-900 uppercase text-sm mb-1">
+                  Location
+                </h3>
                 {isEditing ? (
                   <input
                     value={content.address}
                     onChange={(e) =>
                       setContent({ ...content, address: e.target.value })
                     }
-                    className="w-full bg-transparent border border-gray-600 rounded p-2 text-gray-200"
+                    className="w-full border border-gray-300 rounded p-2"
                   />
                 ) : (
                   <p>{content.address}</p>
                 )}
               </div>
 
-              {/* Contact */}
+              {/* Contact Info */}
               <div>
-                <h3 className="font-bold uppercase mb-1">How to Reach Us</h3>
+                <h3 className="font-semibold text-gray-900 uppercase text-sm mb-1">
+                  How to Reach Us
+                </h3>
                 {isEditing ? (
                   <>
                     <input
@@ -145,41 +177,49 @@ export default function ContactPage() {
                       onChange={(e) =>
                         setContent({ ...content, phone: e.target.value })
                       }
-                      className="w-full bg-transparent border border-gray-600 rounded p-2 mb-2 text-gray-200"
+                      className="w-full border border-gray-300 rounded p-2 mb-2"
                     />
                     <input
                       value={content.email}
                       onChange={(e) =>
                         setContent({ ...content, email: e.target.value })
                       }
-                      className="w-full bg-transparent border border-gray-600 rounded p-2 text-gray-200"
+                      className="w-full border border-gray-300 rounded p-2"
                     />
                   </>
                 ) : (
                   <>
-                    <p>{content.phone}</p>
-                    <p>{content.email}</p>
+                    <p className="font-medium">{content.phone}</p>
+                    <p className="text-blue-600">{content.email}</p>
                   </>
                 )}
               </div>
 
               {/* Hours */}
               <div>
-                <h3 className="font-bold uppercase mb-2">Hours</h3>
-                <div className="border-t border-gray-700 divide-y divide-gray-700">
+                <h3 className="font-semibold text-gray-900 uppercase text-sm mb-2">
+                  Hours
+                </h3>
+                <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
                   {Object.entries(content.hours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between py-2">
-                      <span className="font-semibold">{day}:</span>
+                    <div
+                      key={day}
+                      className="flex justify-between py-2 px-3 text-sm"
+                    >
+                      <span className="font-medium">{day}</span>
                       {isEditing ? (
                         <input
                           value={hours}
                           onChange={(e) =>
                             setContent({
                               ...content,
-                              hours: { ...content.hours, [day]: e.target.value },
+                              hours: {
+                                ...content.hours,
+                                [day]: e.target.value,
+                              },
                             })
                           }
-                          className="bg-transparent border border-gray-600 rounded px-2 text-gray-200"
+                          className="border border-gray-300 rounded px-2"
                         />
                       ) : (
                         <span>{hours}</span>
@@ -194,22 +234,22 @@ export default function ContactPage() {
             {!isEditing && (
               <button
                 onClick={openWhatsApp}
-                className="mt-6 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-full font-semibold transition"
+                className="mt-8 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-full text-white font-semibold transition"
               >
-                CONTACT US
+                Contact Us
               </button>
             )}
           </div>
 
-          {/* Map */}
-          <div className="rounded-xl overflow-hidden border-4 border-red-600">
+          {/* RIGHT column: Map */}
+          <div className="rounded-xl overflow-hidden shadow-lg border border-gray-200">
             {isEditing ? (
               <textarea
                 value={content.mapEmbed}
                 onChange={(e) =>
                   setContent({ ...content, mapEmbed: e.target.value })
                 }
-                className="w-full h-64 bg-black text-gray-300 p-2 border border-gray-600 rounded-lg"
+                className="w-full h-64 border border-gray-300 p-2 rounded-lg"
               />
             ) : (
               <iframe
@@ -224,10 +264,13 @@ export default function ContactPage() {
           </div>
         </div>
 
+        {/* Status Message */}
         {status && (
-          <p className="mt-6 text-green-400 font-medium text-center">{status}</p>
+          <p className="mt-6 text-green-600 font-medium text-center">
+            {status}
+          </p>
         )}
-      </div>
-    </section>
+      </section>
+    </main>
   );
 }
