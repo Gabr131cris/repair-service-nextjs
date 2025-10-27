@@ -13,6 +13,7 @@ import {
   LogOut,
   Search,
   ListOrdered,
+  BadgeInfo,
 } from "lucide-react";
 import { logoutUser, getUserRole } from "@/lib/auth";
 
@@ -55,6 +56,7 @@ export default function Sidebar() {
           { href: "/dashboard/superadmin/stats", label: "Analytics", icon: <BarChart2 size={18} /> },
           { href: "/dashboard/superadmin/schema-builder", label: "Schema Builder", icon: <ListOrdered size={18} /> },
           { href: "/dashboard/superadmin/schema-order", label: "Section Order", icon: <ListOrdered size={18} /> },
+          { href: "/dashboard/superadmin/site-settings", label: "Info Company", icon: <BadgeInfo size={18} /> },
         ]
       : [];
 
