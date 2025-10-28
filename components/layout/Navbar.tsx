@@ -41,8 +41,10 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/listings", label: "Listings" },
     { href: "/finance", label: "Finance" },
+    { href: "/shipping", label: "Shipping" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
+    
   ];
 
   return (
