@@ -53,9 +53,11 @@ export default function Sidebar() {
   const superLinks =
     role === "superadmin"
       ? [
+        { href: "/dashboard/superadmin/create-user", label: "Add new User", icon: <Users size={18} /> },
           { href: "/dashboard/superadmin/stats", label: "Analytics", icon: <BarChart2 size={18} /> },
           { href: "/dashboard/superadmin/schema-builder", label: "Schema Builder", icon: <ListOrdered size={18} /> },
           { href: "/dashboard/superadmin/schema-order", label: "Section Order", icon: <ListOrdered size={18} /> },
+          
           { href: "/dashboard/tools/webp-converter", label: "Convertor WEBP", icon: <ListOrdered size={18} /> },
           { href: "/dashboard/superadmin/site-settings", label: "Info Company", icon: <BadgeInfo size={18} /> },
         ]

@@ -41,6 +41,10 @@ export default function WebPConverterPage() {
       <p className="text-gray-600 mb-6">
         This tool scans <code>/public/uploads/pages/</code>, converts all images
         to <b>.webp</b>, deletes originals, and updates Firestore paths.
+<br></br>
+        !!! Warning: This action is irreversible!
+<br></br>
+        <b>!!! Only if images are found in a format other than webp !!!</b>
       </p>
 
       <button
