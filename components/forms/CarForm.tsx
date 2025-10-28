@@ -44,16 +44,26 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
   }, []);
 
   // ✅ Încarcă schema din Firestore
-  useEffect(() => {
-    const fetchSchema = async () => {
+  // ✅ Încarcă schema din Firestore (doar după ce db este inițializat)
+useEffect(() => {
+  if (!db) return; // 🧱 Evită rularea până când db e gata
+
+  const fetchSchema = async () => {
+    try {
       const querySnapshot = await getDocs(collection(db, "car_schemas"));
       const sections = querySnapshot.docs.map((doc) => doc.data()) as Section[];
       const sorted = sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       setSchema(sorted);
+    } catch (error) {
+      console.error("Eroare la fetch schema:", error);
+    } finally {
       setLoading(false);
-    };
-    fetchSchema();
-  }, []);
+    }
+  };
+
+  fetchSchema();
+}, [db]); // <— rulează doar când db e setat
+
 
   // ✅ Setează date inițiale în mod editare
   useEffect(() => {
