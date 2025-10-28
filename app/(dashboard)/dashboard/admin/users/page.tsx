@@ -102,7 +102,7 @@ export default function AdminUsersPage() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Shield className="text-blue-600" size={24} />
-          Gestionare Utilizatoriiiiii
+          Gestionare Utilizatoriiiiiiiii
         </h1>
         <Link
           href="/dashboard/superadmin/create-user"
