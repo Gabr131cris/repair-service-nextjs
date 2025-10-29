@@ -31,7 +31,6 @@ export default function UserCarsPage() {
 
   useEffect(() => {
     (async () => {
-      // 🟢 Aici inițializezi corect Firebase Auth și Firestore
       const auth = await getFirebaseAuth();
       const db = getDb();
 
@@ -51,7 +50,6 @@ export default function UserCarsPage() {
     })();
   }, []);
 
-  // 🔹 Ștergere anunț
   const handleDelete = async (carId: string) => {
     if (!confirm("Sigur vrei să ștergi acest anunț?")) return;
 
@@ -96,7 +94,6 @@ export default function UserCarsPage() {
               car?.images?.exterior?.[0] ||
               "/images/placeholder-car.jpg";
 
-            // 🔹 Extragem valorile din schemaData
             const title =
               findValue(car.schemaData, "Title") ||
               findValue(car.schemaData, "Titlu") ||
@@ -117,31 +114,17 @@ export default function UserCarsPage() {
               findValue(car.schemaData, "An fabricație") ||
               undefined;
 
-            const location =
-              findValue(car.schemaData, "Location") ||
-              findValue(car.schemaData, "Locație") ||
-              undefined;
-
-            // 🔍 Debug
-            console.groupCollapsed(`[DashboardCard] ${car.id}`);
-            console.log("Title:", title);
-            console.log("Price:", price);
-            console.log("Mileage:", mileage);
-            console.log("Year:", year);
-            console.log("Location:", location);
-            console.groupEnd();
-
             return (
               <div
                 key={car.id}
                 className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white hover:shadow-lg transition relative"
               >
                 {/* Imagine mașină */}
-                <div className="relative w-full h-48 bg-gray-100">
+                <div className="relative w-full aspect-[4/3] overflow-hidden bg-gray-100">
                   <img
                     src={mainImage}
                     alt={title}
-                    className="object-cover w-full h-full"
+                    className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                   />
                   <span
                     className={`absolute top-2 left-2 px-2 py-1 text-xs font-bold text-white rounded ${
@@ -157,46 +140,47 @@ export default function UserCarsPage() {
                 </div>
 
                 {/* Conținut card */}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold truncate mb-1">{title}</h3>
-                  <p className="text-sm text-gray-500 mb-2">
-                    {year || "N/A"} • {mileage ? `${mileage} km` : "—"}
-                  </p>
-                  <p className="text-blue-600 font-bold text-lg mb-3">
-                    {price ? `${price} €` : "—"}
-                  </p>
+                <div className="p-4 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold truncate mb-1">{title}</h3>
+                    <p className="text-sm text-gray-500 mb-2">
+                      {year || "N/A"} • {mileage ? `${mileage} km` : "—"}
+                    </p>
+                    <p className="text-blue-600 font-bold text-lg mb-3">
+                      {price ? `${price} €` : "—"}
+                    </p>
+                  </div>
 
-                  <div className="flex justify-between items-center">
-  <div className="flex items-center gap-3">
-    <Link
-      href={`/listings/${car.id}`}
-      className="flex items-center gap-1 text-blue-600 hover:underline"
-    >
-      <Eye size={16} /> Vezi
-    </Link>
+                  <div className="flex justify-between items-center mt-3">
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/listings/${car.id}`}
+                        className="flex items-center gap-1 text-blue-600 hover:underline"
+                      >
+                        <Eye size={16} /> Vezi
+                      </Link>
 
-    <Link
-      href={`/dashboard/cars/edit/${car.id}`}
-      className="flex items-center gap-1 text-green-600 hover:underline"
-    >
-      ✏️ Editează
-    </Link>
-  </div>
+                      <Link
+                        href={`/dashboard/cars/edit/${car.id}`}
+                        className="flex items-center gap-1 text-green-600 hover:underline"
+                      >
+                        ✏️ Editează
+                      </Link>
+                    </div>
 
-  <button
-    onClick={() => handleDelete(car.id)}
-    disabled={deleting === car.id}
-    className={`flex items-center gap-1 px-3 py-1 rounded text-sm transition ${
-      deleting === car.id
-        ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-        : "bg-red-100 text-red-600 hover:bg-red-200"
-    }`}
-  >
-    <Trash2 size={16} />
-    {deleting === car.id ? "Ștergere..." : "Șterge"}
-  </button>
-</div>
-
+                    <button
+                      onClick={() => handleDelete(car.id)}
+                      disabled={deleting === car.id}
+                      className={`flex items-center gap-1 px-3 py-1 rounded text-sm transition ${
+                        deleting === car.id
+                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          : "bg-red-100 text-red-600 hover:bg-red-200"
+                      }`}
+                    >
+                      <Trash2 size={16} />
+                      {deleting === car.id ? "Ștergere..." : "Șterge"}
+                    </button>
+                  </div>
                 </div>
               </div>
             );

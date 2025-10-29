@@ -14,12 +14,13 @@ import {
   Trash2,
   Save,
   GripVertical,
-  ImageIcon,
 } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 type FieldType = "text" | "number" | "list" | "icon-value" | "richtext";
-type SectionType = "custom" | "list" | "richtext" | "images";
+
+// 🔹 Adăugăm noul tip de secțiune "youtube"
+type SectionType = "custom" | "list" | "richtext" | "images" | "youtube";
 
 interface Field {
   id?: string;
@@ -258,6 +259,8 @@ export default function SchemaBuilderPage() {
                           <option value="list">List (Highlights)</option>
                           <option value="richtext">Rich Text (Description)</option>
                           <option value="images">Image Gallery</option>
+                          {/* 🔹 Nou tip de secțiune */}
+                          <option value="youtube">YouTube Links</option>
                         </select>
                       </div>
 
@@ -368,11 +371,20 @@ export default function SchemaBuilderPage() {
                         </Droppable>
                       )}
 
-                      {section.type !== "custom" && section.type !== "images" && (
-                        <p className="text-gray-500 text-sm italic">
-                          This section type does not use specific fields.
+                      {/* 🔹 YouTube section info */}
+                      {section.type === "youtube" && (
+                        <p className="text-sm text-gray-600 italic">
+                          This section will allow adding YouTube links in the car form.
                         </p>
                       )}
+
+                      {section.type !== "custom" &&
+                        section.type !== "images" &&
+                        section.type !== "youtube" && (
+                          <p className="text-gray-500 text-sm italic">
+                            This section type does not use specific fields.
+                          </p>
+                        )}
                     </div>
                   )}
                 </Draggable>

@@ -16,7 +16,7 @@ interface Field {
 
 interface Section {
   title: string;
-  type: "custom" | "list" | "richtext" | "images";
+  type: "custom" | "list" | "richtext" | "images" | "youtube"; // 🔹 adăugăm youtube
   fields?: Field[];
 }
 
@@ -43,27 +43,25 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     })();
   }, []);
 
-  // ✅ Încarcă schema din Firestore
   // ✅ Încarcă schema din Firestore (doar după ce db este inițializat)
-useEffect(() => {
-  if (!db) return; // 🧱 Evită rularea până când db e gata
+  useEffect(() => {
+    if (!db) return;
 
-  const fetchSchema = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, "car_schemas"));
-      const sections = querySnapshot.docs.map((doc) => doc.data()) as Section[];
-      const sorted = sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-      setSchema(sorted);
-    } catch (error) {
-      console.error("Eroare la fetch schema:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchSchema = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "car_schemas"));
+        const sections = querySnapshot.docs.map((doc) => doc.data()) as Section[];
+        const sorted = sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        setSchema(sorted);
+      } catch (error) {
+        console.error("Eroare la fetch schema:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchSchema();
-}, [db]); // <— rulează doar când db e setat
-
+    fetchSchema();
+  }, [db]);
 
   // ✅ Setează date inițiale în mod editare
   useEffect(() => {
@@ -259,6 +257,20 @@ useEffect(() => {
               </div>
             </div>
           )}
+
+          {/* 🔹 YouTube Section */}
+          {section.type === "youtube" && (
+            <YouTubeLinksSection
+              section={section}
+              initialLinks={formData[section.title]?.links || []}
+              onChange={(links) =>
+                setFormData((prev: any) => ({
+                  ...prev,
+                  [section.title]: { links },
+                }))
+              }
+            />
+          )}
         </div>
       ))}
 
@@ -282,9 +294,7 @@ function ListSection({
   onChange: (list: string[]) => void;
   initialItems?: string[];
 }) {
-  //const [items, setItems] = useState<string[]>(initialItems);
   const [items, setItems] = useState<string[]>(Array.isArray(initialItems) ? initialItems : []);
-
 
   const addItem = () => setItems([...items, ""]);
   const removeItem = (index: number) => {
@@ -325,6 +335,64 @@ function ListSection({
         className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
       >
         <Plus size={16} /> Adaugă element
+      </button>
+    </div>
+  );
+}
+
+// 🧩 YouTube Links Section
+function YouTubeLinksSection({
+  section,
+  onChange,
+  initialLinks = [],
+}: {
+  section: Section;
+  onChange: (links: string[]) => void;
+  initialLinks?: string[];
+}) {
+  const [links, setLinks] = useState<string[]>(Array.isArray(initialLinks) ? initialLinks : []);
+
+  const addLink = () => setLinks([...links, ""]);
+  const removeLink = (index: number) => {
+    const updated = links.filter((_, i) => i !== index);
+    setLinks(updated);
+    onChange(updated);
+  };
+  const updateLink = (index: number, value: string) => {
+    const updated = [...links];
+    updated[index] = value;
+    setLinks(updated);
+    onChange(updated);
+  };
+
+  return (
+    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <p className="text-sm text-gray-600 mb-2">
+        Adaugă linkuri YouTube pentru <b>{section.title}</b>:
+      </p>
+      {links.map((link, i) => (
+        <div key={i} className="flex items-center gap-2 mb-2">
+          <input
+            value={link}
+            onChange={(e) => updateLink(i, e.target.value)}
+            placeholder="https://www.youtube.com/watch?v=..."
+            className="flex-1 border rounded-lg p-2"
+          />
+          <button
+            type="button"
+            onClick={() => removeLink(i)}
+            className="text-red-500 hover:text-red-700"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={addLink}
+        className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+      >
+        <Plus size={16} /> Adaugă link
       </button>
     </div>
   );
