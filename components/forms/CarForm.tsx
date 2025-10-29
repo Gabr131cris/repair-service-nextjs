@@ -50,7 +50,9 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     const fetchSchema = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "car_schemas"));
-        const sections = querySnapshot.docs.map((doc) => doc.data()) as Section[];
+        const sections = querySnapshot.docs.map((doc) =>
+          doc.data()
+        ) as Section[];
         const sorted = sections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         setSchema(sorted);
       } catch (error) {
@@ -71,7 +73,11 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
   }, [initialData]);
 
   // 🔹 Gestionare inputuri dinamice
-  const handleChange = (sectionTitle: string, fieldName: string, value: any) => {
+  const handleChange = (
+    sectionTitle: string,
+    fieldName: string,
+    value: any
+  ) => {
     setFormData((prev: any) => ({
       ...prev,
       [sectionTitle]: {
@@ -82,7 +88,10 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
   };
 
   // 🔹 Upload imagini
-  const handleImageUpload = async (sectionTitle: string, files: FileList | null) => {
+  const handleImageUpload = async (
+    sectionTitle: string,
+    files: FileList | null
+  ) => {
     if (!files) return;
     const uploaded: any[] = [];
 
@@ -101,7 +110,10 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       formDataUpload.append("carId", carId);
       formDataUpload.append("section", sectionTitle);
 
-      const res = await fetch("/api/upload", { method: "POST", body: formDataUpload });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
       const data = await res.json();
 
       if (data.url) uploaded.push({ name: file.name, src: data.url });
@@ -122,7 +134,9 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       ...prev,
       [sectionTitle]: {
         ...prev[sectionTitle],
-        images: prev[sectionTitle].images.filter((_: any, i: number) => i !== index),
+        images: prev[sectionTitle].images.filter(
+          (_: any, i: number) => i !== index
+        ),
       },
     }));
   };
@@ -152,7 +166,8 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     router.push("/dashboard/cars");
   };
 
-  if (loading) return <p className="text-center mt-6">Se încarcă formularul...</p>;
+  if (loading)
+    return <p className="text-center mt-6">Se încarcă formularul...</p>;
 
   return (
     <form
@@ -228,7 +243,9 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
                 type="file"
                 multiple
                 accept="image/*"
-                onChange={(e) => handleImageUpload(section.title, e.target.files)}
+                onChange={(e) =>
+                  handleImageUpload(section.title, e.target.files)
+                }
                 className="mb-4"
               />
 
@@ -261,16 +278,19 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
           {/* 🔹 YouTube Section */}
           {section.type === "youtube" && (
             <YouTubeLinksSection
-  section={section}
-  initialLinks={Array.isArray(formData[section.title]) ? formData[section.title] : []}
-  onChange={(links) =>
-    setFormData((prev: any) => ({
-      ...prev,
-      [section.title]: links, // ✅ salvează direct array, fără "links"
-    }))
-  }
-/>
-
+              section={section}
+              initialLinks={
+                Array.isArray(formData[section.title])
+                  ? formData[section.title]
+                  : []
+              }
+              onChange={(links) =>
+                setFormData((prev: any) => ({
+                  ...prev,
+                  [section.title]: links, // ✅ salvează direct array, fără "links"
+                }))
+              }
+            />
           )}
         </div>
       ))}
@@ -295,7 +315,9 @@ function ListSection({
   onChange: (list: string[]) => void;
   initialItems?: string[];
 }) {
-  const [items, setItems] = useState<string[]>(Array.isArray(initialItems) ? initialItems : []);
+  const [items, setItems] = useState<string[]>(
+    Array.isArray(initialItems) ? initialItems : []
+  );
 
   const addItem = () => setItems([...items, ""]);
   const removeItem = (index: number) => {
@@ -312,7 +334,9 @@ function ListSection({
 
   return (
     <div>
-      <p className="text-sm text-gray-600 mb-2">Adaugă specificații sau avantaje:</p>
+      <p className="text-sm text-gray-600 mb-2">
+        Adaugă specificații sau avantaje:
+      </p>
       {items.map((item, i) => (
         <div key={i} className="flex items-center gap-2 mb-2">
           <input
@@ -351,7 +375,9 @@ function YouTubeLinksSection({
   onChange: (links: string[]) => void;
   initialLinks?: string[];
 }) {
-  const [links, setLinks] = useState<string[]>(Array.isArray(initialLinks) ? initialLinks : []);
+  const [links, setLinks] = useState<string[]>(
+    Array.isArray(initialLinks) ? initialLinks : []
+  );
 
   const addLink = () => setLinks([...links, ""]);
   const removeLink = (index: number) => {
