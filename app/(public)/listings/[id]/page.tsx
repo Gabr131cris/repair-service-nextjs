@@ -110,6 +110,7 @@ export default function CarDetailsPage() {
 }
 
 /* 🧩 Component that applies schema_order from Firestore */
+/* 🧩 Component that applies schema_order from Firestore */
 function DynamicSections({ schemaData }: { schemaData: any }) {
   const [schemaOrder, setSchemaOrder] = useState<
     { name: string; active: boolean }[] | null
@@ -139,19 +140,17 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
       </p>
     );
 
-  // 🔹 Extract only active sections, in defined order
+  // 🔹 Extrage doar secțiunile active și adaugă fallback pentru cele noi
   const orderedSections = schemaOrder
     .filter((s) => s.active)
     .map((s) => s.name)
     .filter((name) => !!schemaData[name]);
 
-  // 🔹 Add fallback for completely new sections
   const definedNames = schemaOrder.map((s) => s.name.toLowerCase());
   const remaining = Object.keys(schemaData).filter(
     (key) => !definedNames.includes(key.toLowerCase())
   );
 
-  // 🔹 Remove duplicates (case-insensitive)
   const finalSections = Array.from(
     new Map(
       [...orderedSections, ...remaining].map((name) => [
@@ -160,6 +159,62 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
       ])
     ).values()
   );
+
+  // ✅ Funcție robustă pentru extragerea ID-ului YouTube din orice format
+  const renderYouTubeEmbed = (url: string) => {
+    try {
+      const cleanUrl = url.trim();
+
+      // regex robust care prinde toate formele
+      const videoIdMatch = cleanUrl.match(
+        /(?:v=|\/embed\/|\/shorts\/|youtu\.be\/)([A-Za-z0-9_-]{11})/
+      );
+      const videoId = videoIdMatch ? videoIdMatch[1] : null;
+
+      // 🧩 DEBUG: vezi exact ce link e procesat și ce ID s-a extras
+      console.log(
+        "%c🎬 YouTube debug",
+        "background: #222; color: #4af; font-weight: bold; padding: 2px 6px; border-radius: 4px;",
+        "\nURL:", cleanUrl,
+        "\nVideo ID:", videoId
+      );
+
+      if (!videoId) {
+        console.warn("⚠️ Nu s-a putut extrage ID YouTube din:", url);
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {url}
+          </a>
+        );
+      }
+
+      return (
+        <div className="mt-4 mb-6 aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-200">
+          <iframe
+            className="w-full h-full"
+            src={`https://www.youtube.com/embed/${videoId}`}
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          ></iframe>
+        </div>
+      );
+    } catch (err) {
+      console.error("❌ Invalid YouTube link:", url, err);
+      return null;
+    }
+  };
+
+  // 🔹 Detectează dacă un string e un link YouTube
+  const isYouTubeLink = (value: any): value is string =>
+    typeof value === "string" &&
+    (value.includes("youtube.com") || value.includes("youtu.be"));
 
   return (
     <>
@@ -181,21 +236,29 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
               {section}
             </h2>
 
+            {/* 🔹 Liste simple */}
             {isArray && (
               <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-gray-800 text-[15px] leading-relaxed">
                 {data.length > 0 ? (
-                  data.map((item: string, i: number) => (
-                    <li key={i} className="flex items-start gap-2">
-                      <span className="text-blue-600 mt-[6px]">•</span>
-                      <span>{item}</span>
-                    </li>
-                  ))
+                  data.map((item: string, i: number) =>
+                    isYouTubeLink(item) ? (
+                      <li key={i} className="col-span-2">
+                        {renderYouTubeEmbed(item)}
+                      </li>
+                    ) : (
+                      <li key={i} className="flex items-start gap-2">
+                        <span className="text-blue-600 mt-[6px]">•</span>
+                        <span>{item}</span>
+                      </li>
+                    )
+                  )
                 ) : (
                   <li className="text-gray-400 italic">No data available</li>
                 )}
               </ul>
             )}
 
+            {/* 🔹 Obiecte structurate */}
             {isObject && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
@@ -210,12 +273,20 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                       ].includes(fieldName)
                     )
                       return null;
-                    if (
-                      fieldValue === undefined ||
-                      fieldValue === null ||
-                      fieldValue === ""
-                    )
-                      return null;
+
+                    if (!fieldValue) return null;
+
+                    // 🔹 Dacă e un link YouTube, afișează player
+                    if (isYouTubeLink(fieldValue)) {
+                      return (
+                        <div key={fieldName} className="col-span-3 w-full">
+                          <span className="block text-xs font-semibold uppercase text-gray-500 tracking-wide mb-2">
+                            {fieldName.replace(/_/g, " ")}
+                          </span>
+                          {renderYouTubeEmbed(fieldValue)}
+                        </div>
+                      );
+                    }
 
                     const displayValue = Array.isArray(fieldValue)
                       ? fieldValue.join(", ")
@@ -237,6 +308,7 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                   })}
                 </div>
 
+                {/* 🔹 Content + imagini */}
                 {data.content && (
                   <div className="text-gray-700 leading-relaxed whitespace-pre-wrap text-[15px]">
                     {data.content}
@@ -270,3 +342,4 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
     </>
   );
 }
+

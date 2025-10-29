@@ -261,15 +261,16 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
           {/* 🔹 YouTube Section */}
           {section.type === "youtube" && (
             <YouTubeLinksSection
-              section={section}
-              initialLinks={formData[section.title]?.links || []}
-              onChange={(links) =>
-                setFormData((prev: any) => ({
-                  ...prev,
-                  [section.title]: { links },
-                }))
-              }
-            />
+  section={section}
+  initialLinks={Array.isArray(formData[section.title]) ? formData[section.title] : []}
+  onChange={(links) =>
+    setFormData((prev: any) => ({
+      ...prev,
+      [section.title]: links, // ✅ salvează direct array, fără "links"
+    }))
+  }
+/>
+
           )}
         </div>
       ))}
