@@ -1,6 +1,6 @@
 "use client";
-// Componenta galerie auto single product
-import { useState } from "react";
+
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import CarLightbox from "./CarLightbox";
 
@@ -9,18 +9,47 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // ✅ Extragem toate categoriile cu imagini din schemaData
+  // ✅ Extragem toate categoriile care au imagini
   const categories = Object.keys(schemaData || {}).filter(
     (key) => schemaData[key]?.images?.length > 0
   );
 
-  // ✅ Construim o listă totală cu toate imaginile
-  const allImages = categories.flatMap((cat) =>
-    schemaData[cat].images.map((img: any) => ({
-      src: img.src,
-      category: cat,
-    }))
-  );
+  // ✅ Funcție de sortare alfabetică / numerică pentru fișiere
+  const sortImages = (images: any[]) =>
+    [...images].sort((a, b) => {
+      const aName = a.name?.toLowerCase() || "";
+      const bName = b.name?.toLowerCase() || "";
+      const aNum = parseInt(aName);
+      const bNum = parseInt(bName);
+      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+      return aName.localeCompare(bName, undefined, { numeric: true });
+    });
+
+  // ✅ Construim lista completă de imagini (sortate)
+  const allImages = useMemo(() => {
+    // Sortăm fiecare categorie individual
+    const sortedByCategory = categories.flatMap((cat) =>
+      sortImages(schemaData[cat].images).map((img: any) => ({
+        ...img,
+        category: cat,
+      }))
+    );
+
+    // 🔹 Căutăm prima imagine din secțiunea "Exterior"
+    const exteriorIndex = sortedByCategory.findIndex(
+      (img) => img.category.toLowerCase() === "exterior"
+    );
+
+    // Dacă există imagini la Exterior, o punem prima
+    if (exteriorIndex > -1) {
+      const featured = sortedByCategory[exteriorIndex];
+      const rest = sortedByCategory.filter((_, i) => i !== exteriorIndex);
+      return [featured, ...rest];
+    }
+
+    // Altfel, returnăm lista normală
+    return sortedByCategory;
+  }, [schemaData, categories]);
 
   const openLightbox = (index: number, category = "All") => {
     setActiveCategory(category);
@@ -30,7 +59,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 w-full mb-8">
-      {/* Imagine principală */}
+      {/* 🔹 Imagine principală (mereu prima din Exterior dacă există) */}
       <div className="lg:col-span-4 relative bg-gray-100 rounded-lg overflow-hidden">
         <Image
           src={allImages[0]?.src || "/images/placeholder-car.jpg"}
@@ -38,13 +67,17 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
           fill
           className="object-cover cursor-pointer"
           onClick={() => openLightbox(0)}
+          priority
         />
         <span className="absolute top-3 left-3 bg-gray-900/70 text-white text-xs px-2 py-1 rounded">
           FEATURED
+          {allImages[0]?.category
+            ? ` (${allImages[0].category})`
+            : ""}
         </span>
       </div>
 
-      {/* Thumbnails */}
+      {/* 🔹 Thumbnails */}
       <div className="lg:col-span-1 grid grid-cols-2 lg:grid-cols-1 gap-2">
         {allImages.slice(1, 6).map((img, i) => (
           <div
@@ -67,7 +100,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
           </div>
         ))}
 
-        {/* Buton All Photos */}
+        {/* 🔹 Buton pentru toate pozele */}
         <div
           onClick={() => setIsOpen(true)}
           className="relative h-[100px] md:h-[120px] bg-gray-800 text-white flex items-center justify-center rounded-lg cursor-pointer hover:bg-gray-700 transition"
@@ -76,7 +109,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* 🔹 Lightbox */}
       {isOpen && (
         <CarLightbox
           images={allImages}

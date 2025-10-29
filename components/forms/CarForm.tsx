@@ -88,11 +88,28 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
   };
 
   // 🔹 Upload imagini
+  // 🔹 Upload imagini (păstrează ordinea numerică/alfabetică a numelui fișierului)
   const handleImageUpload = async (
     sectionTitle: string,
     files: FileList | null
   ) => {
     if (!files) return;
+
+    // 🔸 Convertim în array și sortăm alfabetic (1.jpg, 2.jpg, 10.jpg etc)
+    const sortedFiles = Array.from(files).sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+
+      // Dacă numele sunt numerice, sortează numeric (1,2,10)
+      const aNum = parseInt(aName);
+      const bNum = parseInt(bName);
+
+      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+
+      // Altfel sortare alfabetică normală
+      return aName.localeCompare(bName, undefined, { numeric: true });
+    });
+
     const uploaded: any[] = [];
 
     const carId = formData.tempId || Date.now().toString();
@@ -104,7 +121,8 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       }));
     }
 
-    for (const file of Array.from(files)) {
+    // 🔹 Urcăm fișierele în ordinea sortată
+    for (const file of sortedFiles) {
       const formDataUpload = new FormData();
       formDataUpload.append("file", file);
       formDataUpload.append("carId", carId);
@@ -116,9 +134,14 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       });
       const data = await res.json();
 
-      if (data.url) uploaded.push({ name: file.name, src: data.url });
+      if (data.url)
+        uploaded.push({
+          name: file.name,
+          src: data.url,
+        });
     }
 
+    // 🔹 Le adăugăm la formData în ordinea corectă
     setFormData((prev: any) => ({
       ...prev,
       [sectionTitle]: {
@@ -126,6 +149,11 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
         images: [...((prev[sectionTitle]?.images as any[]) || []), ...uploaded],
       },
     }));
+
+    console.log(
+      "✅ Upload complete:",
+      uploaded.map((f) => f.name)
+    );
   };
 
   // 🔹 Șterge imagine locală

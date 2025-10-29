@@ -32,17 +32,31 @@ export default function SchemaOrderPage() {
           .map((doc) => doc.data()?.title)
           .filter((title): title is string => !!title);
 
-        // 🔹 3. Combine Firestore sections with saved order
+        // 🔹 3. Combine Firestore sections with saved order (preserve order!)
         let combined: SectionState[] = [];
 
-        firestoreSections.forEach((name) => {
-          const existing = savedSections.find((s) => s.name === name);
-          if (existing) {
-            combined.push(existing);
-          } else {
-            combined.push({ name, active: true }); // default active
+        // ✅ Începem cu ordinea salvată (cea din Firestore)
+        savedSections.forEach((saved) => {
+          if (firestoreSections.includes(saved.name)) {
+            combined.push(saved);
           }
         });
+
+        // ✅ Adaugăm orice secțiune nouă apărută între timp în car_schemas
+        firestoreSections.forEach((name) => {
+          if (!combined.some((s) => s.name === name)) {
+            combined.push({ name, active: true });
+          }
+        });
+
+        // ✅ (opțional) Adaugăm cele vechi care nu mai există în car_schemas, la final
+        savedSections.forEach((old) => {
+          if (!firestoreSections.includes(old.name)) {
+            combined.push(old);
+          }
+        });
+
+        setSections(combined);
 
         // 🔹 4. Add any old sections that no longer exist in car_schemas (optional)
         savedSections.forEach((old) => {
@@ -94,15 +108,19 @@ export default function SchemaOrderPage() {
   };
 
   if (loading) {
-    return <p className="text-center mt-10 text-gray-600">Loading sections...</p>;
+    return (
+      <p className="text-center mt-10 text-gray-600">Loading sections...</p>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8">
-      <h1 className="text-2xl font-semibold mb-4">Reorder & Toggle Schema Sections</h1>
+      <h1 className="text-2xl font-semibold mb-4">
+        Reorder & Toggle Schema Sections
+      </h1>
       <p className="text-gray-600 mb-6">
-        Drag to reorder sections or toggle their visibility. Sections come directly from
-        your <b>car_schemas</b> collection.
+        Drag to reorder sections or toggle their visibility. Sections come
+        directly from your <b>car_schemas</b> collection.
       </p>
 
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">

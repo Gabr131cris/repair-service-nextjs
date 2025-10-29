@@ -50,17 +50,11 @@ export default function CarDetailsPage() {
 
   if (loading)
     return (
-      <p className="text-center mt-6 text-gray-600">
-        Loading car details...
-      </p>
+      <p className="text-center mt-6 text-gray-600">Loading car details...</p>
     );
 
   if (!car)
-    return (
-      <p className="text-center text-red-500 mt-6">
-        Car not found.
-      </p>
-    );
+    return <p className="text-center text-red-500 mt-6">Car not found.</p>;
 
   // 🔹 Extract all values safely
   const title = deepFindValue(car.schemaData, "Title") || "Unknown Title";
@@ -91,7 +85,7 @@ export default function CarDetailsPage() {
         {/* ✅ Price nicely placed top-right */}
         {price && (
           <div className="mt-3 md:mt-0 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-md rounded-2xl px-6 py-3 text-xl font-semibold text-gray-900">
-             <span className="text-blue-700">Price:</span> {price} $
+            <span className="text-blue-700">Price:</span> {price} $
           </div>
         )}
       </div>
@@ -175,8 +169,10 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
       console.log(
         "%c🎬 YouTube debug",
         "background: #222; color: #4af; font-weight: bold; padding: 2px 6px; border-radius: 4px;",
-        "\nURL:", cleanUrl,
-        "\nVideo ID:", videoId
+        "\nURL:",
+        cleanUrl,
+        "\nVideo ID:",
+        videoId
       );
 
       if (!videoId) {
@@ -315,25 +311,67 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                   </div>
                 )}
 
+                {/* 🔹 Imagini — sortate + prima imagine exterior afișată prima */}
                 {data.images &&
                   Array.isArray(data.images) &&
-                  data.images.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
-                      {data.images.map((img: any, i: number) => (
-                        <div
-                          key={i}
-                          className="relative overflow-hidden rounded-xl border border-gray-200 shadow-sm group"
-                        >
-                          <img
-                            src={img.src}
-                            alt={`${section} ${i + 1}`}
-                            className="object-cover w-full h-44 transition-transform duration-300 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  data.images.length > 0 &&
+                  (() => {
+                    // 🔸 Sortează imaginile după nume (alfabetic sau numeric)
+                    const sortedImages = [...data.images].sort((a, b) => {
+                      const aName = a.name?.toLowerCase() || "";
+                      const bName = b.name?.toLowerCase() || "";
+
+                      // dacă numele sunt numerice (ex: "1.jpg", "10.jpg"), sortează numeric
+                      const aNum = parseInt(aName);
+                      const bNum = parseInt(bName);
+                      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+
+                      // altfel sortare alfabetică naturală
+                      return aName.localeCompare(bName, undefined, {
+                        numeric: true,
+                      });
+                    });
+
+                    // 🔸 dacă e secțiunea "Exterior", marchează prima imagine drept featured
+                    const featuredFirst =
+                      section.toLowerCase() === "exterior"
+                        ? [sortedImages[0], ...sortedImages.slice(1)]
+                        : sortedImages;
+
+                    return (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
+                        {featuredFirst.map((img: any, i: number) => (
+                          <div
+                            key={i}
+                            className={`relative overflow-hidden rounded-xl border border-gray-200 shadow-sm group ${
+                              section.toLowerCase() === "exterior" && i === 0
+                                ? "ring-2 ring-blue-500 ring-offset-2"
+                                : ""
+                            }`}
+                          >
+                            <img
+                              src={img.src}
+                              alt={`${section} ${i + 1}`}
+                              className={`object-cover w-full h-44 transition-transform duration-300 group-hover:scale-105 ${
+                                section.toLowerCase() === "exterior" && i === 0
+                                  ? "h-60 md:h-72"
+                                  : ""
+                              }`}
+                              loading="lazy"
+                            />
+
+                            {/* 🔸 Badge vizual opțional */}
+                            {section.toLowerCase() === "exterior" &&
+                              i === 0 && (
+                                <span className="absolute top-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-md shadow">
+                                  Featured
+                                </span>
+                              )}
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
               </>
             )}
           </section>
@@ -342,4 +380,3 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
     </>
   );
 }
-
