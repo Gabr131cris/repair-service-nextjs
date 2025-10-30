@@ -112,7 +112,7 @@ export default function CarCard({ car }: Props) {
   console.log("Main Image:", mainImage);
   console.groupEnd();
 
-  return (return (
+  return (
   <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
     {/* 🖼️ Imagine principală */}
     <Link href={`/listings/${car.id}`} className="block relative w-full h-56 md:h-64 overflow-hidden">
