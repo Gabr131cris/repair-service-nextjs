@@ -264,10 +264,11 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                         {renderYouTubeEmbed(item)}
                       </li>
                     ) : (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-blue-600 mt-[6px]">•</span>
-                        <span>{item}</span>
-                      </li>
+                      <li key={i} className="flex items-center gap-2">
+  <span className="text-blue-600 text-lg leading-none">•</span>
+  <span className="text-[15px]">{item}</span>
+</li>
+
                     )
                   )
                 ) : (
