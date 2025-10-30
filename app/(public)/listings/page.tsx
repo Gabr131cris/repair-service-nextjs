@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getCars } from "@/lib/firestore";
-import Link from "next/link";
 import Image from "next/image";
+import { getCars } from "@/lib/firestore";
 import { Car } from "@/lib/types";
 import CarCard from "@/components/car/CarCard";
-
 import CarFilters from "@/components/filters/CarFilters";
 
 /* ---------- helper ---------- */
@@ -38,38 +36,133 @@ export default function ListingsPage() {
         const data = await getCars();
         setCars(data);
       } catch (e) {
-        console.error("Error loading cars:", e);
+        console.error("❌ Error loading cars:", e);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  /* filtering logic */
-  const filteredCars = cars.filter((car) => {
-    const title =
-      findValue(car.schemaData, "Title") ||
-      findValue(car.schemaData, "Titlu") ||
-      "";
-    const year =
-      findValue(car.schemaData, "Year") ||
-      findValue(car.schemaData, "An fabricație") ||
-      "";
-    const make =
-      findValue(car.schemaData, "Make") ||
-      findValue(car.schemaData, "Marcă") ||
-      "";
+  /* ---------- filtering logic ---------- */
+  const filteredCars = cars
+    .filter((car) => {
+      const title =
+        findValue(car.schemaData, "Title") ||
+        findValue(car.schemaData, "Titlu") ||
+        "";
+      const year =
+        findValue(car.schemaData, "Year") ||
+        findValue(car.schemaData, "An fabricație") ||
+        "";
+      const make =
+        findValue(car.schemaData, "Make") ||
+        findValue(car.schemaData, "Marcă") ||
+        car.make ||
+        "";
+      const model =
+        findValue(car.schemaData, "Model") ||
+        findValue(car.schemaData, "Model") ||
+        car.model ||
+        "";
+      const price =
+        parseFloat(
+          findValue(car.schemaData, "Price") ||
+            findValue(car.schemaData, "Preț") ||
+            car.price ||
+            0
+        ) || 0;
 
-    if (
-      filters.query &&
-      !title.toLowerCase().includes(filters.query.toLowerCase())
-    )
-      return false;
-    if (filters.year && parseInt(year) < parseInt(filters.year)) return false;
-    if (filters.make && make !== filters.make) return false;
-    return true;
-  });
+      // text search
+      if (
+        filters.query &&
+        !(
+          title.toLowerCase().includes(filters.query.toLowerCase()) ||
+          make.toLowerCase().includes(filters.query.toLowerCase()) ||
+          model.toLowerCase().includes(filters.query.toLowerCase())
+        )
+      )
+        return false;
 
+      // year
+      if (filters.year && parseInt(year) < parseInt(filters.year)) return false;
+
+      // make
+      if (filters.make && !make.toLowerCase().includes(filters.make.toLowerCase()))
+        return false;
+
+      // model
+      if (
+        filters.model &&
+        !model.toLowerCase().includes(filters.model.toLowerCase())
+      )
+        return false;
+
+      // price range
+      const min = parseFloat(filters.minPrice) || 0;
+      const max = parseFloat(filters.maxPrice) || Infinity;
+      if (price < min || price > max) return false;
+
+      return true;
+    })
+    .sort((a, b) => {
+      const priceA =
+        parseFloat(
+          findValue(a.schemaData, "Price") ||
+            findValue(a.schemaData, "Preț") ||
+            a.price ||
+            0
+        ) || 0;
+      const priceB =
+        parseFloat(
+          findValue(b.schemaData, "Price") ||
+            findValue(b.schemaData, "Preț") ||
+            b.price ||
+            0
+        ) || 0;
+
+      if (filters.sort === "price_low") return priceA - priceB;
+      if (filters.sort === "price_high") return priceB - priceA;
+
+      if (filters.sort === "newest") {
+        const yearA =
+          parseInt(
+            findValue(a.schemaData, "Year") ||
+              findValue(a.schemaData, "An fabricație") ||
+              a.year ||
+              0
+          ) || 0;
+        const yearB =
+          parseInt(
+            findValue(b.schemaData, "Year") ||
+              findValue(b.schemaData, "An fabricație") ||
+              b.year ||
+              0
+          ) || 0;
+        return yearB - yearA;
+      }
+
+      if (filters.sort === "oldest") {
+        const yearA =
+          parseInt(
+            findValue(a.schemaData, "Year") ||
+              findValue(a.schemaData, "An fabricație") ||
+              a.year ||
+              0
+          ) || 0;
+        const yearB =
+          parseInt(
+            findValue(b.schemaData, "Year") ||
+              findValue(b.schemaData, "An fabricație") ||
+              b.year ||
+              0
+          ) || 0;
+        return yearA - yearB;
+      }
+
+      return 0;
+    });
+
+  /* ---------- pagination ---------- */
   const totalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
   const paginatedCars = filteredCars.slice(
     (page - 1) * ITEMS_PER_PAGE,
