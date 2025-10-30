@@ -130,7 +130,7 @@ export default function HomePage() {
   const visibleCars = cars.filter(
     (car) =>
       car.status &&
-      !["sold", "pending", "rejected"].includes(car.status.toLowerCase())
+      !["sold", "pending", "rejected","draft"].includes(car.status.toLowerCase())
   );
 
   /* ---------- Load data ---------- */

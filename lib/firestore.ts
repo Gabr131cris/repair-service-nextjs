@@ -14,6 +14,10 @@ import {
 } from "firebase/firestore";
 import { Car } from "./types";
 
+/* =========================================================
+   🚗 CRUD: CARS COLLECTION
+   ========================================================= */
+
 // 🔹 Adaugă o mașină nouă
 export async function addCar(car: Car) {
   const carsRef = collection(db, "cars");
@@ -76,4 +80,34 @@ export async function updateCar(id: string, data: Partial<Car>) {
 export async function deleteCar(id: string) {
   const docRef = doc(db, "cars", id);
   await deleteDoc(docRef);
+}
+
+/* =========================================================
+   🟢 SETTINGS: CAR STATUSES (dynamic colors)
+   ========================================================= */
+
+// 🔹 Obține toate statusurile din Firestore (cu nume + culoare)
+export async function getCarStatuses() {
+  try {
+    const statusesRef = collection(db, "settings", "car_statuses", "list");
+    const snapshot = await getDocs(statusesRef);
+
+    const statuses: Record<string, { name: string; color: string }> = {};
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+
+      if (data.name) {
+        statuses[data.name.toLowerCase()] = {
+          name: data.name,
+          color: data.color || "#999999", // fallback culoare implicită
+        };
+      }
+    });
+
+    return statuses;
+  } catch (err) {
+    console.error("❌ Eroare la încărcarea statusurilor:", err);
+    return {};
+  }
 }

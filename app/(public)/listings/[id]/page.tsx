@@ -1,13 +1,11 @@
 "use client";
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import CarGallery from "@/components/listings/CarGallery";
-import { Calendar, Gauge, Car, MapPin } from "lucide-react";
-
-export const dynamic = "force-dynamic";
 
 /* 🧠 Recursive deep search in schemaData */
 function deepFindValue(obj: any, key: string): any {
@@ -23,40 +21,58 @@ function deepFindValue(obj: any, key: string): any {
   return undefined;
 }
 
+/* 🔢 Format numbers with commas */
+function formatNumber(value: any) {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+  return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+}
+
 export default function CarDetailsPage() {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [statuses, setStatuses] = useState<Record<string, { color: string; name: string }>>({});
 
+  /* 🔹 Fetch car data + status colors */
   useEffect(() => {
-    const fetchCar = async () => {
+    const fetchData = async () => {
       if (!id) return;
       try {
+        // 1️⃣ Mașina
         const docRef = doc(db, "cars", id as string);
         const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const carData = { id, ...snap.data() };
-          setCar(carData);
-          console.log("[CarDetails] Car loaded:", carData);
-        }
+        if (snap.exists()) setCar({ id, ...snap.data() });
+
+        // 2️⃣ Statusuri cu culori
+        const statusSnap = await getDocs(collection(db, "settings", "car_statuses", "list"));
+        const map: Record<string, { color: string; name: string }> = {};
+        statusSnap.forEach((s) => {
+          const data = s.data();
+          if (data.name)
+            map[data.name.toLowerCase().trim()] = {
+              name: data.name,
+              color: data.color || "#999999",
+            };
+        });
+        setStatuses(map);
       } catch (err) {
-        console.error("[CarDetails] Error loading car:", err);
+        console.error("[CarDetails] Error loading car or statuses:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchCar();
+
+    fetchData();
   }, [id]);
 
   if (loading)
-    return (
-      <p className="text-center mt-6 text-gray-600">Loading car details...</p>
-    );
+    return <p className="text-center mt-6 text-gray-600">Loading car details...</p>;
 
   if (!car)
     return <p className="text-center text-red-500 mt-6">Car not found.</p>;
 
-  // 🔹 Extract all values safely
+  // 🔹 Extract details
   const title = deepFindValue(car.schemaData, "Title") || "Unknown Title";
   const price = deepFindValue(car.schemaData, "Price") || undefined;
   const make = deepFindValue(car.schemaData, "Make") || "—";
@@ -64,28 +80,34 @@ export default function CarDetailsPage() {
   const year = deepFindValue(car.schemaData, "Year") || undefined;
   const mileage = deepFindValue(car.schemaData, "Mileage") || undefined;
 
+  // 🔹 Status styling din Firestore
+  const normalizedStatus = (car.status || "unknown").trim().toLowerCase();
+  const statusData = statuses[normalizedStatus];
+  const statusColor = statusData?.color || "#999";
+  const statusName = statusData?.name || car.status || "Unknown";
+
   return (
     <div className="max-w-[1600px] mx-auto p-6">
-      {/* 🔹 Title */}
+      {/* 🔹 Title + status */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
           <p className="text-gray-600 mb-4">
-            {year || "N/A"} • {mileage ? `${mileage} mileage` : "—"} •{" "}
-            {car.status === "available" ? (
-              <span className="text-green-600 font-medium">Available</span>
-            ) : car.status === "pending" ? (
-              <span className="text-yellow-600 font-medium">Pending</span>
-            ) : (
-              <span className="text-red-600 font-medium">Sold</span>
-            )}
+            {year || "N/A"} •{" "}
+            {mileage ? `${formatNumber(mileage)} mileage` : "—"} •{" "}
+            <span
+              className="font-semibold uppercase px-2 py-1 rounded-md text-white"
+              style={{ backgroundColor: statusColor }}
+            >
+              {statusName}
+            </span>
           </p>
         </div>
 
-        {/* ✅ Price nicely placed top-right */}
+        {/* 💰 Price */}
         {price && (
           <div className="mt-3 md:mt-0 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-md rounded-2xl px-6 py-3 text-xl font-semibold text-gray-900">
-            <span className="text-blue-700">Price:</span> {price} $
+            <span className="text-blue-700">Price:</span> ${formatNumber(price)}
           </div>
         )}
       </div>
@@ -95,7 +117,7 @@ export default function CarDetailsPage() {
         <CarGallery schemaData={car.schemaData} />
       </div>
 
-      {/* 🔹 Dynamic Sections */}
+      {/* 🧩 Dynamic Sections */}
       <div className="mt-12 bg-white p-10 rounded-2xl shadow-xl space-y-12 border border-gray-100">
         {car.schemaData && <DynamicSections schemaData={car.schemaData} />}
       </div>

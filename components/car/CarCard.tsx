@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Car } from "@/lib/types";
+import { getCarStatuses } from "@/lib/firestore"; // 🔹 asigură-te că ai funcția asta în lib/firestore.ts
 
 /* 🧠 Helper universal pentru citirea valorilor din schemaData */
 function findValue(schemaData: any, key: string) {
@@ -58,6 +60,19 @@ interface Props {
 }
 
 export default function CarCard({ car }: Props) {
+  const [statusColors, setStatusColors] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getCarStatuses(); // 🔹 Citim statusurile din Firestore
+        setStatusColors(data);
+      } catch (err) {
+        console.error("❌ Eroare la citirea statusurilor:", err);
+      }
+    })();
+  }, []);
+
   if (!car) return null;
 
   const mainImage = getFeaturedImage(car);
@@ -88,6 +103,10 @@ export default function CarCard({ car }: Props) {
     findValue(car.schemaData, "Locație") ||
     undefined;
 
+  // 🔹 Status logic
+  const statusKey = (car.status || "unknown").toLowerCase();
+  const statusColor = statusColors[statusKey]?.color || "#777777";
+
   return (
     <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       {/* 🖼️ Imagine principală */}
@@ -106,17 +125,12 @@ export default function CarCard({ car }: Props) {
         {/* 🔹 Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-70 group-hover:opacity-90 transition"></div>
 
-        {/* 🔹 Status Badge */}
+        {/* 🔹 Status Badge — culoare din Firestore */}
         <span
-          className={`absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1.5 rounded-full tracking-wide shadow-md ${
-            car.status === "available"
-              ? "bg-green-500 text-white"
-              : car.status === "pending"
-              ? "bg-yellow-500 text-black"
-              : "bg-red-600 text-white"
-          }`}
+          className="absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1.5 rounded-full tracking-wide shadow-md text-white"
+          style={{ backgroundColor: statusColor }}
         >
-          {car.status?.toUpperCase() || "UNKNOWN"}
+          {(car.status || "Unknown").toUpperCase()}
         </span>
       </Link>
 
