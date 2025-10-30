@@ -95,10 +95,10 @@ function ListingCard({ car }: { car: Car }) {
           {typeof title === "string" ? title : "Listing"}
         </h3>
         <p className="mt-1 text-sm text-gray-500">
-          {year || "—"} • {mileage ? `${mileage} km` : "—"}
+          {year || "—"} • {mileage ? `${mileage} mileage` : "—"}
         </p>
         <p className="mt-2 text-xl font-bold text-blue-600">
-          {price ? `${Number(price).toLocaleString()} €` : "—"}
+          {price ? `${Number(price).toLocaleString()} $` : "—"}
         </p>
       </div>
     </Link>

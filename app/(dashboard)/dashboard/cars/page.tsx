@@ -144,10 +144,10 @@ export default function UserCarsPage() {
                   <div>
                     <h3 className="text-lg font-semibold truncate mb-1">{title}</h3>
                     <p className="text-sm text-gray-500 mb-2">
-                      {year || "N/A"} • {mileage ? `${mileage} km` : "—"}
+                      {year || "N/A"} • {mileage ? `${mileage} mileage` : "—"}
                     </p>
                     <p className="text-blue-600 font-bold text-lg mb-3">
-                      {price ? `${price} €` : "—"}
+                      {price ? `${price} $` : "—"}
                     </p>
                   </div>
 

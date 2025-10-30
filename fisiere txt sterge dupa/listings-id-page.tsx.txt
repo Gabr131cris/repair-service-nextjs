@@ -123,7 +123,7 @@ export default function CarDetailsPage() {
       {/* 🔹 Titlu principal */}
       <h1 className="text-3xl font-bold mb-2">{title}</h1>
       <p className="text-gray-600 mb-6">
-        {year || "N/A"} • {mileage ? `${mileage} km` : "—"} •{" "}
+        {year || "N/A"} • {mileage ? `${mileage} mileage` : "—"} •{" "}
         {car.status === "available" ? (
           <span className="text-green-600 font-medium">Disponibil</span>
         ) : car.status === "pending" ? (
@@ -145,7 +145,7 @@ export default function CarDetailsPage() {
         {/* 🔹 Card detalii esențiale */}
         <div className="bg-white p-5 rounded-xl shadow-lg border border-gray-100 space-y-3 h-fit">
           <p className="text-3xl font-bold text-blue-600">
-            {price ? `${price} €` : "N/A"}
+            {price ? `${price} $` : "N/A"}
           </p>
 
           <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-700 mt-4">
@@ -174,7 +174,7 @@ export default function CarDetailsPage() {
               <span className="flex items-center gap-1">
                 <Gauge className="w-4 h-4 text-gray-500" /> Kilometraj:
               </span>
-              <span>{mileage ? `${mileage} km` : "—"}</span>
+              <span>{mileage ? `${mileage} mileage` : "—"}</span>
             </div>
 
             <div className="col-span-2 flex justify-between">

@@ -104,10 +104,10 @@ export default function CarFilters({
         className="rounded-full px-4 py-2 bg-white text-sm font-medium text-gray-900 border border-gray-200 hover:border-red-400 focus:ring-2 focus:ring-red-500 outline-none transition"
       >
         <option value="">Price Range</option>
-        <option value="0-20000">Up to €20,000</option>
-        <option value="20000-50000">€20,000 – €50,000</option>
-        <option value="50000-100000">€50,000 – €100,000</option>
-        <option value="100000+">€100,000+</option>
+        <option value="0-20000">Up to $20,000</option>
+        <option value="20000-50000">$20,000 – $50,000</option>
+        <option value="50000-100000">$50,000 – $100,000</option>
+        <option value="100000+">$100,000+</option>
       </select>
 
       {/* Sort By */}

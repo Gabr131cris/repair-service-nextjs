@@ -71,7 +71,7 @@ export default function CarDetailsPage() {
         <div>
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
           <p className="text-gray-600 mb-4">
-            {year || "N/A"} • {mileage ? `${mileage} km` : "—"} •{" "}
+            {year || "N/A"} • {mileage ? `${mileage} mileage` : "—"} •{" "}
             {car.status === "available" ? (
               <span className="text-green-600 font-medium">Available</span>
             ) : car.status === "pending" ? (

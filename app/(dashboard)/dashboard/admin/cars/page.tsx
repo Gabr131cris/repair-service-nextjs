@@ -229,7 +229,7 @@ export default function AdminCarsPage() {
                 <p className="text-sm text-gray-500 mt-1">
                   {year} •{" "}
                   {price !== "—"
-                    ? `${price.toLocaleString?.()} €`
+                    ? `${price.toLocaleString?.()} $`
                     : "Preț indisponibil"}
                 </p>
                 <p
