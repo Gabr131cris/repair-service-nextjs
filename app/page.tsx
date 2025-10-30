@@ -7,6 +7,7 @@ import { getCars } from "@/lib/firestore";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { getUserRole } from "@/lib/auth";
+import CarCard from "@/components/car/CarCard";
 import type { Car } from "@/lib/types";
 import { Gauge, ShieldCheck, Wallet, Truck } from "lucide-react";
 
@@ -125,6 +126,13 @@ export default function HomePage() {
     bannerText: "We make it easy—photography, paperwork, nationwide buyers.",
   });
 
+  // 🔹 Filtrăm mașinile — excludem cele cu status "sold", "pending" sau "rejected"
+  const visibleCars = cars.filter(
+    (car) =>
+      car.status &&
+      !["sold", "pending", "rejected"].includes(car.status.toLowerCase())
+  );
+
   /* ---------- Load data ---------- */
   useEffect(() => {
     (async () => {
@@ -165,10 +173,12 @@ export default function HomePage() {
     if (!file) return;
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("/api/upload-page", { method: "POST", body: formData });
+    const res = await fetch("/api/upload-page", {
+      method: "POST",
+      body: formData,
+    });
     const data = await res.json();
-    if (data.url)
-      setContent((prev) => ({ ...prev, heroImage: data.url }));
+    if (data.url) setContent((prev) => ({ ...prev, heroImage: data.url }));
   };
 
   return (
@@ -258,7 +268,9 @@ export default function HomePage() {
             <ShieldCheck className="mt-0.5 h-6 w-6 text-blue-600" />
             <div>
               <p className="font-semibold">Verified Listings</p>
-              <p className="text-sm text-gray-600">Quality cars, vetted by us</p>
+              <p className="text-sm text-gray-600">
+                Quality cars, vetted by us
+              </p>
             </div>
           </div>
           <div className="flex items-start gap-3">
@@ -305,7 +317,10 @@ export default function HomePage() {
         {loading ? (
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-xl border border-gray-200">
+              <div
+                key={i}
+                className="animate-pulse rounded-xl border border-gray-200"
+              >
                 <div className="h-48 w-full bg-gray-100" />
                 <div className="space-y-2 p-4">
                   <div className="h-4 w-2/3 bg-gray-100" />
@@ -317,8 +332,8 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cars.slice(0, 12).map((car) => (
-              <ListingCard key={car.id} car={car} />
+            {visibleCars.slice(0, 12).map((car) => (
+              <CarCard key={car.id} car={car} />
             ))}
           </div>
         )}
