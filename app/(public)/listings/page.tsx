@@ -5,6 +5,8 @@ import { getCars } from "@/lib/firestore";
 import Link from "next/link";
 import Image from "next/image";
 import { Car } from "@/lib/types";
+import CarCard from "@/components/car/CarCard";
+
 import CarFilters from "@/components/filters/CarFilters";
 
 /* ---------- helper ---------- */
@@ -58,7 +60,10 @@ export default function ListingsPage() {
       findValue(car.schemaData, "Marcă") ||
       "";
 
-    if (filters.query && !title.toLowerCase().includes(filters.query.toLowerCase()))
+    if (
+      filters.query &&
+      !title.toLowerCase().includes(filters.query.toLowerCase())
+    )
       return false;
     if (filters.year && parseInt(year) < parseInt(filters.year)) return false;
     if (filters.make && make !== filters.make) return false;
@@ -89,7 +94,8 @@ export default function ListingsPage() {
             Explore Our Classic Car Listings
           </h1>
           <p className="mt-3 text-gray-700 max-w-xl mx-auto">
-            Hand-picked vintage icons — browse, compare and find your next classic.
+            Hand-picked vintage icons — browse, compare and find your next
+            classic.
           </p>
         </div>
       </section>
@@ -112,66 +118,9 @@ export default function ListingsPage() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {paginatedCars.map((car) => {
-                const title =
-                  findValue(car.schemaData, "Title") ||
-                  findValue(car.schemaData, "Titlu") ||
-                  "Untitled";
-                const price =
-                  findValue(car.schemaData, "Price") ||
-                  findValue(car.schemaData, "Preț");
-                const mileage =
-                  findValue(car.schemaData, "Mileage") ||
-                  findValue(car.schemaData, "Kilometraj");
-                const year =
-                  findValue(car.schemaData, "Year") ||
-                  findValue(car.schemaData, "An fabricație");
-                const mainImage =
-                  car?.schemaData?.Exterior?.images?.[0]?.src ||
-                  car?.images?.exterior?.[0] ||
-                  "/images/placeholder-car.jpg";
-
-                return (
-                  <Link
-                    key={car.id}
-                    href={`/listings/${car.id}`}
-                    className="group bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
-                  >
-                    <div className="relative w-full h-56">
-                      <Image
-                        src={mainImage}
-                        alt={title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      {car.status && (
-                        <span
-                          className={`absolute top-3 left-3 text-xs font-semibold px-2 py-1 rounded text-white ${
-                            car.status === "available"
-                              ? "bg-green-600"
-                              : car.status === "pending"
-                              ? "bg-yellow-500"
-                              : "bg-red-600"
-                          }`}
-                        >
-                          {car.status.toUpperCase()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold group-hover:text-blue-600 transition">
-                        {title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {year || "—"} • {mileage ? `${mileage} km` : "—"}
-                      </p>
-                      <p className="text-xl font-bold text-blue-600 mt-1">
-                        {price ? `${price} €` : "—"}
-                      </p>
-                    </div>
-                  </Link>
-                );
-              })}
+              {paginatedCars.map((car) => (
+                <CarCard key={car.id} car={car} />
+              ))}
             </div>
 
             {/* PAGINATION */}
