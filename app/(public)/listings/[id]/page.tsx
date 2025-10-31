@@ -32,7 +32,9 @@ export default function CarDetailsPage() {
   const { id } = useParams();
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [statuses, setStatuses] = useState<Record<string, { color: string; name: string }>>({});
+  const [statuses, setStatuses] = useState<
+    Record<string, { color: string; name: string }>
+  >({});
 
   /* 🔹 Fetch car data + status colors */
   useEffect(() => {
@@ -45,7 +47,9 @@ export default function CarDetailsPage() {
         if (snap.exists()) setCar({ id, ...snap.data() });
 
         // 2️⃣ Statusuri cu culori
-        const statusSnap = await getDocs(collection(db, "settings", "car_statuses", "list"));
+        const statusSnap = await getDocs(
+          collection(db, "settings", "car_statuses", "list")
+        );
         const map: Record<string, { color: string; name: string }> = {};
         statusSnap.forEach((s) => {
           const data = s.data();
@@ -67,7 +71,9 @@ export default function CarDetailsPage() {
   }, [id]);
 
   if (loading)
-    return <p className="text-center mt-6 text-gray-600">Loading car details...</p>;
+    return (
+      <p className="text-center mt-6 text-gray-600">Loading car details...</p>
+    );
 
   if (!car)
     return <p className="text-center text-red-500 mt-6">Car not found.</p>;
@@ -265,10 +271,11 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                       </li>
                     ) : (
                       <li key={i} className="flex items-center gap-2">
-  <span className="text-blue-600 text-lg leading-none">•</span>
-  <span className="text-[15px]">{item}</span>
-</li>
-
+                        <span className="text-blue-600 text-lg leading-none">
+                          •
+                        </span>
+                        <span className="text-[15px]">{item}</span>
+                      </li>
                     )
                   )
                 ) : (
