@@ -28,10 +28,12 @@ export default function Navbar() {
     fetchSiteInfo();
   }, []);
 
+  // 🔍 Handle search (redirect + pass query param)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (search.trim()) {
-      router.push(`/listings?query=${encodeURIComponent(search)}`);
+      // Trimite către listings cu parametru de query
+      router.push(`/listings?query=${encodeURIComponent(search.trim())}`);
       setSearch("");
       setOpen(false);
     }
@@ -43,8 +45,6 @@ export default function Navbar() {
     { href: "/finance", label: "Finance" },
     { href: "/shipping", label: "Shipping" },
     { href: "/about", label: "About" },
-    
-    
   ];
 
   return (
@@ -73,7 +73,7 @@ export default function Navbar() {
         {/* 🔹 SEARCH BAR (desktop) */}
         <form
           onSubmit={handleSearch}
-          className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-1.5 w-96 border border-gray-200"
+          className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-4 py-1.5 w-[400px] lg:w-[500px] xl:w-[600px] border border-gray-200"
         >
           <Search size={18} className="text-gray-400" />
           <input
@@ -83,6 +83,12 @@ export default function Navbar() {
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent outline-none text-sm text-gray-700 px-2 flex-1"
           />
+          <button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition ml-1"
+          >
+            <Search size={16} />
+          </button>
         </form>
 
         {/* 🔹 NAV LINKS (desktop) */}
@@ -101,15 +107,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* SELL BUTTON */}
-          {/*<Link
-            href="/dashboard/cars/new"
-            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold transition"
-          >
-            Sell a Car
-          </Link>*/}
-
-          {/* Contact */}
+          {/* Contact button */}
           <Link
             href="/contact"
             className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold transition"
@@ -130,7 +128,7 @@ export default function Navbar() {
       {/* 🔹 MOBILE DROPDOWN */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-sm">
-          {/* Search bar mobile */}
+          {/* Search bar (mobile) */}
           <form
             onSubmit={handleSearch}
             className="flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-2 m-4 border border-gray-200"
@@ -143,6 +141,12 @@ export default function Navbar() {
               onChange={(e) => setSearch(e.target.value)}
               className="bg-transparent outline-none text-sm text-gray-700 px-2 flex-1"
             />
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition ml-1"
+            >
+              <Search size={16} />
+            </button>
           </form>
 
           {/* Menu items */}

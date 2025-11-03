@@ -9,6 +9,8 @@ import CarFilters from "@/components/filters/CarFilters";
 import { getUserRole } from "@/lib/auth";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { useSearchParams } from "next/navigation";
+
 
 /* ---------- helper ---------- */
 function findValue(schemaData: any, key: string) {
@@ -41,6 +43,32 @@ export default function ListingsPage() {
       "Hand-picked vintage icons — browse, compare and find your next classic.",
   });
 
+  // 🔹 Citește parametrii din URL (ex: ?query=BMW)
+const searchParams = useSearchParams();
+
+useEffect(() => {
+  const q = searchParams.get("query");
+
+  if (q) {
+    // Dacă există query, aplică filtrul
+    setFilters((prev: any) => ({ ...prev, query: q }));
+  } else {
+    // Dacă nu mai există query (ex: doar /listings), resetează toate filtrele
+    setFilters({
+      query: "",
+      yearFrom: "",
+      yearTo: "",
+      make: "",
+      model: "",
+      minPrice: "",
+      maxPrice: "",
+      sort: "",
+    });
+  }
+}, [searchParams]);
+
+
+
   const ITEMS_PER_PAGE = 12;
 
   /* ---------- Load data ---------- */
@@ -66,6 +94,7 @@ export default function ListingsPage() {
       }
     })();
   }, []);
+  
 
   /* ---------- Save changes ---------- */
   const handleSave = async () => {
