@@ -332,7 +332,7 @@ export default function HomePage() {
           </div>
         ) : (
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {visibleCars.slice(0, 12).map((car) => (
+            {visibleCars.slice(0, 4).map((car) => (
               <CarCard key={car.id} car={car} />
             ))}
           </div>

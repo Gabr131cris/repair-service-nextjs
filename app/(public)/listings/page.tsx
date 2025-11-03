@@ -6,6 +6,9 @@ import { getCars } from "@/lib/firestore";
 import { Car } from "@/lib/types";
 import CarCard from "@/components/car/CarCard";
 import CarFilters from "@/components/filters/CarFilters";
+import { getUserRole } from "@/lib/auth";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 
 /* ---------- helper ---------- */
 function findValue(schemaData: any, key: string) {
@@ -27,25 +30,81 @@ export default function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<any>({});
   const [page, setPage] = useState(1);
+  const [role, setRole] = useState<string | null>(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [status, setStatus] = useState("");
+  const [content, setContent] = useState({
+    heroImage: "/images/hero-listings.jpg",
+    heroTitle: "Explore Our Classic Car Listings",
+    heroText:
+      "Hand-picked vintage icons — browse, compare and find your next classic.",
+  });
 
   const ITEMS_PER_PAGE = 12;
 
+  /* ---------- Load data ---------- */
   useEffect(() => {
     (async () => {
       try {
+        const r = await getUserRole();
+        setRole(r);
+
+        // 🔹 Load editable content from Firestore
+        const docRef = doc(db, "pages", "listings");
+        const snap = await getDoc(docRef);
+        if (snap.exists()) setContent(snap.data() as any);
+        else await setDoc(docRef, content);
+
+        // 🔹 Load cars
         const data = await getCars();
         setCars(data);
       } catch (e) {
-        console.error("❌ Error loading cars:", e);
+        console.error("❌ Error loading data:", e);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  /* ---------- filtering logic ---------- */
+  /* ---------- Save changes ---------- */
+  const handleSave = async () => {
+    try {
+      const docRef = doc(db, "pages", "listings");
+      await updateDoc(docRef, content);
+      setIsEditing(false);
+      setStatus("✅ Listings page updated successfully!");
+      setTimeout(() => setStatus(""), 3000);
+    } catch (err) {
+      console.error("Save failed:", err);
+    }
+  };
+
+  /* ---------- Upload image ---------- */
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch("/api/upload-page", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.url) setContent((prev) => ({ ...prev, heroImage: data.url }));
+  };
+
+  /* ---------- Filtering logic ---------- */
   const filteredCars = cars
     .filter((car) => {
+      if (
+        car.status &&
+        ["sold", "pending", "rejected", "draft"].includes(
+          car.status.toLowerCase()
+        )
+      ) {
+        return false;
+      }
+
       const title =
         findValue(car.schemaData, "Title") ||
         findValue(car.schemaData, "Titlu") ||
@@ -72,7 +131,6 @@ export default function ListingsPage() {
             0
         ) || 0;
 
-      // text search
       if (
         filters.query &&
         !(
@@ -83,21 +141,20 @@ export default function ListingsPage() {
       )
         return false;
 
-      // year
       if (filters.year && parseInt(year) < parseInt(filters.year)) return false;
 
-      // make
-      if (filters.make && !make.toLowerCase().includes(filters.make.toLowerCase()))
+      if (
+        filters.make &&
+        !make.toLowerCase().includes(filters.make.toLowerCase())
+      )
         return false;
 
-      // model
       if (
         filters.model &&
         !model.toLowerCase().includes(filters.model.toLowerCase())
       )
         return false;
 
-      // price range
       const min = parseFloat(filters.minPrice) || 0;
       const max = parseFloat(filters.maxPrice) || Infinity;
       if (price < min || price > max) return false;
@@ -162,7 +219,7 @@ export default function ListingsPage() {
       return 0;
     });
 
-  /* ---------- pagination ---------- */
+  /* ---------- Pagination ---------- */
   const totalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
   const paginatedCars = filteredCars.slice(
     (page - 1) * ITEMS_PER_PAGE,
@@ -175,21 +232,48 @@ export default function ListingsPage() {
       {/* HERO cover */}
       <section className="relative w-full h-[45vh] min-h-[420px]">
         <Image
-          src="/images/hero-listings.jpg"
+          src={content.heroImage}
           alt="Explore Classic Listings"
           fill
           priority
           className="object-cover"
         />
+        {isEditing && (
+          <input
+            type="file"
+            onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
+            className="absolute bottom-2 left-2 bg-white/80 text-xs"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
-            Explore Our Classic Car Listings
-          </h1>
-          <p className="mt-3 text-gray-700 max-w-xl mx-auto">
-            Hand-picked vintage icons — browse, compare and find your next
-            classic.
-          </p>
+          {isEditing ? (
+            <div className="text-center max-w-xl w-full">
+              <input
+                value={content.heroTitle}
+                onChange={(e) =>
+                  setContent({ ...content, heroTitle: e.target.value })
+                }
+                className="w-full border p-2 rounded text-3xl font-bold text-center"
+              />
+              <textarea
+                value={content.heroText}
+                onChange={(e) =>
+                  setContent({ ...content, heroText: e.target.value })
+                }
+                className="mt-3 w-full border p-2 rounded text-gray-700 text-center"
+              />
+            </div>
+          ) : (
+            <>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
+                {content.heroTitle}
+              </h1>
+              <p className="mt-3 text-gray-700 max-w-xl mx-auto">
+                {content.heroText}
+              </p>
+            </>
+          )}
         </div>
       </section>
 
@@ -210,13 +294,12 @@ export default function ListingsPage() {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {paginatedCars.map((car) => (
                 <CarCard key={car.id} car={car} />
               ))}
             </div>
 
-            {/* PAGINATION */}
             {totalPages > 1 && (
               <div className="flex justify-center mt-10 gap-2">
                 {Array.from({ length: totalPages }).map((_, i) => (
@@ -237,6 +320,25 @@ export default function ListingsPage() {
           </>
         )}
       </section>
+
+      {/* ADMIN CONTROLS */}
+      {role === "superadmin" && (
+        <div className="text-center my-8">
+          <button
+            onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+            className={`px-6 py-2 rounded-lg text-sm font-semibold ${
+              isEditing
+                ? "bg-green-600 hover:bg-green-700 text-white"
+                : "bg-gray-700 hover:bg-gray-600 text-white"
+            }`}
+          >
+            {isEditing ? "💾 Save Changes" : "✏️ Edit Page"}
+          </button>
+          {status && (
+            <p className="mt-3 text-green-600 text-sm font-medium">{status}</p>
+          )}
+        </div>
+      )}
     </main>
   );
 }
