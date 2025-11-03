@@ -43,7 +43,7 @@ export default function Navbar() {
     { href: "/finance", label: "Finance" },
     { href: "/shipping", label: "Shipping" },
     { href: "/about", label: "About" },
-    { href: "/contact", label: "Contact" },
+    
     
   ];
 
@@ -102,19 +102,19 @@ export default function Navbar() {
           ))}
 
           {/* SELL BUTTON */}
-          <Link
+          {/*<Link
             href="/dashboard/cars/new"
             className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold transition"
           >
             Sell a Car
-          </Link>
+          </Link>*/}
 
-          {/* LOGIN */}
+          {/* Contact */}
           <Link
-            href="/auth/login"
-            className="border border-gray-300 hover:border-blue-500 text-gray-700 hover:text-blue-600 px-4 py-2 rounded-full transition"
+            href="/contact"
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-full font-semibold transition"
           >
-            Login
+            Contact
           </Link>
         </div>
 

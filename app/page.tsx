@@ -116,13 +116,13 @@ export default function HomePage() {
 
   const [content, setContent] = useState({
     heroSubtitle: "AMERICAN VINTAGE & MUSCLE",
-    heroTitle: "Buy • Sell • Consign iconic cars from the golden era",
+    heroTitle: "Buy • Consign iconic cars from the golden era",
     heroText:
       "Curated classics, muscle legends and vintage cruisers — inspected, verified, and ready for the open road.",
     heroImage: "/images/hero-vintage.jpg",
     cta1: "Browse All Listings",
-    cta2: "Sell Your Car",
-    bannerTitle: "Got a classic to sell or consign?",
+    cta2: "Talk to Us",
+    bannerTitle: "Got a classic to consign?",
     bannerText: "We make it easy—photography, paperwork, nationwide buyers.",
   });
 
@@ -251,7 +251,7 @@ export default function HomePage() {
                 {content.cta1}
               </Link>
               <Link
-                href="/dashboard/cars/new"
+                href="/contact"
                 className="rounded-full border border-gray-300 px-5 py-2.5 font-semibold text-gray-800 hover:border-blue-500 hover:text-blue-600 transition"
               >
                 {content.cta2}
@@ -369,15 +369,10 @@ export default function HomePage() {
               )}
             </div>
             <div className="flex gap-3">
-              <Link
-                href="/dashboard/cars/new"
-                className="rounded-full bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 transition"
-              >
-                List Your Car
-              </Link>
+              
               <Link
                 href="/contact"
-                className="rounded-full border border-gray-300 px-5 py-2.5 font-semibold text-gray-800 hover:border-blue-500 hover:text-blue-600 transition"
+                className="rounded-full bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700 transition"
               >
                 Talk to Us
               </Link>

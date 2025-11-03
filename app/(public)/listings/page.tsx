@@ -141,7 +141,9 @@ export default function ListingsPage() {
       )
         return false;
 
-      if (filters.year && parseInt(year) < parseInt(filters.year)) return false;
+      if (filters.yearFrom && parseInt(year) < parseInt(filters.yearFrom)) return false;
+if (filters.yearTo && parseInt(year) > parseInt(filters.yearTo)) return false;
+
 
       if (
         filters.make &&
