@@ -1,6 +1,7 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { getCars } from "@/lib/firestore";
 import { Car } from "@/lib/types";
@@ -10,8 +11,6 @@ import { getUserRole } from "@/lib/auth";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-
 
 /* ---------- helper ---------- */
 function findValue(schemaData: any, key: string) {
@@ -26,6 +25,8 @@ function findValue(schemaData: any, key: string) {
   }
   return undefined;
 }
+
+/* ---------- wrapper ---------- */
 export default function ListingsPageWrapper() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -33,14 +34,14 @@ export default function ListingsPageWrapper() {
     </Suspense>
   );
 }
+
 /* ---------- component ---------- */
-export default function ListingsPage() {
+function ListingsPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<any>({});
   const [page, setPage] = useState(1);
   const [role, setRole] = useState<string | null>(null);
-
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
@@ -51,47 +52,39 @@ export default function ListingsPage() {
   });
 
   // 🔹 Citește parametrii din URL (ex: ?query=BMW)
-const searchParams = useSearchParams();
+  const searchParams = useSearchParams();
 
-useEffect(() => {
-  const q = searchParams.get("query");
-
-  if (q) {
-    // Dacă există query, aplică filtrul
-    setFilters((prev: any) => ({ ...prev, query: q }));
-  } else {
-    // Dacă nu mai există query (ex: doar /listings), resetează toate filtrele
-    setFilters({
-      query: "",
-      yearFrom: "",
-      yearTo: "",
-      make: "",
-      model: "",
-      minPrice: "",
-      maxPrice: "",
-      sort: "",
-    });
-  }
-}, [searchParams]);
-
-
+  useEffect(() => {
+    const q = searchParams.get("query");
+    if (q) {
+      setFilters((prev: any) => ({ ...prev, query: q }));
+    } else {
+      setFilters({
+        query: "",
+        yearFrom: "",
+        yearTo: "",
+        make: "",
+        model: "",
+        minPrice: "",
+        maxPrice: "",
+        sort: "",
+      });
+    }
+  }, [searchParams]);
 
   const ITEMS_PER_PAGE = 12;
 
-  /* ---------- Load data ---------- */
   useEffect(() => {
     (async () => {
       try {
         const r = await getUserRole();
         setRole(r);
 
-        // 🔹 Load editable content from Firestore
         const docRef = doc(db, "pages", "listings");
         const snap = await getDoc(docRef);
         if (snap.exists()) setContent(snap.data() as any);
         else await setDoc(docRef, content);
 
-        // 🔹 Load cars
         const data = await getCars();
         setCars(data);
       } catch (e) {
@@ -101,9 +94,7 @@ useEffect(() => {
       }
     })();
   }, []);
-  
 
-  /* ---------- Save changes ---------- */
   const handleSave = async () => {
     try {
       const docRef = doc(db, "pages", "listings");
@@ -116,7 +107,6 @@ useEffect(() => {
     }
   };
 
-  /* ---------- Upload image ---------- */
   const handleImageUpload = async (file: File | null) => {
     if (!file) return;
     const formData = new FormData();
@@ -177,9 +167,10 @@ useEffect(() => {
       )
         return false;
 
-      if (filters.yearFrom && parseInt(year) < parseInt(filters.yearFrom)) return false;
-if (filters.yearTo && parseInt(year) > parseInt(filters.yearTo)) return false;
-
+      if (filters.yearFrom && parseInt(year) < parseInt(filters.yearFrom))
+        return false;
+      if (filters.yearTo && parseInt(year) > parseInt(filters.yearTo))
+        return false;
 
       if (
         filters.make &&
@@ -257,14 +248,12 @@ if (filters.yearTo && parseInt(year) > parseInt(filters.yearTo)) return false;
       return 0;
     });
 
-  /* ---------- Pagination ---------- */
   const totalPages = Math.ceil(filteredCars.length / ITEMS_PER_PAGE);
   const paginatedCars = filteredCars.slice(
     (page - 1) * ITEMS_PER_PAGE,
     page * ITEMS_PER_PAGE
   );
 
-  /* ---------- UI ---------- */
   return (
     <main className="min-h-screen bg-white text-gray-900">
       {/* HERO cover */}
@@ -359,7 +348,6 @@ if (filters.yearTo && parseInt(year) > parseInt(filters.yearTo)) return false;
         )}
       </section>
 
-      {/* ADMIN CONTROLS */}
       {role === "superadmin" && (
         <div className="text-center my-8">
           <button
