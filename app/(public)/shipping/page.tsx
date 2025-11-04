@@ -222,13 +222,15 @@ export default function ShippingPage() {
               key={index}
               className="relative bg-gray-100 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition"
             >
-              <Image
-                src={img.url}
-                alt={img.caption || `Gallery image ${index + 1}`}
-                width={600}
-                height={400}
-                className="object-cover w-full h-60"
-              />
+              <div className="aspect-[4/3] relative w-full rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+  <Image
+    src={img.url}
+    alt={img.caption || `Gallery image ${index + 1}`}
+    fill
+    className="object-cover object-center"
+  />
+</div>
+
               {isEditing && (
                 <>
                   <button

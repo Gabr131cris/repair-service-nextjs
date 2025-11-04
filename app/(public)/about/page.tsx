@@ -32,7 +32,7 @@ export default function AboutPage() {
   const [content, setContent] = useState<AboutData>({
     heroTitle: "BUILT ON TWENTY FIVE YEARS OF AUTO RACING PASSION",
     heroSubtitle: "West Coast Exotic Cars",
-    heroImage: "/images/about-hero.jpg",
+    heroImage: "/images/hero-about.jpg",
     heroText:
       "West Coast Exotic Cars has become the premier exotic car dealer located in the heart of Southern California’s beautiful wine country.",
     heroButtons: [

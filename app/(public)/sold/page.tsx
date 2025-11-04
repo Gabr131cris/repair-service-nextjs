@@ -27,16 +27,16 @@ function findValue(schemaData: any, key: string) {
 }
 
 /* ---------- wrapper ---------- */
-export default function ListingsPageWrapper() {
+export default function SoldPageWrapper() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ListingsPage />
+      <SoldPage />
     </Suspense>
   );
 }
 
 /* ---------- component ---------- */
-function ListingsPage() {
+function SoldPage() {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<any>({});
@@ -46,7 +46,7 @@ function ListingsPage() {
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
     heroImage: "/images/hero-sold.jpg",
-    heroTitle: "Explore Our Classic Car Listings",
+    heroTitle: "Explore Our Classic Car Sold",
     heroText:
       "Hand-picked vintage icons — browse, compare and find your next classic.",
   });
@@ -80,7 +80,7 @@ function ListingsPage() {
         const r = await getUserRole();
         setRole(r);
 
-        const docRef = doc(db, "pages", "listings");
+        const docRef = doc(db, "pages", "Sold");
         const snap = await getDoc(docRef);
         if (snap.exists()) setContent(snap.data() as any);
         else await setDoc(docRef, content);
@@ -97,10 +97,10 @@ function ListingsPage() {
 
   const handleSave = async () => {
     try {
-      const docRef = doc(db, "pages", "listings");
+      const docRef = doc(db, "pages", "sold");
       await updateDoc(docRef, content);
       setIsEditing(false);
-      setStatus("✅ Listings page updated successfully!");
+      setStatus("✅ Sold page updated successfully!");
       setTimeout(() => setStatus(""), 3000);
     } catch (err) {
       console.error("Save failed:", err);

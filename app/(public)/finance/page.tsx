@@ -283,13 +283,13 @@ export default function FinancePage() {
                   key={colIndex}
                   className="flex flex-col items-center bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden"
                 >
-                  <div className="relative w-full h-48 bg-gray-50">
-                    <Image
-                      src={item.image || "/images/placeholder.jpg"}
-                      alt={item.name || "Finance Partner"}
-                      fill
-                      className="object-contain p-6"
-                    />
+                  <div className="relative w-full aspect-[16/9] bg-gray-50 overflow-hidden">
+  <Image
+    src={item.image || "/images/placeholder.jpg"}
+    alt={item.name || "Finance Partner"}
+    fill
+    className="object-cover object-center"
+  />
                     {isEditing && (
                       <input
                         type="file"
