@@ -257,7 +257,7 @@ function ListingsPage() {
           alt="Explore Classic Listings"
           fill
           priority
-          className="object-cover"
+          className="object-cover object-center"
         />
         {isEditing && (
           <input
