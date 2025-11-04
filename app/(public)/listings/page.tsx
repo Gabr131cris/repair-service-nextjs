@@ -10,6 +10,7 @@ import { getUserRole } from "@/lib/auth";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
 
 /* ---------- helper ---------- */
@@ -25,7 +26,13 @@ function findValue(schemaData: any, key: string) {
   }
   return undefined;
 }
-
+export default function ListingsPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListingsPage />
+    </Suspense>
+  );
+}
 /* ---------- component ---------- */
 export default function ListingsPage() {
   const [cars, setCars] = useState<Car[]>([]);
