@@ -77,7 +77,7 @@ export default function ContactPage() {
       <section className="relative w-full h-[45vh] min-h-[420px]">
         <Image
           src="/images/hero-contact.jpg" // 👉 pune aici imaginea ta (ex: assets/hero-contact.jpg)
-          alt="Contact Car Market"
+          alt="Contact Dariella Motors"
           fill
           priority
           className="object-cover"

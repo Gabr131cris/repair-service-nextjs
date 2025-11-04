@@ -143,7 +143,7 @@ export default function SiteSettingsPage() {
             value={data.siteName}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="Car Market"
+            placeholder="Dariella Motors"
           />
         </div>
 
