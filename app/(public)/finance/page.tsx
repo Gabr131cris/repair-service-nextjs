@@ -168,7 +168,8 @@ export default function FinancePage() {
           priority
           className="object-cover"
         />
-        <div className="absolute inset-0 bg-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
+
         <div className="relative z-10 max-w-3xl px-6">
           {isEditing ? (
             <>

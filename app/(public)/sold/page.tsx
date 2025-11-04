@@ -37,7 +37,7 @@ export default function ListingsPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
-    heroImage: "/images/hero-listings.jpg",
+    heroImage: "/images/hero-sold.jpg",
     heroTitle: "Explore Our Classic Car Listings",
     heroText:
       "Hand-picked vintage icons — browse, compare and find your next classic.",

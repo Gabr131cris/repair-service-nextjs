@@ -22,7 +22,7 @@ export default function ContactPage() {
     title: "Contact Us",
     intro:
       "We’d love to hear from you! Reach out to discuss your next vehicle purchase, schedule a visit, or just say hello.",
-    address: "418 North Main Street, Roanoke, IL 61561",
+    address: "North Miami Beach, FL 33315 , 307 SW 5TH ST, APT 910",
     phone: "+1 309-219-9999",
     email: "info@classiccars.com",
     hours: {
@@ -150,7 +150,7 @@ export default function ContactPage() {
               {/* Address */}
               <div>
                 <h3 className="font-semibold text-gray-900 uppercase text-sm mb-1">
-                  Location
+                  Sale office
                 </h3>
                 {isEditing ? (
                   <input

@@ -83,6 +83,8 @@ export default function Footer() {
             {siteInfo?.address && (
               <p className="text-sm text-gray-400 mt-1">
                 📍 {siteInfo.address}
+                <br></br>
+                📍 {siteInfo.city}
               </p>
             )}
 
