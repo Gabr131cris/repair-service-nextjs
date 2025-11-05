@@ -108,7 +108,10 @@ export default function FinancePage() {
     if (!file) return null;
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("/api/upload-page", { method: "POST", body: formData });
+    const res = await fetch("/api/upload-page", {
+      method: "POST",
+      body: formData,
+    });
     const data = await res.json();
     return data.url || null;
   };
@@ -140,9 +143,21 @@ export default function FinancePage() {
         ...(prev.rows || []),
         {
           items: [
-            { image: "/images/placeholder.jpg", link: "#", name: "New Partner" },
-            { image: "/images/placeholder.jpg", link: "#", name: "New Partner" },
-            { image: "/images/placeholder.jpg", link: "#", name: "New Partner" },
+            {
+              image: "/images/placeholder.jpg",
+              link: "#",
+              name: "New Partner",
+            },
+            {
+              image: "/images/placeholder.jpg",
+              link: "#",
+              name: "New Partner",
+            },
+            {
+              image: "/images/placeholder.jpg",
+              link: "#",
+              name: "New Partner",
+            },
           ],
         },
       ],
@@ -180,12 +195,16 @@ export default function FinancePage() {
               />
               <input
                 value={content.title}
-                onChange={(e) => setContent({ ...content, title: e.target.value })}
+                onChange={(e) =>
+                  setContent({ ...content, title: e.target.value })
+                }
                 className="text-4xl md:text-5xl font-bold text-center border-b border-blue-400 focus:outline-none bg-transparent text-white w-full mb-2"
               />
               <textarea
                 value={content.subtitle}
-                onChange={(e) => setContent({ ...content, subtitle: e.target.value })}
+                onChange={(e) =>
+                  setContent({ ...content, subtitle: e.target.value })
+                }
                 className="w-full text-center text-white bg-transparent border p-2 rounded-md text-sm"
               />
             </>
@@ -194,7 +213,9 @@ export default function FinancePage() {
               <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-3 drop-shadow">
                 {content.title}
               </h1>
-              <p className="text-gray-200 text-lg max-w-2xl mx-auto">{content.subtitle}</p>
+              <p className="text-gray-200 text-lg max-w-2xl mx-auto">
+                {content.subtitle}
+              </p>
             </>
           )}
         </div>
@@ -211,7 +232,9 @@ export default function FinancePage() {
             className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 text-center"
           />
         ) : (
-          <p className="text-gray-600 text-lg leading-relaxed">{content.description}</p>
+          <p className="text-gray-600 text-lg leading-relaxed">
+            {content.description}
+          </p>
         )}
       </div>
 
@@ -239,7 +262,13 @@ export default function FinancePage() {
                 className="flex flex-col items-center bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition"
               >
                 <div className="text-blue-600 mb-3">
-                  {i === 0 ? <DollarSign size={28} /> : i === 1 ? <FileCheck2 size={28} /> : <CheckCircle size={28} />}
+                  {i === 0 ? (
+                    <DollarSign size={28} />
+                  ) : i === 1 ? (
+                    <FileCheck2 size={28} />
+                  ) : (
+                    <CheckCircle size={28} />
+                  )}
                 </div>
                 {isEditing ? (
                   <textarea
@@ -284,17 +313,21 @@ export default function FinancePage() {
                   className="flex flex-col items-center bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition overflow-hidden"
                 >
                   <div className="relative w-full aspect-[16/9] bg-gray-50 overflow-hidden">
-  <Image
-    src={item.image || "/images/placeholder.jpg"}
-    alt={item.name || "Finance Partner"}
-    fill
-    className="object-cover object-center"
-  />
+                    <Image
+                      src={item.image || "/images/placeholder.jpg"}
+                      alt={item.name || "Finance Partner"}
+                      fill
+                      className="object-cover object-center"
+                    />
                     {isEditing && (
                       <input
                         type="file"
                         onChange={(e) =>
-                          handlePartnerUpload(rowIndex, colIndex, e.target.files?.[0] || null)
+                          handlePartnerUpload(
+                            rowIndex,
+                            colIndex,
+                            e.target.files?.[0] || null
+                          )
                         }
                         className="absolute bottom-2 left-2 text-xs bg-white/80 p-1 rounded"
                       />
@@ -309,7 +342,8 @@ export default function FinancePage() {
                           value={item.name}
                           onChange={(e) => {
                             const updated = [...(content.rows || [])];
-                            updated[rowIndex].items[colIndex].name = e.target.value;
+                            updated[rowIndex].items[colIndex].name =
+                              e.target.value;
                             setContent({ ...content, rows: updated });
                           }}
                           className="w-full border p-1 rounded mb-1 text-sm text-center"
@@ -319,7 +353,8 @@ export default function FinancePage() {
                           value={item.link}
                           onChange={(e) => {
                             const updated = [...(content.rows || [])];
-                            updated[rowIndex].items[colIndex].link = e.target.value;
+                            updated[rowIndex].items[colIndex].link =
+                              e.target.value;
                             setContent({ ...content, rows: updated });
                           }}
                           className="w-full border p-1 rounded text-sm text-center"
