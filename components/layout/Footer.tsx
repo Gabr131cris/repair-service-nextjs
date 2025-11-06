@@ -32,7 +32,7 @@ export default function Footer() {
           {/* 🔹 Company Info */}
           <div>
             <h3 className="text-lg font-semibold text-white mb-3">
-              {siteInfo?.siteName || "CarMarket"}
+              {siteInfo?.siteName || "Dariella Motors"}
             </h3>
             <p className="text-sm text-gray-400 leading-relaxed">
               {siteInfo?.description ||
@@ -122,7 +122,7 @@ export default function Footer() {
 
         {/* 🔹 Copyright */}
         <div className="border-t border-gray-700 mt-8 pt-4 text-sm text-gray-500 text-center">
-          © {year} {siteInfo?.siteName || "CarMarket"}. All rights reserved.
+          © {year} {siteInfo?.siteName || "Dariella Motors"}. All rights reserved.
         </div>
       </div>
     </footer>

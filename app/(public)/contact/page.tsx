@@ -44,7 +44,7 @@ export default function ContactPage() {
       setRole(role);
 
       const docRef = doc(db, "pages", "contact");
-      const snap = await getDoc(docRef);
+      const snap = await getDoc(docRef, { source: "server" });
 
       if (snap.exists()) setContent(snap.data() as ContactData);
       else await setDoc(docRef, content);

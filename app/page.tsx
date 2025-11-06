@@ -140,7 +140,7 @@ export default function HomePage() {
       setRole(r);
 
       const docRef = doc(db, "pages", "home");
-      const snap = await getDoc(docRef);
+      const snap = await getDoc(docRef, { source: "server" });
       if (snap.exists()) setContent(snap.data() as any);
       else await setDoc(docRef, content);
 

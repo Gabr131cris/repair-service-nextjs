@@ -34,7 +34,7 @@ export default function AboutPage() {
     heroSubtitle: "Dariella Motors",
     heroImage: "/images/hero-about.jpg",
     heroText:
-      "Dariella Motors Cars has become the premier exotic car dealer located in the heart of Southern California’s beautiful wine country.",
+      "Dariella Motors has become the premier exotic car dealer located in the heart of Southern California’s beautiful wine country.",
     heroButtons: [
       { text: "CONTACT US", link: "https://wa.me/1234567890" },
       { text: "VIEW OUR INVENTORY", link: "/listings" },
@@ -75,7 +75,7 @@ export default function AboutPage() {
       setRole(role);
 
       const docRef = doc(db, "pages", "about");
-      const snap = await getDoc(docRef);
+      const snap = await getDoc(docRef, { source: "server" });
 
       if (snap.exists()) setContent(snap.data() as AboutData);
       else await setDoc(docRef, content);

@@ -46,7 +46,7 @@ function ListingsPage() {
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
     heroImage: "/images/hero-listings.jpg",
-    heroTitle: "Explore Our Classic Car Listings",
+    heroTitle: "Explore our selection of new and pre-owned trusted cars for sale.",
     heroText:
       "",
   });
@@ -81,7 +81,7 @@ function ListingsPage() {
         setRole(r);
 
         const docRef = doc(db, "pages", "listings");
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(docRef, { source: "server" });
         if (snap.exists()) setContent(snap.data() as any);
         else await setDoc(docRef, content);
 

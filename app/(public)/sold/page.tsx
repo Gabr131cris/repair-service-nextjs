@@ -81,7 +81,7 @@ function SoldPage() {
         setRole(r);
 
         const docRef = doc(db, "pages", "Sold");
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(docRef, { source: "server" });
         if (snap.exists()) setContent(snap.data() as any);
         else await setDoc(docRef, content);
 

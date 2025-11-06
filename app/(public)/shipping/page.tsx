@@ -56,7 +56,7 @@ export default function ShippingPage() {
         setRole(userRole);
 
         const docRef = doc(db, "pages", "shipping");
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(docRef, { source: "server" });
 
         if (snap.exists()) {
           const data = snap.data() as Partial<ShippingData>;

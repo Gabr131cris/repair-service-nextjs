@@ -30,10 +30,10 @@ interface FinanceData {
 export default function FinancePage() {
   const defaultData: FinanceData = {
     heroImage: "/images/hero-finance.jpg",
-    title: "Tailored Financing for Your Dream Car",
-    subtitle: "Drive luxury — with flexible and secure financing solutions.",
+    title: "FINANCE",
+    subtitle: "Don't allow your aspirations to be hindered by financial constraints.",
     description:
-      "We’ve partnered with the industry’s most trusted lenders to offer our customers simple, transparent, and competitive financing options. Whether you’re buying your first supercar or expanding your collection, our finance experts are here to guide you every step of the way.",
+      "You have the power and the control thru hours financing partners or others of your choice , to find the best solution that sadisfied you and your needs . We are here to help finding the best solution and the Instant promise for tayloring for You a Exclusive offer Proven and Guaranteed Saving money solution from our part .",
     benefitsTitle: "Why Finance With Us?",
     benefits: [
       "Competitive rates from top automotive lenders",
@@ -64,7 +64,7 @@ export default function FinancePage() {
         setRole(userRole);
 
         const docRef = doc(db, "pages", "finance");
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(docRef, { source: "server" });
 
         if (snap.exists()) {
           const data = snap.data() as Partial<FinanceData>;

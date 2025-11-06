@@ -43,7 +43,7 @@ export default function CarDetailsPage() {
       try {
         // 1️⃣ Mașina
         const docRef = doc(db, "cars", id as string);
-        const snap = await getDoc(docRef);
+        const snap = await getDoc(docRef, { source: "server" });
         if (snap.exists()) setCar({ id, ...snap.data() });
 
         // 2️⃣ Statusuri cu culori
