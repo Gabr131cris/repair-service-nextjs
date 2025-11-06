@@ -48,7 +48,7 @@ function SoldPage() {
     heroImage: "/images/hero-sold.jpg",
     heroTitle: "Explore Our Classic Car Sold",
     heroText:
-      "Hand-picked vintage icons — browse, compare and find your next classic.",
+      "",
   });
 
   // 🔹 Citește parametrii din URL (ex: ?query=BMW)

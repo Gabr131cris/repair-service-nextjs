@@ -48,7 +48,7 @@ function ListingsPage() {
     heroImage: "/images/hero-listings.jpg",
     heroTitle: "Explore Our Classic Car Listings",
     heroText:
-      "Hand-picked vintage icons — browse, compare and find your next classic.",
+      "",
   });
 
   // 🔹 Citește parametrii din URL (ex: ?query=BMW)
