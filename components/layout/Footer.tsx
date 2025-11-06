@@ -36,7 +36,7 @@ export default function Footer() {
             </h3>
             <p className="text-sm text-gray-400 leading-relaxed">
               {siteInfo?.description ||
-                "Buy or sell your car easily, quickly and safely."}
+                "."}
             </p>
             {siteInfo?.logoUrl && (
               <img

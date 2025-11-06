@@ -239,7 +239,7 @@ export default function FinancePage() {
       </div>
 
       {/* ⭐ Benefits Section */}
-      <div className="bg-gray-50 py-16">
+     {/* <div className="bg-gray-50 py-16">
         <div className="max-w-6xl mx-auto text-center">
           {isEditing ? (
             <input
@@ -287,7 +287,7 @@ export default function FinancePage() {
             ))}
           </div>
         </div>
-      </div>
+      </div>*/}
 
       {/* 💰 Finance Partners */}
       <div className="max-w-6xl mx-auto px-6 py-20">
