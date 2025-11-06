@@ -115,10 +115,10 @@ export default function HomePage() {
   const [status, setStatus] = useState("");
 
   const [content, setContent] = useState({
-    heroSubtitle: "AMERICAN VINTAGE & MUSCLE",
-    heroTitle: "Buy • Consign iconic cars from the golden era",
+    heroSubtitle: "Imagine Discovering with us your Revolutionary dream car .",
+    heroTitle: "We are your new, proven and guaranteed dealer, offering limited exclusive instant results for unique offers.",
     heroText:
-      "Curated classics, muscle legends and vintage cruisers — inspected, verified, and ready for the open road.",
+      "Imagine Discovering with us your Revolutionary dream car.",
     heroImage: "/images/hero-vintage.jpg",
     cta1: "Browse All Listings",
     cta2: "Talk to Us",
@@ -204,7 +204,8 @@ export default function HomePage() {
         </div>
 
         <div className="container mx-auto -mt-28 px-4">
-          <div className="mx-auto max-w-5xl rounded-2xl border border-gray-200 bg-white/90 backdrop-blur p-8 shadow-sm">
+          <div className="mx-auto max-w-7xl rounded-2xl border border-gray-200 bg-white/90 backdrop-blur p-8 shadow-sm">
+
             {isEditing ? (
               <>
                 <input
