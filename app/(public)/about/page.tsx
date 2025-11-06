@@ -31,17 +31,17 @@ interface AboutData {
 export default function AboutPage() {
   const [content, setContent] = useState<AboutData>({
     heroTitle: "BUILT ON TWENTY FIVE YEARS OF AUTO RACING PASSION",
-    heroSubtitle: "West Coast Exotic Cars",
+    heroSubtitle: "Dariella Motors",
     heroImage: "/images/hero-about.jpg",
     heroText:
-      "West Coast Exotic Cars has become the premier exotic car dealer located in the heart of Southern California’s beautiful wine country.",
+      "Dariella Motors Cars has become the premier exotic car dealer located in the heart of Southern California’s beautiful wine country.",
     heroButtons: [
       { text: "CONTACT US", link: "https://wa.me/1234567890" },
       { text: "VIEW OUR INVENTORY", link: "/listings" },
     ],
     section2Title: "WE BUY, SELL AND CONSIGN EXOTIC CARS NATIONWIDE",
     section2Text:
-      "West Coast Exotic Cars is located in southern California but serves customers throughout the country and the world.",
+      "Dariella Motors Cars is located in southern California but serves customers throughout the country and the world.",
     section2Quote:
       "We work hard every day to build a reputation as the most trusted exotic car dealer. I personally inspect and handle each and every car sale.",
     section2Image: "/images/about-team.jpg",

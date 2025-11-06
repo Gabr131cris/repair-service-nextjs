@@ -232,39 +232,43 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <p className="text-xs tracking-[0.2em] text-gray-500">
-                  {content.heroSubtitle}
-                </p>
-                <h1 className="mt-2 text-3xl font-extrabold leading-tight md:text-4xl">
-                  {content.heroTitle}
-                </h1>
-                <p className="mt-3 max-w-3xl text-gray-600">
-                  {content.heroText}
-                </p>
+                <div className="text-center">
+  <p className="text-xs tracking-[0.2em] text-gray-500">
+    {content.heroSubtitle}
+  </p>
+  <h1 className="mt-2 text-3xl font-extrabold leading-tight md:text-4xl">
+    {content.heroTitle}
+  </h1>
+  <p className="mt-3 max-w-3xl mx-auto text-gray-600">
+    {content.heroText}
+  </p>
+</div>
               </>
             )}
 
-            <div className="mt-5 flex flex-wrap gap-3">
-              <Link
-                href="/listings"
-                className="rounded-full bg-blue-600 px-5 py-2.5 text-white font-semibold hover:bg-blue-700 transition"
-              >
-                {content.cta1}
-              </Link>
-              <Link
-                href="/contact"
-                className="rounded-full border border-gray-300 px-5 py-2.5 font-semibold text-gray-800 hover:border-blue-500 hover:text-blue-600 transition"
-              >
-                {content.cta2}
-              </Link>
-            </div>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+  <Link
+    href="/listings"
+    className="rounded-full bg-blue-600 px-5 py-2.5 text-white font-semibold hover:bg-blue-700 transition"
+  >
+    {content.cta1}
+  </Link>
+  <Link
+    href="/contact"
+    className="rounded-full border border-gray-300 px-5 py-2.5 font-semibold text-gray-800 hover:border-blue-500 hover:text-blue-600 transition"
+  >
+    {content.cta2}
+  </Link>
+</div>
+
           </div>
         </div>
       </section>
 
       {/* BENEFITS */}
-      <section className="container mx-auto px-4">
-        <div className="mx-auto mt-12 grid gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-4">
+      <section className="w-full flex justify-center px-4">
+  <div className="w-full max-w-6xl mt-12 grid gap-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm md:grid-cols-4">
+
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-6 w-6 text-blue-600" />
             <div>
