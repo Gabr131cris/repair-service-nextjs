@@ -6,7 +6,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { getUserRole } from "@/lib/auth";
 import { CheckCircle, DollarSign, FileCheck2 } from "lucide-react";
-
+//
 interface FinanceItem {
   image: string;
   link: string;
