@@ -25,8 +25,8 @@ export default function ShippingPage() {
     heroImage: "/images/shipping-hero.jpg",
     title: "Classic Car Shipping",
     description: [
-      "Dariella Motors offers classic car shipping and transport services for all makes, models, and years of classic cars. Our experienced staff is dedicated to safely transporting your vehicle from one location to another with the utmost care and attention to detail.",
-      "We understand that classic cars are valuable investments, which is why we use only the most advanced auto transport equipment and practices to ensure your vehicle is properly and securely transported.",
+      "At Dariella Motors, we specialise in providing comprehensive transportation and shipping services for a wide range of vehicles, encompassing all makes, models and years of manufacture. Our highly experienced team is dedicated to ensuring the safe and careful transportation of your vehicle from one location to another.",
+      "We recognise the importance of your vehicle as a significant investment, and therefore we employ only the most advanced car transport equipment and techniques to ensure its proper and safe handling during transport.",
       "From our enclosed shipping trailers that protect your car from the elements to our open trailer options which allow for direct loading and unloading, Dariella Motors has you covered when it comes to classic car transport.",
       "We also offer express delivery services on select vehicles, so you can rest assured that your classic car is arriving on-time and in perfect condition.",
       "Contact us today to learn more about our classic car transport services and how we can help you safely move your vehicle.",

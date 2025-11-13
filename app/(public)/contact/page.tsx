@@ -23,8 +23,8 @@ export default function ContactPage() {
     intro:
       "We’d love to hear from you! Reach out to discuss your next vehicle purchase, schedule a visit, or just say hello.",
     address: "North Miami Beach, FL 33315 , 307 SW 5TH ST, APT 910",
-    phone: "+1 309-219-9999",
-    email: "info@classiccars.com",
+    phone: "",
+    email: "info@dariellamotors.com",
     hours: {
       "Monday - Friday": "9 AM - 5 PM",
       Saturday: "9 AM - 12 PM",
