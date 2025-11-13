@@ -10,7 +10,7 @@ import { getUserRole } from "@/lib/auth";
 import CarCard from "@/components/car/CarCard";
 import type { Car } from "@/lib/types";
 import { Gauge, ShieldCheck, Wallet, Truck } from "lucide-react";
-
+//
 /* ---------- helpers ---------- */
 function findValue(schemaData: any, key: string) {
   if (!schemaData || typeof schemaData !== "object") return undefined;
