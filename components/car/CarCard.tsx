@@ -112,7 +112,7 @@ export default function CarCard({ car }: Props) {
       {/* 🖼️ Imagine principală */}
       <Link
         href={`/listings/${car.id}`}
-        className="block relative w-full h-56 md:h-64 overflow-hidden"
+        className="block relative w-full h-56 md:h-55 overflow-hidden"
       >
         <Image
           src={mainImage}
