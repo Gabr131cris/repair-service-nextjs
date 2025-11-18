@@ -340,28 +340,33 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
   )}
 
             {/* 🔹 Liste simple */}
-            {isArray && (
-              <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-2 text-gray-800 text-[15px] leading-relaxed">
-                {data.length > 0 ? (
-                  data.map((item: string, i: number) =>
-                    isYouTubeLink(item) ? (
-                      <li key={i} className="col-span-2">
-                        {renderYouTubeEmbed(item)}
-                      </li>
-                    ) : (
-                      <li key={i} className="flex items-center gap-2">
-                        <span className="text-blue-600 text-lg leading-none">
-                          •
-                        </span>
-                        <span className="text-[15px]">{item}</span>
-                      </li>
-                    )
-                  )
-                ) : (
-                  <li className="text-gray-400 italic">No data available</li>
-                )}
-              </ul>
-            )}
+{isArray && (
+  <ul
+    className={`grid gap-x-8 gap-y-2 text-gray-800 text-[15px] leading-relaxed
+      ${section.toLowerCase() === "equipment"
+        ? "sm:grid-cols-3"   // 👉 EQUIPMENT = 3 coloane
+        : "sm:grid-cols-2"   // 👉 restul = 2 coloane
+      }
+    `}
+  >
+    {data.length > 0 ? (
+      data.map((item: string, i: number) =>
+        isYouTubeLink(item) ? (
+          <li key={i} className="col-span-3">
+            {renderYouTubeEmbed(item)}
+          </li>
+        ) : (
+          <li key={i} className="flex items-center gap-2">
+            <span className="text-blue-600 text-lg leading-none">•</span>
+            <span className="text-[15px]">{item}</span>
+          </li>
+        )
+      )
+    ) : (
+      <li className="text-gray-400 italic">No data available</li>
+    )}
+  </ul>
+)}
 
             {/* 🔹 Obiecte structurate */}
             {isObject && (
