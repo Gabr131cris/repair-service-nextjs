@@ -5,7 +5,7 @@ import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
 import { getCars } from "@/lib/firestore";
 import { Car } from "@/lib/types";
-import CarCard from "@/components/car/CarCard";
+import CarCardSold from "@/components/car/CarCardSold";
 import CarFilters from "@/components/filters/CarFilters";
 import { getUserRole } from "@/lib/auth";
 import { db } from "@/lib/firebase";
@@ -317,7 +317,7 @@ function SoldPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {paginatedCars.map((car) => (
-                <CarCard key={car.id} car={car} />
+                <CarCardSold key={car.id} car={car} />
               ))}
             </div>
 
