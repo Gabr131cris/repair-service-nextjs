@@ -34,14 +34,14 @@ export default function AboutPage() {
     heroSubtitle: "Dariella Motors",
     heroImage: "/images/hero-about.jpg",
     heroText:
-      "Dariella Motors has become the premier exotic car dealer located in the heart of Florida’s beautiful Sunny Isles Beach.",
+      "Dariella Motors has become the premier exotic car dealer located in the heart of North Miami, Florida.",
     heroButtons: [
-      { text: "CONTACT US", link: "https://wa.me/1234567890" },
+      { text: "CONTACT US", link: "https://wa.me/17864629941" },
       { text: "VIEW OUR INVENTORY", link: "/listings" },
     ],
     section2Title: "WE BUY, SELL AND CONSIGN EXOTIC CARS NATIONWIDE",
     section2Text:
-      "Dariella Motors Cars is located in Sunny Isles Beach, Florida, and serves customers throughout the country and the world.",
+      "Dariella Motors is located in North Miami, Florida, and serves customers throughout the country and the world.",
     section2Quote:
       "We work hard every day to build a reputation as the most trusted exotic car dealer. I personally inspect and handle each and every car sale.",
     section2Image: "/images/about-team.jpg",
