@@ -118,7 +118,7 @@ export default function HomePage() {
     heroSubtitle: "Imagine Discovering with us your Revolutionary dream car .",
     heroTitle: "We are your new, proven and guaranteed dealer, offering limited exclusive instant results for unique offers.",
     heroText:
-      "Imagine Discovering with us your Revolutionary dream car.",
+      "",
     heroImage: "/images/hero-vintage.jpg",
     cta1: "Browse All Listings",
     cta2: "Talk to Us",

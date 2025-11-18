@@ -87,7 +87,7 @@ export default function ContactPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
             Get in Touch with Us
           </h1>
-          <p className="mt-3 text-gray-700 max-w-xl mx-auto">
+          <p className="mt-3 text-gray-700 max-w-2xl mx-auto">
             Have questions about a car, financing, or selling your vehicle?
             We’re happy to help.
           </p>

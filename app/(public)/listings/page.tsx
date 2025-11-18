@@ -46,9 +46,9 @@ function ListingsPage() {
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
     heroImage: "/images/hero-listings.jpg",
-    heroTitle: "Explore our selection of new and pre-owned trusted cars for sale.",
-    heroText:
-      "",
+    heroTitle:
+      "Explore our selection of new and pre-owned trusted cars for sale.",
+    heroText: "",
   });
 
   // 🔹 Citește parametrii din URL (ex: ?query=BMW)
@@ -296,8 +296,20 @@ function ListingsPage() {
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
                 {content.heroTitle}
               </h1>
-              <p className="mt-3 text-gray-700 max-w-xl mx-auto">
-                {content.heroText}
+              <p className="mt-3 text-gray-700 mx-auto max-w-full text-center">
+                {/* Varianta pe mobile foarte mic - 3 rânduri FIX */}
+                <span className="block sm:hidden leading-snug">
+                  Explore our selection of new
+                  <br />
+                  and
+                  <br />
+                  pre-owned trusted cars for sale.
+                </span>
+
+                {/* Varianta pe ecrane medii și mari - 1 rând FIX */}
+                <span className="hidden sm:inline whitespace-nowrap">
+                  {content.heroText}
+                </span>
               </p>
             </>
           )}
