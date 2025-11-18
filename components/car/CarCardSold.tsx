@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { Car } from "@/lib/types";
 import { getCarStatuses } from "@/lib/firestore";
@@ -87,47 +86,65 @@ export default function CarCardSold({ car }: Props) {
     undefined;
 
   return (
-    <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-      {/* IMAGE */}
-      <Link
-        href={`/listings/${car.id}`}
-        className="block relative w-full h-56 md:h-64 overflow-hidden"
-      >
-        <Image
-          src={mainImage}
-          alt={title}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+  <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 select-none">
 
-        {/* GRADIENT OVERLAY */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition"></div>
+    {/* IMAGE (non-clickable) */}
+    <div className="relative w-full h-56 md:h-64 overflow-hidden cursor-default">
+      <Image
+        src={mainImage}
+        alt={title}
+        fill
+        className="object-cover transition-transform duration-500"
+      />
 
-        {/* SOLD BADGE */}
-        <span className="absolute top-3 left-3 text-[13px] font-bold px-3 py-1.5 rounded-full bg-red-600 text-white tracking-wide shadow-lg">
-          SOLD
-        </span>
-      </Link>
-
-      {/* CONTENT */}
-      <div className="p-4">
-        <Link
-          href={`/listings/${car.id}`}
-          className="block text-[17px] font-semibold text-gray-900 leading-snug hover:text-blue-600 transition-colors truncate"
+      {/* DIAGONAL SOLD OVERLAY */}
+      <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+        <div
+          className="
+            absolute
+            w-[200%]
+            h-20
+            bg-white/70
+            rotate-[-25deg]
+            top-1/2
+            -translate-y-1/2
+            flex
+            items-center
+            justify-center
+            shadow-xl
+          "
         >
-          {title}
-        </Link>
-
-        <p className="text-sm text-gray-500 mt-1">
-          {year ? `${year}` : ""} • {mileage ? `${formatNumber(mileage)} miles` : "—"}
-        </p>
-
-        {/* IN LOC DE PREȚ – SOLD */}
-        <p className="text-xl font-bold text-red-600 mt-3 mb-3">
-          SOLD
-        </p>
+          <span className="text-4xl md:text-5xl font-extrabold text-red-600 tracking-wider drop-shadow-lg">
+            SOLD
+          </span>
+        </div>
       </div>
+
+      {/* GRADIENT OVERLAY */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
+
+      {/* SOLD BADGE (optional) */}
+      <span className="absolute top-3 left-3 text-[13px] font-bold px-3 py-1.5 rounded-full bg-red-600 text-white tracking-wide shadow-lg">
+        SOLD
+      </span>
     </div>
-  );
+
+    {/* CONTENT (non-clickable) */}
+    <div className="p-4 cursor-default">
+      <p className="block text-[17px] font-semibold text-gray-900 leading-snug truncate">
+        {title}
+      </p>
+
+      <p className="text-sm text-gray-500 mt-1">
+        {year ? `${year}` : ""} • {mileage ? `${formatNumber(mileage)} miles` : "—"}
+      </p>
+
+      {/* SOLD TEXT */}
+      <p className="text-xl font-bold text-red-600 mt-3 mb-3">
+        SOLD
+      </p>
+    </div>
+  </div>
+);
+
 }
