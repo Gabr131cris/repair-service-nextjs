@@ -21,13 +21,51 @@ export default function CheckAvailabilityModal({
     phone: "",
   });
 
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
+
   if (!isOpen) return null;
 
   const handleChange = (e: any) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // șterge eroarea când tastezi
+  };
+
+  const validate = () => {
+    let valid = true;
+    let newErrors: any = {};
+
+    if (!form.firstName.trim()) {
+      newErrors.firstName = "First name is required";
+      valid = false;
+    }
+    if (!form.lastName.trim()) {
+      newErrors.lastName = "Last name is required";
+      valid = false;
+    }
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+      valid = false;
+    } else if (!form.email.includes("@")) {
+      newErrors.email = "Invalid email";
+      valid = false;
+    }
+    if (!form.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
   };
 
   const handleSubmit = async () => {
+    if (!validate()) return;
+
     setLoading(true);
 
     const res = await fetch("/api/send-check-form", {
@@ -101,7 +139,6 @@ export default function CheckAvailabilityModal({
       {status === null && (
         <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl p-10 border border-gray-200 relative">
 
-
           {/* Close button */}
           <button
             onClick={onClose}
@@ -121,33 +158,61 @@ export default function CheckAvailabilityModal({
           {/* INPUT GRID */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-2">
 
-            <input
-              name="firstName"
-              placeholder="First name"
-              onChange={handleChange}
-              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
-            />
+            <div>
+              <input
+                name="firstName"
+                placeholder="First name *"
+                onChange={handleChange}
+                className={`p-4 rounded-xl bg-gray-100 border ${
+                  errors.firstName ? "border-red-500" : "border-gray-200"
+                } focus:border-gray-400 focus:bg-white outline-none transition`}
+              />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+              )}
+            </div>
 
-            <input
-              name="lastName"
-              placeholder="Last name"
-              onChange={handleChange}
-              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
-            />
+            <div>
+              <input
+                name="lastName"
+                placeholder="Last name *"
+                onChange={handleChange}
+                className={`p-4 rounded-xl bg-gray-100 border ${
+                  errors.lastName ? "border-red-500" : "border-gray-200"
+                } focus:border-gray-400 focus:bg-white outline-none transition`}
+              />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              )}
+            </div>
 
-            <input
-              name="email"
-              placeholder="Email"
-              onChange={handleChange}
-              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
-            />
+            <div>
+              <input
+                name="email"
+                placeholder="Email *"
+                onChange={handleChange}
+                className={`p-4 rounded-xl bg-gray-100 border ${
+                  errors.email ? "border-red-500" : "border-gray-200"
+                } focus:border-gray-400 focus:bg-white outline-none transition`}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
+            </div>
 
-            <input
-              name="phone"
-              placeholder="Telephone"
-              onChange={handleChange}
-              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
-            />
+            <div>
+              <input
+                name="phone"
+                placeholder="Telephone *"
+                onChange={handleChange}
+                className={`p-4 rounded-xl bg-gray-100 border ${
+                  errors.phone ? "border-red-500" : "border-gray-200"
+                } focus:border-gray-400 focus:bg-white outline-none transition`}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
+            </div>
           </div>
 
           {/* Submit Button */}
