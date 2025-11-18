@@ -22,7 +22,7 @@ export default function ContactPage() {
     title: "Contact Us",
     intro:
       "We’d love to hear from you! Reach out to discuss your next vehicle purchase, schedule a visit, or just say hello.",
-    address: "North Miami Beach, FL 33315 , 307 SW 5TH ST, APT 910",
+    address: "",
     phone: "",
     email: "info@dariellamotors.com",
     hours: {
