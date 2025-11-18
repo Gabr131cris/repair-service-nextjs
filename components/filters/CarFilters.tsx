@@ -38,25 +38,23 @@ const [carsData, setCarsData] = useState<any[]>([]);
       const allModels = new Set<string>();
 
       cars.forEach((car: any) => {
-        const make =
-          car.make ||
-          car.schemaData?.General?.Make ||
-          car.schemaData?.Detalii?.Make ||
-          car.schemaData?.["Specificații"]?.Marcă ||
-          undefined;
+  const make =
+    car.make ||
+    car.schemaData?.Details?.Make ||
+    undefined;
 
-        const model =
-          car.model ||
-          car.schemaData?.General?.Model ||
-          car.schemaData?.Detalii?.Model ||
-          car.schemaData?.["Specificații"]?.Model ||
-          undefined;
+  const model =
+    car.model ||
+    car.schemaData?.Details?.Model ||
+    undefined;
 
-        if (make && typeof make === "string" && make.trim() !== "")
-          allMakes.add(make.trim());
-        if (model && typeof model === "string" && model.trim() !== "")
-          allModels.add(model.trim());
-      });
+  if (make && typeof make === "string" && make.trim() !== "")
+    allMakes.add(make.trim());
+
+  if (model && typeof model === "string" && model.trim() !== "")
+    allModels.add(model.trim());
+});
+
 
       setMakes(Array.from(allMakes).sort());
       setModels(Array.from(allModels).sort());
@@ -88,34 +86,32 @@ useEffect(() => {
   }
 
   // altfel, filtrăm doar modelele care au marca selectată
-  const filteblueModels = new Set<string>();
-  carsData.forEach((car) => {
-    const make =
-      car.make ||
-      car.schemaData?.General?.Make ||
-      car.schemaData?.Detalii?.Make ||
-      car.schemaData?.["Specificații"]?.Marcă ||
-      undefined;
+  const filteredModels = new Set<string>();
 
-    const model =
-      car.model ||
-      car.schemaData?.General?.Model ||
-      car.schemaData?.Detalii?.Model ||
-      car.schemaData?.["Specificații"]?.Model ||
-      undefined;
+carsData.forEach((car) => {
+  const make =
+    car.make ||
+    car.schemaData?.Details?.Make ||
+    undefined;
 
-    if (
-      make &&
-      model &&
-      typeof make === "string" &&
-      typeof model === "string" &&
-      make.trim().toLowerCase() === filters.make.trim().toLowerCase()
-    ) {
-      filteblueModels.add(model.trim());
-    }
-  });
+  const model =
+    car.model ||
+    car.schemaData?.Details?.Model ||
+    undefined;
 
-  setModels(Array.from(filteblueModels).sort());
+  if (
+    make &&
+    model &&
+    typeof make === "string" &&
+    typeof model === "string" &&
+    make.trim().toLowerCase() === filters.make.trim().toLowerCase()
+  ) {
+    filteredModels.add(model.trim());
+  }
+});
+
+setModels(Array.from(filteredModels).sort());
+
 }, [filters.make, carsData]);
 
 

@@ -29,10 +29,7 @@ export default function ContactPopup({
         <div className="space-y-4 text-gray-800">
 
           {/* Address */}
-          <div>
-            <h3 className="font-semibold text-sm text-gray-500">ADDRESS</h3>
-            <p>11900 Biscayne Blvd, North Miami, FL 33181</p>
-          </div>
+          
 
           {/* Contact */}
           <div>
