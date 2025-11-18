@@ -22,6 +22,7 @@ export default function CarLightbox({
     setActiveIndex((prev: number) =>
       prev === filtered.length - 1 ? 0 : prev + 1
     );
+
   const prev = () =>
     setActiveIndex((prev: number) =>
       prev === 0 ? filtered.length - 1 : prev - 1
@@ -63,10 +64,11 @@ export default function CarLightbox({
 
       {/* 🔹 Large image area */}
       <div className="flex-1 flex items-center justify-center relative px-4 sm:px-8">
+
         {/* Prev */}
         <button
           onClick={prev}
-          className="absolute left-4 sm:left-8 text-white/70 hover:text-white transition"
+          className="absolute left-4 sm:left-8 text-white/70 hover:text-white transition z-50"
         >
           <ChevronLeft size={48} strokeWidth={1.5} />
         </button>
@@ -78,7 +80,7 @@ export default function CarLightbox({
               src={current.src}
               alt={current.alt || ""}
               fill
-              className="object-contain select-none rounded-lg transition-transform duration-300 hover:scale-[1.02]"
+              className="object-contain select-none pointer-events-none rounded-lg transition-transform duration-300 hover:scale-[1.02]"
               priority
             />
           </div>
@@ -89,7 +91,7 @@ export default function CarLightbox({
         {/* Next */}
         <button
           onClick={next}
-          className="absolute right-4 sm:right-8 text-white/70 hover:text-white transition"
+          className="absolute right-4 sm:right-8 text-white/70 hover:text-white transition z-50"
         >
           <ChevronRight size={48} strokeWidth={1.5} />
         </button>
