@@ -21,7 +21,7 @@ export default function ContactPage() {
   const [content, setContent] = useState<ContactData>({
     title: "Contact Us",
     intro:
-      "We’d love to hear from you! Reach out to discuss your next vehicle purchase, schedule a visit, or just say hello.",
+      "We’d love to hear from you! Reach out to discuss your next vehicle purchase, or just say hello.",
     address: "",
     phone: "",
     email: "info@dariellamotors.com",
