@@ -47,20 +47,7 @@ export default function AboutPage() {
     section2Image: "/images/about-team.jpg",
     teamTitle: "OUR TEAM",
     team: [
-      {
-        name: "ERIC CURRAN",
-        role: "CEO / Founder",
-        phone: "(844) 488-9323 ext. 103",
-        email: "eric@westcoastexoticcars.com",
-        image: "/images/team1.jpg",
-      },
-      {
-        name: "BLAKE WARREN",
-        role: "Director of Marketing / Business Development",
-        phone: "(844) 488-9323 ext. 104",
-        email: "blake@westcoastexoticcars.com",
-        image: "/images/team2.jpg",
-      },
+      
     ],
   });
 
