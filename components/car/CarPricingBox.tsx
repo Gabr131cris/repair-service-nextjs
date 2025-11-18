@@ -28,7 +28,7 @@ export default function CarPricingBox({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
         {/* LEFT SIDE: price + crypto */}
-        <div className="flex items-center gap-4 flex-wrap">
+        <div className="flex items-center gap-4 flex-wrap pl-4 md:pl-6">
 
           {/* PRICE (formatted correctly) */}
           <span className="text-3xl font-extrabold text-gray-900">
