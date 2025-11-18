@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getFirebaseAuth, getDb } from "@/lib/firebase";
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, query, where } from "firebase/firestore";
 import { addCar } from "@/lib/firestore";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
@@ -86,6 +86,42 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       },
     }));
   };
+  useEffect(() => {
+    console.log("SCHEMA:", schema);
+  }, [schema]);
+
+
+  // 🔹 Generează stock automat la formular NOU
+  useEffect(() => {
+  // Așteaptă încărcarea reală a schemei
+  if (loading) return;
+
+  // Dacă edităm o mașină existentă, nu generăm un cod nou
+  if (initialData && Object.keys(initialData).length > 0) return;
+
+  if (!schema || schema.length === 0) return;
+
+  // Găsim secțiunea care conține câmpul "stock"
+  const stockSection = schema.find((s) =>
+    s.fields?.some((f) => f.name === "stock")
+  );
+
+  if (!stockSection) {
+    console.warn("Nu am găsit câmpul stock în schema!");
+    return;
+  }
+
+  const newStock = generateStockCode();
+
+  setFormData((prev: any) => ({
+    ...prev,
+    [stockSection.title]: {
+      ...(prev[stockSection.title] || {}),
+      stock: newStock,
+    },
+  }));
+}, [loading, schema]);
+
 
   // 🔹 Upload imagini
   // 🔹 Upload imagini (păstrează ordinea numerică/alfabetică a numelui fișierului)
@@ -182,8 +218,33 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     }
 
     // 🟢 Creare nouă
-    await addCar({
+    /*await addCar({
       schemaData: formData,
+      ownerId: user.uid,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+      tempId: formData.tempId || null,
+    });*/
+
+    // 🟦 GENERARE STOCK AUTOMAT - DOAR LA CREAREA ANUNȚULUI NOU
+    
+
+    // Gasim numele real al sectiunii Stock din schema builder
+    const stockSectionName = findStockSectionName(schema);
+
+    const stockCode = await generateUniqueStock(db, stockSectionName);
+
+    // Injectăm în schemaData secțiunea corectă
+    const updatedSchemaData = {
+      ...formData,
+      [stockSectionName]: {
+        ...(formData[stockSectionName] || {}),
+        stock: stockCode,
+      },
+    };
+
+    await addCar({
+      schemaData: updatedSchemaData,
       ownerId: user.uid,
       status: "pending",
       createdAt: new Date().toISOString(),
@@ -222,7 +283,9 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
                     type={field.type === "number" ? "number" : "text"}
                     placeholder={field.placeholder || ""}
                     className="w-full border rounded-lg p-2"
-                    defaultValue={formData[section.title]?.[field.name] || ""}
+                    //defaultValue={formData[section.title]?.[field.name] || ""}
+
+                    value={formData[section.title]?.[field.name] || ""}
                     onChange={(e) =>
                       handleChange(section.title, field.name, e.target.value)
                     }
@@ -331,6 +394,42 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
       </button>
     </form>
   );
+}
+
+function findStockSectionName(schema: Section[]) {
+  return (
+    schema.find((s) => s.title.trim().toLowerCase() === "stock")?.title ||
+    "Stock"
+  );
+}
+
+function generateStockCode() {
+  const letter = String.fromCharCode(65 + Math.floor(Math.random() * 26)); // A-Z
+  const number = Math.floor(100000 + Math.random() * 900000); // 6 digits
+  return `${letter}${number}`;
+}
+
+// 🔥 Generează cod stock unic — nu se repetă în baza de date
+async function generateUniqueStock(db: any, stockSectionName: string) {
+  let stock = generateStockCode();
+  let exists = true;
+
+  while (exists) {
+    const q = query(
+      collection(db, "cars"),
+      where(`schemaData.${stockSectionName}.stock`, "==", stock)
+    );
+
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      exists = false; // Codul este liber
+    } else {
+      stock = generateStockCode(); // Codul exista -> generează altul
+    }
+  }
+
+  return stock;
 }
 
 // 🧩 List Section (Highlights)
