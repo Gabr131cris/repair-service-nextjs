@@ -9,8 +9,8 @@ export async function POST(req: Request) {
     const { firstName, lastName, email, phone, carTitle, pageUrl } = body;
 
     await resend.emails.send({
-      from: "Dariella Motors <info@dariellamotors.com>", // domain UL TAU valid
-      to: "info@dariellamotors.com", // email unde primești mesajele
+      from: "Dariella Motors <notifications@oprenashue.resend.app>", // folosesti domeniul Resend
+      to: "info@dariellamotors.com", // aici primești tu mesajul
       subject: `${firstName} is interested in ${carTitle}`,
       html: `
         <h2>New Inquiry – Check Availability</h2>
