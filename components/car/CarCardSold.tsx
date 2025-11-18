@@ -89,7 +89,7 @@ export default function CarCardSold({ car }: Props) {
   <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm transition-all duration-300 select-none">
 
     {/* IMAGE (non-clickable) */}
-    <div className="relative w-full h-56 md:h-64 overflow-hidden cursor-default">
+    <div className="relative w-full h-56 md:h-55 overflow-hidden cursor-default">
       <Image
         src={mainImage}
         alt={title}
