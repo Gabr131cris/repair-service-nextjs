@@ -279,6 +279,17 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
         const data = schemaData[section];
         if (!data) return null;
 
+        // 🛑 Ascunde secțiunile complet goale
+        if (
+          typeof data === "object" &&
+          !Array.isArray(data) &&
+          Object.values(data).every(
+            (v) => v === null || v === "" || v === undefined
+          )
+        ) {
+          return null;
+        }
+
         const isArray = Array.isArray(data);
         const isObject = typeof data === "object" && !isArray;
         const skipFields = ["tempId", "createdAt", "updatedAt"];
