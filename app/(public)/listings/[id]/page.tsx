@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import CarGallery from "@/components/listings/CarGallery";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import CarPricingBox from "@/components/car/CarPricingBox";
 
 /* 🧠 Recursive deep search in schemaData */
 function deepFindValue(obj: any, key: string): any {
@@ -107,46 +108,43 @@ export default function CarDetailsPage() {
   const statusName = statusData?.name || car.status || "Unknown";
 
   return (
-    <div className="max-w-[1600px] mx-auto p-6">
-      {/* 🔹 Title + status */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{title}</h1>
-          <p className="text-gray-600 mb-4">
-            {year || "N/A"} •{" "}
-            {mileage ? `${formatNumber(mileage)} mileage` : "—"} •{" "}
-            {stock ? `Stock: ${stock}` : "Stock: —"} •{" "}
-            {isLogged && (
-              <span
-                className="font-semibold uppercase px-2 py-1 rounded-md text-white"
-                style={{ backgroundColor: statusColor }}
-              >
-                {statusName}
-              </span>
-            )}
-          </p>
-        </div>
+  <div className="max-w-[1600px] mx-auto p-6">
 
-        {/* 💰 Price */}
-        {price && (
-          <div className="mt-3 md:mt-0 bg-white/80 backdrop-blur-sm border border-gray-200 shadow-md rounded-2xl px-6 py-3 text-xl font-semibold text-gray-900">
-            <span className="text-blue-700">Price:</span> ${formatNumber(price)}
-          </div>
-        )}
-      </div>
-
-      {/* 🖼️ Gallery */}
-      <div className="md:col-span-2 mb-10 mt-4">
-        <CarGallery schemaData={car.schemaData} />
-      </div>
-
-      {/* 🧩 Dynamic Sections */}
-      <div className="mt-12 bg-white p-10 rounded-2xl shadow-xl space-y-12 border border-gray-100">
-        {car.schemaData && <DynamicSections schemaData={car.schemaData} />}
-      </div>
+    {/* TITLE + small info */}
+    <div className="mb-6">
+      <h1 className="text-3xl font-bold">{title}</h1>
+      <p className="text-gray-600 mt-1">
+        {year || "N/A"} •{" "}
+        {mileage ? `${formatNumber(mileage)} miles` : "—"} •{" "}
+        {stock ? `Stock: ${stock}` : "—"}
+      </p>
     </div>
-  );
-}
+
+    {/* 🖼️ GALLERY */}
+    <div className="mb-6">
+      <CarGallery schemaData={car.schemaData} />
+    </div>
+
+    {/* 💰 PRICING BOX */}
+<div className="mt-6 mb-6">
+  <CarPricingBox
+    title={title}
+    price={price}
+    views={car.views || 0}
+  />
+</div>
+
+
+    {/* 🧩 SECTIONS */}
+    <div className="bg-white p-10 rounded-2xl shadow-xl border border-gray-100 mt-10">
+      {car.schemaData && <DynamicSections schemaData={car.schemaData} />}
+    </div>
+
+  </div>
+);
+
+
+
 
 function findStockValue(schemaData: any) {
   if (!schemaData || typeof schemaData !== "object") return null;
