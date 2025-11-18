@@ -57,113 +57,108 @@ export default function CheckAvailabilityModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
 
-      {/* SUCCESS POPUP */}
+      {/* SUCCESS STATE */}
       {status === "success" && (
-        <div className="absolute bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm z-[60] animate-popIn text-center border border-gray-200">
-          <div className="mx-auto w-20 h-20 bg-green-500 rounded-full flex items-center justify-center">
+        <div className="absolute bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center z-[60] border border-gray-200">
+          <div className="mx-auto w-16 h-16 bg-green-500 rounded-full flex items-center justify-center">
             <span className="text-white text-4xl">✓</span>
           </div>
-
-          <h3 className="text-3xl font-bold mt-5 text-gray-900">Awesome!</h3>
+          <h3 className="text-2xl font-semibold mt-4">Awesome!</h3>
           <p className="text-gray-600 mt-2">
-            Your message has been sent.<br />Check your email for details.
+            Your message has been sent successfully.
           </p>
-
           <button
-            className="mt-6 px-10 py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition"
-            onClick={() => onClose()}
+            onClick={onClose}
+            className="mt-6 w-full py-3 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600"
           >
             OK
           </button>
         </div>
       )}
 
-      {/* ERROR POPUP */}
+      {/* ERROR STATE */}
       {status === "error" && (
-        <div className="absolute bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm z-[60] animate-popIn text-center border border-gray-200">
-          <div className="mx-auto w-20 h-20 bg-red-500 rounded-full flex items-center justify-center">
+        <div className="absolute bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center z-[60] border border-gray-200">
+          <div className="mx-auto w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
             <span className="text-white text-4xl">✕</span>
           </div>
-
-          <h3 className="text-3xl font-bold mt-5 text-gray-900">Error</h3>
+          <h3 className="text-2xl font-semibold mt-4">Error</h3>
           <p className="text-gray-600 mt-2">
             Something went wrong. Please try again.
           </p>
-
           <button
-            className="mt-6 px-10 py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600 transition"
             onClick={() => setStatus(null)}
+            className="mt-6 w-full py-3 bg-red-500 text-white rounded-xl font-semibold hover:bg-red-600"
           >
             Close
           </button>
         </div>
       )}
 
-      {/* MAIN FORM POPUP */}
+      {/* BASE FORM */}
       {status === null && (
-        <div
-          className="
-            bg-white/80 backdrop-blur-xl w-full max-w-lg rounded-3xl p-10 
-            shadow-2xl border border-white/40 relative animate-slideUp
-          "
-        >
+        <div className="bg-white w-full max-w-xl rounded-3xl shadow-xl p-10 border border-gray-200 relative">
+
+
           {/* Close button */}
           <button
-            className="absolute top-4 right-4 text-gray-500 hover:text-black text-xl"
             onClick={onClose}
+            className="absolute top-6 right-6 text-gray-400 hover:text-black text-2xl"
           >
-            ×
+            ✕
           </button>
 
-          <h2 className="text-4xl font-bold text-center mb-3 text-gray-900">
+          {/* Title */}
+          <h2 className="text-3xl font-semibold text-center text-gray-900">
             Check availability
           </h2>
-          <p className="text-center text-gray-600 mb-8">
+          <p className="text-center text-gray-500 mt-1 mb-8">
             Please fill in all the required fields
           </p>
 
-          {/* Form fields */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* INPUT GRID */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 px-2">
+
             <input
               name="firstName"
               placeholder="First name"
               onChange={handleChange}
-              className="p-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-black outline-none"
+              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
             />
+
             <input
               name="lastName"
               placeholder="Last name"
               onChange={handleChange}
-              className="p-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-black outline-none"
+              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
             />
+
             <input
               name="email"
               placeholder="Email"
               onChange={handleChange}
-              className="p-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-black outline-none"
+              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
             />
+
             <input
               name="phone"
               placeholder="Telephone"
               onChange={handleChange}
-              className="p-4 border rounded-xl bg-gray-50 focus:ring-2 focus:ring-black outline-none"
+              className="p-4 rounded-xl bg-gray-100 border border-gray-200 focus:border-gray-400 focus:bg-white outline-none transition"
             />
           </div>
 
-          {/* Submit button */}
+          {/* Submit Button */}
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="
-              w-full mt-8 py-4 bg-black text-white rounded-xl 
-              font-semibold hover:bg-gray-900 transition text-lg
-              disabled:bg-gray-400
-            "
+            className="w-full mt-10 py-4 bg-black text-white rounded-xl text-lg font-semibold hover:bg-gray-900 disabled:bg-gray-300"
           >
             {loading ? "Sending..." : "Send message"}
           </button>
+
         </div>
       )}
     </div>
