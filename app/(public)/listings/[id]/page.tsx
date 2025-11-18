@@ -85,7 +85,9 @@ export default function CarDetailsPage() {
   const model = deepFindValue(car.schemaData, "Model") || "—";
   const year = deepFindValue(car.schemaData, "Year") || undefined;
   const mileage = deepFindValue(car.schemaData, "Mileage") || undefined;
-  const stock = deepFindValue(car.schemaData, "stock") || undefined;
+  //const stockSection = deepFindValue(car.schemaData, "Stock");
+  const stock = findStockValue(car.schemaData) || "—";
+
 
   // 🔹 Status styling din Firestore
   const normalizedStatus = (car.status || "unknown").trim().toLowerCase();
@@ -100,16 +102,16 @@ export default function CarDetailsPage() {
         <div>
           <h1 className="text-3xl font-bold mb-2">{title}</h1>
           <p className="text-gray-600 mb-4">
-  {year || "N/A"} •{" "}
-  {mileage ? `${formatNumber(mileage)} mileage` : "—"} •{" "}
-  {stock ? `Stock: ${stock}` : "Stock: —"} •{" "}
-  <span
-    className="font-semibold uppercase px-2 py-1 rounded-md text-white"
-    style={{ backgroundColor: statusColor }}
-  >
-    {statusName}
-  </span>
-</p>
+            {year || "N/A"} •{" "}
+            {mileage ? `${formatNumber(mileage)} mileage` : "—"} •{" "}
+            {stock ? `Stock: ${stock}` : "Stock: —"} •{" "}
+            <span
+              className="font-semibold uppercase px-2 py-1 rounded-md text-white"
+              style={{ backgroundColor: statusColor }}
+            >
+              {statusName}
+            </span>
+          </p>
         </div>
 
         {/* 💰 Price */}
@@ -131,6 +133,22 @@ export default function CarDetailsPage() {
       </div>
     </div>
   );
+}
+
+function findStockValue(schemaData: any) {
+  if (!schemaData || typeof schemaData !== "object") return null;
+
+  for (const [sectionName, sectionValue] of Object.entries(schemaData)) {
+    if (
+      typeof sectionValue === "object" &&
+      sectionValue !== null &&
+      "stock" in sectionValue
+    ) {
+      return sectionValue.stock;
+    }
+  }
+
+  return null;
 }
 
 /* 🧩 Component that applies schema_order from Firestore */
