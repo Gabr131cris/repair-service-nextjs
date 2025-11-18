@@ -90,38 +90,36 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     console.log("SCHEMA:", schema);
   }, [schema]);
 
-
   // 🔹 Generează stock automat la formular NOU
   useEffect(() => {
-  // Așteaptă încărcarea reală a schemei
-  if (loading) return;
+    // Așteaptă încărcarea reală a schemei
+    if (loading) return;
 
-  // Dacă edităm o mașină existentă, nu generăm un cod nou
-  if (initialData && Object.keys(initialData).length > 0) return;
+    // Dacă edităm o mașină existentă, nu generăm un cod nou
+    if (initialData && Object.keys(initialData).length > 0) return;
 
-  if (!schema || schema.length === 0) return;
+    if (!schema || schema.length === 0) return;
 
-  // Găsim secțiunea care conține câmpul "stock"
-  const stockSection = schema.find((s) =>
-    s.fields?.some((f) => f.name === "stock")
-  );
+    // Găsim secțiunea care conține câmpul "stock"
+    const stockSection = schema.find((s) =>
+      s.fields?.some((f) => f.name === "stock")
+    );
 
-  if (!stockSection) {
-    console.warn("Nu am găsit câmpul stock în schema!");
-    return;
-  }
+    if (!stockSection) {
+      console.warn("Nu am găsit câmpul stock în schema!");
+      return;
+    }
 
-  const newStock = generateStockCode();
+    const newStock = generateStockCode();
 
-  setFormData((prev: any) => ({
-    ...prev,
-    [stockSection.title]: {
-      ...(prev[stockSection.title] || {}),
-      stock: newStock,
-    },
-  }));
-}, [loading, schema]);
-
+    setFormData((prev: any) => ({
+      ...prev,
+      [stockSection.title]: {
+        ...(prev[stockSection.title] || {}),
+        stock: newStock,
+      },
+    }));
+  }, [loading, schema]);
 
   // 🔹 Upload imagini
   // 🔹 Upload imagini (păstrează ordinea numerică/alfabetică a numelui fișierului)
@@ -227,7 +225,6 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     });*/
 
     // 🟦 GENERARE STOCK AUTOMAT - DOAR LA CREAREA ANUNȚULUI NOU
-    
 
     // Gasim numele real al sectiunii Stock din schema builder
     const stockSectionName = findStockSectionName(schema);
@@ -297,16 +294,26 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
 
           {/* 🔹 List Section */}
           {section.type === "list" && (
-            <ListSection
-              section={section}
-              initialItems={formData[section.title] || []}
-              onChange={(list) =>
-                setFormData((prev: any) => ({
-                  ...prev,
-                  [section.title]: list,
-                }))
-              }
-            />
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label className="block text-sm font-medium mb-2">
+                Adaugă lista (un element pe linie)
+              </label>
+
+              <textarea
+  className="w-full border rounded-lg p-3 h-40 font-mono text-sm"
+  placeholder="Rear Wheel Drive&#10;Aluminum Wheels&#10;MP3 Capability&#10;..."
+  value={formData[section.title]?.join("\n") || ""}
+  onChange={(e) => {
+    // când scrii sau dai Enter normal, las React să facă treaba
+    const lines = e.target.value.split("\n");
+    setFormData((prev: any) => ({
+      ...prev,
+      [section.title]: lines,
+    }));
+  }}
+/>
+
+            </div>
           )}
 
           {/* 🔹 Rich Text */}
@@ -431,7 +438,7 @@ async function generateUniqueStock(db: any, stockSectionName: string) {
 
   return stock;
 }
-
+/*
 // 🧩 List Section (Highlights)
 function ListSection({
   section,
@@ -490,7 +497,7 @@ function ListSection({
       </button>
     </div>
   );
-}
+}*/
 
 // 🧩 YouTube Links Section
 function YouTubeLinksSection({

@@ -9,12 +9,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import {
-  Plus,
-  Trash2,
-  Save,
-  GripVertical,
-} from "lucide-react";
+import { Plus, Trash2, Save, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 type FieldType = "text" | "number" | "list" | "icon-value" | "richtext";
@@ -45,6 +40,7 @@ interface Section {
   order: number;
   fields: Field[];
   images?: ImageItem[];
+  items?: string[];
 }
 
 export default function SchemaBuilderPage() {
@@ -148,6 +144,7 @@ export default function SchemaBuilderPage() {
         ...s,
         order: si + 1,
         fields: s.fields.map((f, fi) => ({ ...f, order: fi + 1 })),
+        items: s.items || [], // test empty array if undefined
       }));
 
       for (const s of ordered) {
@@ -250,14 +247,17 @@ export default function SchemaBuilderPage() {
                           value={section.type}
                           onChange={(e) => {
                             const updated = [...sections];
-                            updated[sIndex].type = e.target.value as SectionType;
+                            updated[sIndex].type = e.target
+                              .value as SectionType;
                             setSections(updated);
                           }}
                           className="border rounded p-2"
                         >
                           <option value="custom">Custom (Fields)</option>
                           <option value="list">List (Highlights)</option>
-                          <option value="richtext">Rich Text (Description)</option>
+                          <option value="richtext">
+                            Rich Text (Description)
+                          </option>
                           <option value="images">Image Gallery</option>
                           {/* 🔹 Nou tip de secțiune */}
                           <option value="youtube">YouTube Links</option>
@@ -305,7 +305,10 @@ export default function SchemaBuilderPage() {
                       {section.type === "custom" && (
                         <Droppable droppableId={`${sIndex}`} type="field">
                           {(provided) => (
-                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                            >
                               {section.fields.map((field, fIndex) => (
                                 <Draggable
                                   key={`field-${sIndex}-${fIndex}`}
@@ -319,7 +322,10 @@ export default function SchemaBuilderPage() {
                                       {...provided.dragHandleProps}
                                       className="flex items-center gap-3 bg-white p-2 rounded border border-gray-200 mb-2 cursor-grab"
                                     >
-                                      <GripVertical size={14} className="text-gray-400" />
+                                      <GripVertical
+                                        size={14}
+                                        className="text-gray-400"
+                                      />
                                       <input
                                         value={field.name}
                                         onChange={(e) => {
@@ -347,10 +353,14 @@ export default function SchemaBuilderPage() {
                                         <option value="icon-value">
                                           Icon + Value
                                         </option>
-                                        <option value="richtext">Rich Text</option>
+                                        <option value="richtext">
+                                          Rich Text
+                                        </option>
                                       </select>
                                       <button
-                                        onClick={() => removeField(sIndex, fIndex)}
+                                        onClick={() =>
+                                          removeField(sIndex, fIndex)
+                                        }
                                         className="text-red-500 hover:text-red-700"
                                       >
                                         <Trash2 size={16} />
@@ -374,17 +384,24 @@ export default function SchemaBuilderPage() {
                       {/* 🔹 YouTube section info */}
                       {section.type === "youtube" && (
                         <p className="text-sm text-gray-600 italic">
-                          This section will allow adding YouTube links in the car form.
+                          This section will allow adding YouTube links in the
+                          car form.
                         </p>
                       )}
 
-                      {section.type !== "custom" &&
-                        section.type !== "images" &&
-                        section.type !== "youtube" && (
-                          <p className="text-gray-500 text-sm italic">
-                            This section type does not use specific fields.
-                          </p>
-                        )}
+                      {/* LIST (HIGHLIGHTS) — textarea input */}
+                      {section.type === "list" && (
+  <div className="bg-white p-3 rounded-lg border border-gray-200">
+    <label className="block text-sm font-medium mb-2">
+      Paste equipment list (one item per line)
+    </label>
+
+    <p className="text-xs text-gray-500 mt-2">
+      Total items: {section.items?.length || 0}
+    </p>
+  </div>
+)}
+
                     </div>
                   )}
                 </Draggable>
