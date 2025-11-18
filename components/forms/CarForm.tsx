@@ -16,7 +16,8 @@ interface Field {
 
 interface Section {
   title: string;
-  type: "custom" | "list" | "richtext" | "images" | "youtube"; // 🔹 adăugăm youtube
+  //type: "custom" | "list" | "richtext" | "images" | "youtube"; // 🔹 adăugăm youtube
+  type: "custom" | "list" | "richtext" | "images" | "youtube" | "files";
   fields?: Field[];
 }
 
@@ -190,6 +191,54 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
     );
   };
 
+  // 🔹 Upload PDF / DOC / DOCX
+  const handleFileUpload = async (
+    sectionTitle: string,
+    files: FileList | null
+  ) => {
+    if (!files) return;
+
+    const uploaded: any[] = [];
+
+    const carId = formData.tempId || Date.now().toString();
+
+    if (!formData.tempId) {
+      setFormData((prev: any) => ({
+        ...prev,
+        tempId: carId,
+      }));
+    }
+
+    for (const file of Array.from(files)) {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+      formDataUpload.append("carId", carId);
+      formDataUpload.append("section", sectionTitle);
+
+      const res = await fetch("/api/upload-file", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      const data = await res.json();
+
+      if (data.url) {
+        uploaded.push({
+          name: file.name,
+          src: data.url,
+        });
+      }
+    }
+
+    setFormData((prev: any) => ({
+      ...prev,
+      [sectionTitle]: {
+        ...(prev[sectionTitle] || {}),
+        files: [...((prev[sectionTitle]?.files as any[]) || []), ...uploaded],
+      },
+    }));
+  };
+
   // 🔹 Șterge imagine locală
   const removeImage = (sectionTitle: string, index: number) => {
     setFormData((prev: any) => ({
@@ -300,19 +349,18 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
               </label>
 
               <textarea
-  className="w-full border rounded-lg p-3 h-40 font-mono text-sm"
-  placeholder="Rear Wheel Drive&#10;Aluminum Wheels&#10;MP3 Capability&#10;..."
-  value={formData[section.title]?.join("\n") || ""}
-  onChange={(e) => {
-    // când scrii sau dai Enter normal, las React să facă treaba
-    const lines = e.target.value.split("\n");
-    setFormData((prev: any) => ({
-      ...prev,
-      [section.title]: lines,
-    }));
-  }}
-/>
-
+                className="w-full border rounded-lg p-3 h-40 font-mono text-sm"
+                placeholder="Rear Wheel Drive&#10;Aluminum Wheels&#10;MP3 Capability&#10;..."
+                value={formData[section.title]?.join("\n") || ""}
+                onChange={(e) => {
+                  // când scrii sau dai Enter normal, las React să facă treaba
+                  const lines = e.target.value.split("\n");
+                  setFormData((prev: any) => ({
+                    ...prev,
+                    [section.title]: lines,
+                  }));
+                }}
+              />
             </div>
           )}
 
@@ -389,6 +437,79 @@ export default function DynamicCarForm({ initialData = {}, onSubmit }: Props) {
                 }))
               }
             />
+          )}
+
+          {/* 🔹 Files Section (PDF, DOC, DOCX) */}
+          {section.type === "files" && (
+            <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <label className="block text-sm font-medium mb-2">
+                Documente (PDF / DOC / DOCX)
+              </label>
+
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={(e) =>
+                  handleFileUpload(section.title, e.target.files)
+                }
+                className="mb-4"
+              />
+
+              <div className="flex flex-col gap-3">
+                {(formData[section.title]?.files || []).map(
+                  (file: any, index: number) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-white p-3 border rounded-lg"
+                    >
+                      <div className="flex items-center gap-2">
+                        <img src="/pdf-icon.png" className="w-6 h-6" />
+                        <a
+                          href={file.src}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {file.name}
+                        </a>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData((prev: any) => {
+                            const fileToDelete =
+                              prev[section.title].files[index];
+
+                            // 🔥 ȘTERGERE FIZICĂ ÎN SERVER
+                            fetch("/api/delete-file", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                filePath: fileToDelete.src,
+                              }),
+                            });
+
+                            return {
+                              ...prev,
+                              [section.title]: {
+                                ...(prev[section.title] || {}),
+                                files: prev[section.title].files.filter(
+                                  (_: any, i: number) => i !== index
+                                ),
+                              },
+                            };
+                          });
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+            </div>
           )}
         </div>
       ))}

@@ -15,7 +15,7 @@ import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 type FieldType = "text" | "number" | "list" | "icon-value" | "richtext";
 
 // 🔹 Adăugăm noul tip de secțiune "youtube"
-type SectionType = "custom" | "list" | "richtext" | "images" | "youtube";
+type SectionType = "custom" | "list" | "richtext" | "images" | "youtube" | "files";
 
 interface Field {
   id?: string;
@@ -261,6 +261,7 @@ export default function SchemaBuilderPage() {
                           <option value="images">Image Gallery</option>
                           {/* 🔹 Nou tip de secțiune */}
                           <option value="youtube">YouTube Links</option>
+                          <option value="files">Files (PDF / DOC)</option>
                         </select>
                       </div>
 

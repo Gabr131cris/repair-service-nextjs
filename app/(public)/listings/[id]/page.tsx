@@ -120,6 +120,43 @@ export default function CarDetailsPage() {
       </p>
     </div>
 
+    {/* CARFAX LOGO — detectează PDF-ul din Files sau PDF */}
+{(() => {
+  let pdfFile = null;
+
+  // 1️⃣ verifică secțiunea "Files"
+  const files = car.schemaData["Files"]?.files;
+  if (Array.isArray(files) && files[0]?.src) {
+    pdfFile = files[0].src;
+  }
+
+  // 2️⃣ verifică secțiunea "PDF"
+  const pdf = car.schemaData["PDF"]?.files;
+  if (!pdfFile && Array.isArray(pdf) && pdf[0]?.src) {
+    pdfFile = pdf[0].src;
+  }
+
+  if (!pdfFile) return null;
+
+  return (
+    <div className="mb-6">
+      <a
+        href={pdfFile}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block"
+      >
+        <img
+          src="/images/carfax-logo.jpg"
+          alt="CarFax Report"
+          className="w-32 hover:opacity-80 transition"
+        />
+      </a>
+    </div>
+  );
+})()}
+
+
     {/* 🖼️ GALLERY */}
     <div className="mb-6">
       <CarGallery schemaData={car.schemaData} />
