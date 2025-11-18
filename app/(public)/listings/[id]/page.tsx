@@ -110,51 +110,48 @@ export default function CarDetailsPage() {
   return (
   <div className="max-w-[1600px] mx-auto p-6">
 
-    {/* TITLE + small info */}
-    <div className="mb-6">
-      <h1 className="text-3xl font-bold">{title}</h1>
-      <p className="text-gray-600 mt-1">
-        {year || "N/A"} •{" "}
-        {mileage ? `${formatNumber(mileage)} miles` : "—"} •{" "}
-        {stock ? `Stock: ${stock}` : "—"}
-      </p>
-    </div>
+    {/* TITLE + INFO + CARFAX în dreapta */}
+<div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
 
-    {/* CARFAX LOGO — detectează PDF-ul din Files sau PDF */}
-{(() => {
-  let pdfFile = null;
+  {/* LEFT — Title + Info */}
+  <div>
+    <h1 className="text-3xl font-bold">{title}</h1>
+    <p className="text-gray-600 mt-1">
+      {year || "N/A"} •{" "}
+      {mileage ? `${formatNumber(mileage)} miles` : "—"} •{" "}
+      {stock ? `Stock: ${stock}` : "—"}
+    </p>
+  </div>
 
-  // 1️⃣ verifică secțiunea "Files"
-  const files = car.schemaData["Files"]?.files;
-  if (Array.isArray(files) && files[0]?.src) {
-    pdfFile = files[0].src;
-  }
+  {/* RIGHT — CARFAX LOGO (aliniat cu textul, nu cu partea de sus) */}
+  {(() => {
+    let pdfFile = null;
 
-  // 2️⃣ verifică secțiunea "PDF"
-  const pdf = car.schemaData["PDF"]?.files;
-  if (!pdfFile && Array.isArray(pdf) && pdf[0]?.src) {
-    pdfFile = pdf[0].src;
-  }
+    const files = car.schemaData["Files"]?.files;
+    if (Array.isArray(files) && files[0]?.src) pdfFile = files[0].src;
 
-  if (!pdfFile) return null;
+    const pdf = car.schemaData["PDF"]?.files;
+    if (!pdfFile && Array.isArray(pdf) && pdf[0]?.src) pdfFile = pdf[0].src;
 
-  return (
-    <div className="mb-6">
+    if (!pdfFile) return null;
+
+    return (
       <a
         href={pdfFile}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-block"
+        className="mt-4 md:mt-0 md:ml-4"
       >
         <img
           src="/images/carfax-logo.jpg"
           alt="CarFax Report"
-          className="w-32 hover:opacity-80 transition"
+          className="w-28 md:w-32 hover:opacity-80 transition"
         />
       </a>
-    </div>
-  );
-})()}
+    );
+  })()}
+</div>
+
 
 
     {/* 🖼️ GALLERY */}
