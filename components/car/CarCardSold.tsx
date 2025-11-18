@@ -1,0 +1,133 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Car } from "@/lib/types";
+import { getCarStatuses } from "@/lib/firestore";
+
+/* Helper universal */
+function findValue(schemaData: any, key: string) {
+  if (!schemaData || typeof schemaData !== "object") return undefined;
+  const normalizedKey = key.trim().toLowerCase();
+
+  for (const [sectionName, sectionValue] of Object.entries(schemaData)) {
+    if (typeof sectionValue === "object" && sectionValue !== null) {
+      for (const [k, v] of Object.entries(sectionValue)) {
+        if (k.trim().toLowerCase() === normalizedKey) return v;
+      }
+    }
+  }
+  return undefined;
+}
+
+function formatNumber(value: any) {
+  const num = Number(value);
+  if (isNaN(num)) return value;
+  return num.toLocaleString("en-US", { maximumFractionDigits: 0 });
+}
+
+function getFeaturedImage(car: any): string {
+  try {
+    const exterior = car?.schemaData?.Exterior?.images?.[0]?.src;
+    if (exterior) return exterior;
+
+    if (car?.schemaData) {
+      for (const [_, value] of Object.entries(car.schemaData)) {
+        if ((value as any)?.images?.length) {
+          return (value as any).images[0].src;
+        }
+      }
+    }
+
+    const legacy = car?.images?.exterior?.[0];
+    if (legacy) return legacy;
+  } catch (err) {
+    console.error("[CarCardSold] Error loading image:", err);
+  }
+
+  return "/images/placeholder-car.jpg";
+}
+
+interface Props {
+  car: Car;
+}
+
+export default function CarCardSold({ car }: Props) {
+  const [statusColors, setStatusColors] = useState<Record<string, any>>({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getCarStatuses();
+        setStatusColors(data);
+      } catch (err) {
+        console.error("❌ Error loading statuses:", err);
+      }
+    })();
+  }, []);
+
+  if (!car) return null;
+
+  const mainImage = getFeaturedImage(car);
+
+  const title =
+    findValue(car.schemaData, "Title") ||
+    findValue(car.schemaData, "Titlu") ||
+    "Unknown Title";
+
+  const year =
+    findValue(car.schemaData, "Year") ||
+    findValue(car.schemaData, "An fabricație") ||
+    undefined;
+
+  const mileage =
+    findValue(car.schemaData, "Mileage") ||
+    findValue(car.schemaData, "Kilometraj") ||
+    undefined;
+
+  return (
+    <div className="group relative bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      {/* IMAGE */}
+      <Link
+        href={`/listings/${car.id}`}
+        className="block relative w-full h-56 md:h-64 overflow-hidden"
+      >
+        <Image
+          src={mainImage}
+          alt={title}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+
+        {/* GRADIENT OVERLAY */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition"></div>
+
+        {/* SOLD BADGE */}
+        <span className="absolute top-3 left-3 text-[13px] font-bold px-3 py-1.5 rounded-full bg-red-600 text-white tracking-wide shadow-lg">
+          SOLD
+        </span>
+      </Link>
+
+      {/* CONTENT */}
+      <div className="p-4">
+        <Link
+          href={`/listings/${car.id}`}
+          className="block text-[17px] font-semibold text-gray-900 leading-snug hover:text-blue-600 transition-colors truncate"
+        >
+          {title}
+        </Link>
+
+        <p className="text-sm text-gray-500 mt-1">
+          {year ? `${year}` : ""} • {mileage ? `${formatNumber(mileage)} miles` : "—"}
+        </p>
+
+        {/* IN LOC DE PREȚ – SOLD */}
+        <p className="text-xl font-bold text-red-600 mt-3 mb-3">
+          SOLD
+        </p>
+      </div>
+    </div>
+  );
+}
