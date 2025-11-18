@@ -124,9 +124,7 @@ export default function CarCardSold({ car }: Props) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
 
       {/* SOLD BADGE (optional) */}
-      <span className="absolute top-3 left-3 text-[13px] font-bold px-3 py-1.5 rounded-full bg-red-600 text-white tracking-wide shadow-lg">
-        SOLD
-      </span>
+      
     </div>
 
     {/* CONTENT (non-clickable) */}
@@ -140,9 +138,7 @@ export default function CarCardSold({ car }: Props) {
       </p>
 
       {/* SOLD TEXT */}
-      <p className="text-xl font-bold text-red-600 mt-3 mb-3">
-        SOLD
-      </p>
+      
     </div>
   </div>
 );
