@@ -332,9 +332,12 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
             key={section}
             className="border-b border-gray-200 pb-10 last:border-0 last:pb-0"
           >
-            <h2 className="text-3xl font-semibold mb-6 text-gray-900 tracking-tight uppercase">
-              {section}
-            </h2>
+            {/* ASCUNDE TITLUL SECȚIUNII DACĂ TOATE VALORILE SUNT VIDEO */}
+  {!Object.values(data).every(v => typeof v === "string" && isYouTubeLink(v)) && (
+    <h2 className="text-3xl font-semibold mb-6 text-gray-900 tracking-tight uppercase">
+      {section}
+    </h2>
+  )}
 
             {/* 🔹 Liste simple */}
             {isArray && (
@@ -379,16 +382,15 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                     if (!fieldValue) return null;
 
                     // 🔹 Dacă e un link YouTube, afișează player
-                    if (isYouTubeLink(fieldValue)) {
-                      return (
-                        <div key={fieldName} className="col-span-3 w-full">
-                          <span className="block text-xs font-semibold uppercase text-gray-500 tracking-wide mb-2">
-                            {fieldName.replace(/_/g, " ")}
-                          </span>
-                          {renderYouTubeEmbed(fieldValue)}
-                        </div>
-                      );
-                    }
+                    // 🔹 Dacă e link YouTube, afișează DOAR video — fără titlu
+if (isYouTubeLink(fieldValue)) {
+  return (
+    <div key={fieldName} className="col-span-3 w-full">
+      {renderYouTubeEmbed(fieldValue)}
+    </div>
+  );
+}
+
 
                     /*const displayValue = Array.isArray(fieldValue)
                       ? fieldValue.join(", ")
