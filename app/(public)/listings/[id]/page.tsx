@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import CarGallery from "@/components/listings/CarGallery";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 /* 🧠 Recursive deep search in schemaData */
 function deepFindValue(obj: any, key: string): any {
@@ -35,6 +36,17 @@ export default function CarDetailsPage() {
   const [statuses, setStatuses] = useState<
     Record<string, { color: string; name: string }>
   >({});
+  const [isLogged, setIsLogged] = useState(false);
+
+  useEffect(() => {
+    const auth = getAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsLogged(!!user); // true dacă e logat, false dacă nu
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   /* 🔹 Fetch car data + status colors */
   useEffect(() => {
@@ -88,7 +100,6 @@ export default function CarDetailsPage() {
   //const stockSection = deepFindValue(car.schemaData, "Stock");
   const stock = findStockValue(car.schemaData) || "—";
 
-
   // 🔹 Status styling din Firestore
   const normalizedStatus = (car.status || "unknown").trim().toLowerCase();
   const statusData = statuses[normalizedStatus];
@@ -105,12 +116,14 @@ export default function CarDetailsPage() {
             {year || "N/A"} •{" "}
             {mileage ? `${formatNumber(mileage)} mileage` : "—"} •{" "}
             {stock ? `Stock: ${stock}` : "Stock: —"} •{" "}
-            <span
-              className="font-semibold uppercase px-2 py-1 rounded-md text-white"
-              style={{ backgroundColor: statusColor }}
-            >
-              {statusName}
-            </span>
+            {isLogged && (
+              <span
+                className="font-semibold uppercase px-2 py-1 rounded-md text-white"
+                style={{ backgroundColor: statusColor }}
+              >
+                {statusName}
+              </span>
+            )}
           </p>
         </div>
 

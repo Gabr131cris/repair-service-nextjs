@@ -17,64 +17,61 @@ export default function SchemaOrderPage() {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // 🔹 1. Fetch existing order (if any)
-        const orderRef = doc(db, "settings", "schema_order");
-        const orderSnap = await getDoc(orderRef);
-        const savedSections: SectionState[] = orderSnap.exists()
-          ? orderSnap.data().sections || []
-          : [];
+  const fetchData = async () => {
+    try {
+      // 1️⃣ Fetch saved order (schema_order)
+      const orderRef = doc(db, "settings", "schema_order");
+      const orderSnap = await getDoc(orderRef);
+      const savedSections: SectionState[] = orderSnap.exists()
+        ? orderSnap.data().sections || []
+        : [];
 
-        // 🔹 2. Fetch all schema sections from car_schemas collection
-        const querySnapshot = await getDocs(collection(db, "car_schemas"));
-        const firestoreSections = querySnapshot.docs
-          .map((doc) => doc.data()?.title)
-          .filter((title): title is string => !!title);
+      // 2️⃣ Fetch actual sections from car_schemas
+      const schemaSnap = await getDocs(collection(db, "car_schemas"));
+      const firestoreSections = schemaSnap.docs
+        .map((d) => d.data()?.title)
+        .filter((title): title is string => !!title)
+        .map((t) => t.trim());
 
-        // 🔹 3. Combine Firestore sections with saved order (preserve order!)
-        let combined: SectionState[] = [];
+      // normalize for comparison
+      const firestoreLower = firestoreSections.map((s) =>
+        s.toLowerCase().trim()
+      );
 
-        // ✅ Începem cu ordinea salvată (cea din Firestore)
-        savedSections.forEach((saved) => {
-          if (firestoreSections.includes(saved.name)) {
-            combined.push(saved);
-          }
-        });
+      let combined: SectionState[] = [];
 
-        // ✅ Adaugăm orice secțiune nouă apărută între timp în car_schemas
-        firestoreSections.forEach((name) => {
-          if (!combined.some((s) => s.name === name)) {
-            combined.push({ name, active: true });
-          }
-        });
+      // 3️⃣ Add sections from saved order, but ONLY if they still exist
+      savedSections.forEach((saved) => {
+        if (firestoreLower.includes(saved.name.toLowerCase().trim())) {
+          combined.push({
+            name: saved.name.trim(),
+            active: saved.active ?? true,
+          });
+        }
+      });
 
-        // ✅ (opțional) Adaugăm cele vechi care nu mai există în car_schemas, la final
-        savedSections.forEach((old) => {
-          if (!firestoreSections.includes(old.name)) {
-            combined.push(old);
-          }
-        });
+      // 4️⃣ Add NEW sections that were not previously in saved order
+      firestoreSections.forEach((name) => {
+        const exists = combined.some(
+          (s) => s.name.toLowerCase() === name.toLowerCase()
+        );
+        if (!exists) {
+          combined.push({ name, active: true });
+        }
+      });
 
-        setSections(combined);
+      // 5️⃣ Set final sections (clean & synchronized)
+      setSections(combined);
+    } catch (err) {
+      console.error("Error loading schema order:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        // 🔹 4. Add any old sections that no longer exist in car_schemas (optional)
-        savedSections.forEach((old) => {
-          if (!firestoreSections.includes(old.name)) {
-            combined.push(old);
-          }
-        });
+  fetchData();
+}, []);
 
-        setSections(combined);
-      } catch (err) {
-        console.error("Error loading schema order:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // 🔹 Handle drag & drop reorder
   const handleDragEnd = (result: any) => {
