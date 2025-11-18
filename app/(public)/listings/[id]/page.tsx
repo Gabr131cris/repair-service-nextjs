@@ -314,10 +314,30 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
                       );
                     }
 
-                    const displayValue = Array.isArray(fieldValue)
+                    /*const displayValue = Array.isArray(fieldValue)
                       ? fieldValue.join(", ")
-                      : String(fieldValue);
+                      : String(fieldValue);*/
+                    //--------------------FORMAT--------------------
+                    // 🛠️ Formatează numerele, dar NU formatează YEAR
+                    const formatIfNumber = (val: any, keyName: string) => {
+                      if (val === null || val === undefined) return "";
 
+                      // 🛑 Nu formata numericele dacă câmpul este Year
+                      if (keyName.trim().toLowerCase() === "year") {
+                        return String(val);
+                      }
+
+                      const num = Number(val);
+                      return isNaN(num) ? String(val) : formatNumber(num);
+                    };
+
+                    const displayValue = Array.isArray(fieldValue)
+                      ? fieldValue
+                          .map((v) => formatIfNumber(v, fieldName))
+                          .join(", ")
+                      : formatIfNumber(fieldValue, fieldName);
+
+                    //--------------------END FORMAT--------------------
                     return (
                       <div
                         key={fieldName}
