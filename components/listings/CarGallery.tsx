@@ -9,46 +9,41 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // ✅ Extragem toate categoriile care au imagini
-  const categories = Object.keys(schemaData || {}).filter(
-    (key) => schemaData[key]?.images?.length > 0
-  );
+  // 🔹 1. CATEGORII SORTATE STABIL (Exterior primul)
+  const categories = useMemo(() => {
+    if (!schemaData) return [];
 
-  // ✅ Funcție de sortare alfabetică / numerică pentru fișiere
+    const keys = Object.keys(schemaData).filter(
+      (key) => schemaData[key]?.images?.length > 0
+    );
+
+    return [
+      ...keys.filter((k) => k.toLowerCase() === "exterior"),
+      ...keys
+        .filter((k) => k.toLowerCase() !== "exterior")
+        .sort((a, b) => a.localeCompare(b)),
+    ];
+  }, [schemaData]);
+
+  // 🔹 2. SORTARE STABILĂ PENTRU IMAGINI
   const sortImages = (images: any[]) =>
-    [...images].sort((a, b) => {
-      const aName = a.name?.toLowerCase() || "";
-      const bName = b.name?.toLowerCase() || "";
-      const aNum = parseInt(aName);
-      const bNum = parseInt(bName);
-      if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
-      return aName.localeCompare(bName, undefined, { numeric: true });
-    });
+    [...images].sort((a, b) =>
+      (a.name || "").localeCompare(b.name || "", undefined, {
+        numeric: true,
+        sensitivity: "base",
+      })
+    );
 
-  // ✅ Construim lista completă de imagini (sortate)
+  // 🔹 3. COMBINĂM IMAGINILE ÎN ORDINE DETERMINISTĂ  
   const allImages = useMemo(() => {
-    // Sortăm fiecare categorie individual
-    const sortedByCategory = categories.flatMap((cat) =>
+    if (!schemaData) return [];
+
+    return categories.flatMap((cat) =>
       sortImages(schemaData[cat].images).map((img: any) => ({
         ...img,
         category: cat,
       }))
     );
-
-    // 🔹 Căutăm prima imagine din secțiunea "Exterior"
-    const exteriorIndex = sortedByCategory.findIndex(
-      (img) => img.category.toLowerCase() === "exterior"
-    );
-
-    // Dacă există imagini la Exterior, o punem prima
-    if (exteriorIndex > -1) {
-      const featured = sortedByCategory[exteriorIndex];
-      const rest = sortedByCategory.filter((_, i) => i !== exteriorIndex);
-      return [featured, ...rest];
-    }
-
-    // Altfel, returnăm lista normală
-    return sortedByCategory;
   }, [schemaData, categories]);
 
   const openLightbox = (index: number, category = "All") => {
@@ -59,7 +54,8 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-2 w-full mb-8">
-      {/* 🔹 Imagine principală (mereu prima din Exterior dacă există) */}
+      
+      {/* 🔹 Imagine principală: prima din Exterior deoarece Exterior e primul în categories */}
       <div className="lg:col-span-4 relative bg-gray-100 rounded-lg overflow-hidden">
         <Image
           src={allImages[0]?.src || "/images/placeholder-car.jpg"}
@@ -70,10 +66,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
           priority
         />
         <span className="absolute top-3 left-3 bg-gray-900/70 text-white text-xs px-2 py-1 rounded">
-          FEATURED
-          {allImages[0]?.category
-            ? ` (${allImages[0].category})`
-            : ""}
+          FEATURED ({allImages[0]?.category || "N/A"})
         </span>
       </div>
 
@@ -92,6 +85,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
               className="object-cover group-hover:scale-105 transition-transform"
             />
             <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition"></div>
+
             {i === 0 && (
               <span className="absolute top-2 left-2 text-xs bg-gray-900/70 text-white px-2 py-1 rounded">
                 {img.category}
@@ -100,7 +94,7 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
           </div>
         ))}
 
-        {/* 🔹 Buton pentru toate pozele */}
+        {/* 🔹 Buton All Photos */}
         <div
           onClick={() => setIsOpen(true)}
           className="relative h-[100px] md:h-[120px] bg-gray-800 text-white flex items-center justify-center rounded-lg cursor-pointer hover:bg-gray-700 transition"
