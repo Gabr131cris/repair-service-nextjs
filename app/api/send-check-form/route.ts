@@ -1,16 +1,15 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
+    const body = await req.json();
     const { firstName, lastName, email, phone, carTitle, pageUrl } = body;
 
     await resend.emails.send({
-      from: "Dariella Motors <notifications@oprenashue.resend.app>", // folosesti domeniul Resend
-      to: "info@dariellamotors.com", // aici primești tu mesajul
+      from: "notifications@oprenashue.resend.app", 
+      to: "info@dariellamotors.com",
       subject: `${firstName} is interested in ${carTitle}`,
       html: `
         <h2>New Inquiry – Check Availability</h2>
@@ -27,12 +26,12 @@ export async function POST(req: Request) {
 
         <br />
         <p>This lead was automatically generated from the website.</p>
-      `,
+      `
     });
 
     return Response.json({ success: true });
   } catch (error) {
-    console.error("Email send error:", error);
+    console.log("EMAIL ERROR →", error);
     return Response.json({ error: "Failed to send email" }, { status: 500 });
   }
 }
