@@ -5,6 +5,7 @@ import Image from "next/image";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
 import { getUserRole } from "@/lib/auth";
+import ContactPopup from "@/components/popup/ContactPopup";
 
 interface TeamMember {
   name: string;
@@ -30,20 +31,20 @@ interface AboutData {
 
 export default function AboutPage() {
   const [content, setContent] = useState<AboutData>({
-    heroTitle: "BUILT ON TWENTY FIVE YEARS OF AUTO RACING PASSION",
+    heroTitle: "A DECADE OF EXPERIENCE IN THE AUTOMOTIVE INDUSTRY",
     heroSubtitle: "Dariella Motors",
     heroImage: "/images/hero-about.jpg",
     heroText:
-      "Dariella Motors has become the premier exotic car dealer located in the heart of North Miami, Florida.",
+      "Dariella Motors has distinguished itself as a premier automotive retailer.",
     heroButtons: [
-      { text: "CONTACT US", link: "https://wa.me/17864629941" },
+      { text: "CONTACT US", link: "" },
       { text: "VIEW OUR INVENTORY", link: "/listings" },
     ],
-    section2Title: "WE BUY, SELL AND CONSIGN EXOTIC CARS NATIONWIDE",
+    section2Title: "WE PROVIDE CAR BUYING, SELLING & CONSIGNMENT SERVICES NATIONWIDE",
     section2Text:
       "Dariella Motors is located in North Miami, Florida, and serves customers throughout the country and the world.",
     section2Quote:
-      "We work hard every day to build a reputation as the most trusted exotic car dealer. I personally inspect and handle each and every car sale.",
+      "We work hard every day to build a reputation as the most trusted car dealer. I personally inspect and handle each and every car sale.",
     section2Image: "/images/about-team.jpg",
     teamTitle: "OUR TEAM",
     team: [
@@ -54,6 +55,7 @@ export default function AboutPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [role, setRole] = useState<string | null>(null);
   const [status, setStatus] = useState("");
+  const [contactOpen, setContactOpen] = useState(false);
 
   // 🔹 Load Firestore content
   useEffect(() => {
@@ -159,13 +161,20 @@ export default function AboutPage() {
                     className="border border-gray-300 px-3 py-2 rounded text-sm text-gray-700"
                   />
                 ) : (
-                  <a
-                    key={i}
-                    href={btn.link}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded font-semibold text-sm transition"
-                  >
-                    {btn.text}
-                  </a>
+                  <button
+  key={i}
+  onClick={() => {
+    if (btn.text.toUpperCase() === "CONTACT US") {
+      setContactOpen(true);
+    } else {
+      window.location.href = btn.link;
+    }
+  }}
+  className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded font-semibold text-sm transition"
+>
+  {btn.text}
+</button>
+
                 )
               )}
             </div>
@@ -387,6 +396,7 @@ export default function AboutPage() {
           </div>
         )}
       </div>
+      <ContactPopup open={contactOpen} onClose={() => setContactOpen(false)} />
     </section>
   );
 }

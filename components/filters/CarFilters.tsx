@@ -88,7 +88,7 @@ useEffect(() => {
   }
 
   // altfel, filtrăm doar modelele care au marca selectată
-  const filteredModels = new Set<string>();
+  const filteblueModels = new Set<string>();
   carsData.forEach((car) => {
     const make =
       car.make ||
@@ -111,11 +111,11 @@ useEffect(() => {
       typeof model === "string" &&
       make.trim().toLowerCase() === filters.make.trim().toLowerCase()
     ) {
-      filteredModels.add(model.trim());
+      filteblueModels.add(model.trim());
     }
   });
 
-  setModels(Array.from(filteredModels).sort());
+  setModels(Array.from(filteblueModels).sort());
 }, [filters.make, carsData]);
 
 
@@ -168,7 +168,7 @@ useEffect(() => {
         />
         <button
           type="submit"
-          className="bg-red-600 hover:bg-red-700 text-white p-2 rounded-full transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition"
         >
           <Search className="h-4 w-4" />
         </button>
@@ -180,7 +180,7 @@ useEffect(() => {
           type="button"
           onClick={() => handleDropdown("years")}
           className={`flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700 text-sm font-medium ${
-            openDropdown === "years" ? "ring-2 ring-red-500" : ""
+            openDropdown === "years" ? "ring-2 ring-blue-500" : ""
           }`}
         >
           Years
@@ -242,7 +242,7 @@ useEffect(() => {
           type="button"
           onClick={() => handleDropdown("make")}
           className={`flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700 text-sm font-medium ${
-            openDropdown === "make" ? "ring-2 ring-red-500" : ""
+            openDropdown === "make" ? "ring-2 ring-blue-500" : ""
           }`}
         >
           Make
@@ -296,7 +296,7 @@ useEffect(() => {
           type="button"
           onClick={() => handleDropdown("model")}
           className={`flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700 text-sm font-medium ${
-            openDropdown === "model" ? "ring-2 ring-red-500" : ""
+            openDropdown === "model" ? "ring-2 ring-blue-500" : ""
           }`}
         >
           Model
@@ -350,7 +350,7 @@ useEffect(() => {
           type="button"
           onClick={() => handleDropdown("price")}
           className={`flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700 text-sm font-medium ${
-            openDropdown === "price" ? "ring-2 ring-red-500" : ""
+            openDropdown === "price" ? "ring-2 ring-blue-500" : ""
           }`}
         >
           Price
@@ -396,7 +396,7 @@ useEffect(() => {
           type="button"
           onClick={() => handleDropdown("sort")}
           className={`flex items-center gap-2 bg-gray-800 rounded-full px-4 py-2 border border-gray-700 text-sm font-medium ${
-            openDropdown === "sort" ? "ring-2 ring-red-500" : ""
+            openDropdown === "sort" ? "ring-2 ring-blue-500" : ""
           }`}
         >
           Sort

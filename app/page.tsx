@@ -122,7 +122,7 @@ export default function HomePage() {
     heroImage: "/images/hero-vintage.jpg",
     cta1: "Browse All Listings",
     cta2: "Talk to Us",
-    bannerTitle: "Got a classic to consign?",
+    bannerTitle: "Got a car to sell or consign?",
     bannerText: "We make it easy—photography, paperwork, nationwide buyers.",
   });
 

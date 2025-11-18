@@ -33,7 +33,7 @@ export default function FinancePage() {
     title: "FINANCE",
     subtitle: "Don't allow your aspirations to be hindered by financial constraints.",
     description:
-      "You have the power and the control thru hours financing partners or others of your choice , to find the best solution that sadisfied you and your needs . We are here to help finding the best solution and the Instant promise for tayloring for You a Exclusive offer Proven and Guaranteed Saving money solution from our part .",
+      "You have the power and the control thru hours financing partners or others of your choice, to find the best solution that sadisfied you and your needs. We are here to help finding the best solution and the Instant promise for tayloring for You a Exclusive offer Proven and Guaranteed Saving money solution from our part.",
     benefitsTitle: "Why Finance With Us?",
     benefits: [
       "Competitive rates from top automotive lenders",

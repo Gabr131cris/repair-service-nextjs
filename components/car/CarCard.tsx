@@ -126,12 +126,12 @@ export default function CarCard({ car }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent opacity-70 group-hover:opacity-90 transition"></div>
 
         {/* 🔹 Status Badge — culoare din Firestore */}
-        <span
+        {/* <span
           className="absolute top-3 left-3 text-[11px] font-semibold px-2.5 py-1.5 rounded-full tracking-wide shadow-md text-white"
           style={{ backgroundColor: statusColor }}
         >
           {(car.status || "Unknown").toUpperCase()}
-        </span>
+        </span>*/}
       </Link>
 
       {/* 🧾 Informații principale */}
@@ -157,17 +157,17 @@ export default function CarCard({ car }: Props) {
 
         {/* Locație + buton */}
         <div className="flex justify-between items-center">
-          {location ? (
+         {/*  {location ? (
             <span className="text-sm text-gray-500 truncate">📍 {location}</span>
           ) : (
             <span className="text-sm text-gray-400">—</span>
-          )}
+          )}*/}
 
           <Link
             href={`/listings/${car.id}`}
             className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
           >
-            View details →
+          {/*  View details →*/}
           </Link>
         </div>
       </div>
