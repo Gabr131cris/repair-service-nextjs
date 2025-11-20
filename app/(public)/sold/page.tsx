@@ -46,7 +46,7 @@ function SoldPage() {
   const [status, setStatus] = useState("");
   const [content, setContent] = useState({
     heroImage: "/images/hero-sold.jpg",
-    heroTitle: "Explore Our Classic Car Sold",
+    heroTitle: "Sold Inventory",
     heroText:
       "",
   });
