@@ -203,6 +203,8 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
     { name: string; active: boolean }[] | null
   >(null);
 
+
+  const [schemaStructure, setSchemaStructure] = useState<any>(null);
   useEffect(() => {
     const fetchSchemaOrder = async () => {
       try {
@@ -219,6 +221,27 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
     };
     fetchSchemaOrder();
   }, []);
+
+  useEffect(() => {
+  const loadSchema = async () => {
+    const snap = await getDocs(collection(db, "car_schemas"));
+    const map: any = {};
+
+    snap.forEach((doc) => {
+      const data = doc.data();
+      const name = data.title;
+      map[name] = {
+        fields: (data.fields || [])
+          .filter((f: any) => f.active !== false)
+          .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0)),
+      };
+    });
+
+    setSchemaStructure(map);
+  };
+
+  loadSchema();
+}, []);
 
   if (!schemaOrder)
     return (
@@ -237,6 +260,11 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
   const remaining = Object.keys(schemaData).filter(
     (key) => !definedNames.includes(key.toLowerCase())
   );
+
+  
+
+
+
 
   const finalSections = Array.from(
     new Map(
@@ -372,70 +400,81 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
             {isObject && (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                  {Object.entries(data).map(([fieldName, fieldValue]: any) => {
-                    if (
-                      [
-                        "content",
-                        "images",
-                        "tempId",
-                        "createdAt",
-                        "updatedAt",
-                      ].includes(fieldName)
-                    )
-                      return null;
 
-                    if (!fieldValue) return null;
+  {/* Dacă structura schema încă nu e încărcată, nu afișăm nimic */}
+  {!schemaStructure ? null : (() => {
 
-                    // 🔹 Dacă e un link YouTube, afișează player
-                    // 🔹 Dacă e link YouTube, afișează DOAR video — fără titlu
-if (isYouTubeLink(fieldValue)) {
-  return (
-    <div key={fieldName} className="col-span-3 w-full">
-      {renderYouTubeEmbed(fieldValue)}
-    </div>
-  );
-}
+    // 1️⃣ Ordinea câmpurilor definită în schema builder
+    const orderedFields =
+      schemaStructure[section]?.fields?.map((f: any) => f.name) || [];
 
+    // 2️⃣ Câmpuri care exista în schemaData dar nu sunt definite în schema builder
+    const fallbackFields = Object.keys(data).filter(
+      (key) =>
+        !["content", "images", "tempId", "createdAt", "updatedAt"].includes(
+          key
+        ) && !orderedFields.includes(key)
+    );
 
-                    /*const displayValue = Array.isArray(fieldValue)
-                      ? fieldValue.join(", ")
-                      : String(fieldValue);*/
-                    //--------------------FORMAT--------------------
-                    // 🛠️ Formatează numerele, dar NU formatează YEAR
-                    const formatIfNumber = (val: any, keyName: string) => {
-                      if (val === null || val === undefined) return "";
+    // 3️⃣ Ordinea finală a câmpurilor
+    const finalFields = [...orderedFields, ...fallbackFields];
 
-                      // 🛑 Nu formata numericele dacă câmpul este Year
-                      if (keyName.trim().toLowerCase() === "year") {
-                        return String(val);
-                      }
+    return finalFields.map((fieldName: string) => {
+      const fieldValue = data[fieldName];
+      if (!fieldValue) return null;
 
-                      const num = Number(val);
-                      return isNaN(num) ? String(val) : formatNumber(num);
-                    };
+      // -------------------------
+      // YouTube handling
+      // -------------------------
+      if (isYouTubeLink(fieldValue)) {
+        return (
+          <div key={fieldName} className="col-span-3 w-full">
+            {renderYouTubeEmbed(fieldValue)}
+          </div>
+        );
+      }
 
-                    const displayValue = Array.isArray(fieldValue)
-                      ? fieldValue
-                          .map((v) => formatIfNumber(v, fieldName))
-                          .join(", ")
-                      : formatIfNumber(fieldValue, fieldName);
+      // -------------------------
+      // FORMAT NUMBERS
+      // -------------------------
+      const formatIfNumber = (val: any, keyName: string) => {
+        if (val === null || val === undefined) return "";
 
-                    //--------------------END FORMAT--------------------
-                    return (
-                      <div
-                        key={fieldName}
-                        className="flex flex-col bg-gray-50 border border-gray-100 rounded-lg p-4 hover:bg-gray-100 transition"
-                      >
-                        <span className="text-xs font-semibold uppercase text-gray-500 tracking-wide">
-                          {fieldName.replace(/_/g, " ")}
-                        </span>
-                        <span className="text-gray-900 font-medium text-base mt-1">
-                          {displayValue}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
+        // year nu se formatează
+        if (keyName.trim().toLowerCase() === "year") {
+          return String(val);
+        }
+
+        const num = Number(val);
+        return isNaN(num) ? String(val) : formatNumber(num);
+      };
+
+      const displayValue = Array.isArray(fieldValue)
+        ? fieldValue.map((v) => formatIfNumber(v, fieldName)).join(", ")
+        : formatIfNumber(fieldValue, fieldName);
+
+      // -------------------------
+      // UI Card Value
+      // -------------------------
+      return (
+        <div
+          key={fieldName}
+          className="flex flex-col bg-gray-50 border border-gray-100 rounded-lg p-4 hover:bg-gray-100 transition"
+        >
+          <span className="text-xs font-semibold uppercase text-gray-500 tracking-wide">
+            {fieldName.replace(/_/g, " ")}
+          </span>
+
+          <span className="text-gray-900 font-medium text-base mt-1">
+            {displayValue}
+          </span>
+        </div>
+      );
+    });
+  })()}
+
+</div>
+
 
                 {/* 🔹 Content + imagini */}
                 {data.content && (
