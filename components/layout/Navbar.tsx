@@ -41,7 +41,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/listings", label: "Listings" },
+    { href: "/listings", label: "Find Your Car" },
     { href: "/sold", label: "Sold" },
     { href: "/finance", label: "Finance" },
     { href: "/shipping", label: "Shipping" },
