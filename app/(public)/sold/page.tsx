@@ -94,6 +94,7 @@ function SoldPage() {
       }
     })();
   }, []);
+  
 
   const handleSave = async () => {
     try {

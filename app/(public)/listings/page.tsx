@@ -55,6 +55,13 @@ function ListingsPage() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
+  const reset = searchParams.get("reset");
+  if (reset === "1") {
+    setPage(1);
+  }
+}, [searchParams]);
+
+  useEffect(() => {
     const q = searchParams.get("query");
     if (q) {
       setFilters((prev: any) => ({ ...prev, query: q }));

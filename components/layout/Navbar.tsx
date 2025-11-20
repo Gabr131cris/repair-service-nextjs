@@ -48,10 +48,27 @@ export default function Navbar() {
     { href: "/about", label: "About" },
   ];
 
+  // Funcție reutilizabilă pentru resetarea la pagina 1
+  // Funcție reutilizabilă pentru resetarea la pagina 1
+const handleNavClick = (href: string) => {
+  if (pathname === href) {
+    // ești deja pe aceeași pagină → forțează refresh real
+    router.push(`${href}?t=${Date.now()}`);
+  } else {
+    // altă pagină → navigare normală
+    router.push(href);
+  }
+
+  setOpen(false);
+};
+
+
+
   return (
     <nav className="bg-white text-gray-800 shadow-sm sticky top-0 z-50 border-b border-gray-200">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
-        {/* 🔹 LOGO or site name fallback */}
+
+        {/* LOGO */}
         <Link href="/" className="flex items-center space-x-2">
           {siteInfo?.logoUrl ? (
             <img
@@ -71,7 +88,7 @@ export default function Navbar() {
           )}
         </Link>
 
-        {/* 🔹 SEARCH BAR (desktop) */}
+        {/* DESKTOP SEARCH */}
         <form
           onSubmit={handleSearch}
           className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-4 py-1.5 w-[400px] lg:w-[500px] xl:w-[600px] border border-gray-200"
@@ -92,12 +109,13 @@ export default function Navbar() {
           </button>
         </form>
 
-        {/* 🔹 NAV LINKS (desktop) */}
+        {/* DESKTOP LINKS */}
         <div className="hidden md:flex items-center space-x-6 font-medium">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
+              onClick={() => handleNavClick(link.href)}
               className={`transition ${
                 pathname === link.href
                   ? "text-blue-600 font-semibold"
@@ -108,17 +126,15 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* Contact button */}
           <Link
-  href="/contact"
-  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold 
-             transition-all duration-200 hover:shadow-lg hover:shadow-blue-300/50"
->
-  Contact
-</Link>
+            href="/contact"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-300/50"
+          >
+            Contact
+          </Link>
         </div>
 
-        {/* 🔹 MOBILE MENU BUTTON */}
+        {/* MOBILE BUTTON */}
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden text-gray-600 hover:text-blue-600"
@@ -127,10 +143,11 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* 🔹 MOBILE DROPDOWN */}
+      {/* MOBILE DROPDOWN */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-sm">
-          {/* Search bar (mobile) */}
+
+          {/* MOBILE SEARCH */}
           <form
             onSubmit={handleSearch}
             className="flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-2 m-4 border border-gray-200"
@@ -151,13 +168,13 @@ export default function Navbar() {
             </button>
           </form>
 
-          {/* Menu items */}
+          {/* MOBILE MENU LINKS */}
           <ul className="flex flex-col space-y-2 px-6 pb-4 font-medium">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  onClick={() => setOpen(false)}
+                  onClick={() => handleNavClick(link.href)}
                   className={`block py-2 transition ${
                     pathname === link.href
                       ? "text-blue-600 font-semibold"
