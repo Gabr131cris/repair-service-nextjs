@@ -57,6 +57,7 @@ export default function Sidebar() {
           { href: "/dashboard/superadmin/stats", label: "Analytics", icon: <BarChart2 size={18} /> },
           { href: "/dashboard/superadmin/schema-builder", label: "Schema Builder", icon: <ListOrdered size={18} /> },
           { href: "/dashboard/superadmin/schema-order", label: "Section Order", icon: <ListOrdered size={18} /> },
+          { href: "/dashboard/superadmin/schema-field-order", label: "Fields Order", icon: <ListOrdered size={18} /> },
           { href: "/dashboard/superadmin/schema-migrator", label: "Migrate Data", icon: <ListOrdered size={18} /> },
           
           { href: "/dashboard/tools/webp-converter", label: "Convertor WEBP", icon: <ListOrdered size={18} /> },
