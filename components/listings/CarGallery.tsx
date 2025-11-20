@@ -9,8 +9,8 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // 🔹 1. CATEGORII SORTATE STABIL (Exterior primul)
-  const categories = useMemo(() => {
+  // 🔹 1. CATEGORII SORTATE STABIL (Exterior primul) 
+ /* const categories = useMemo(() => {
     if (!schemaData) return [];
 
     const keys = Object.keys(schemaData).filter(
@@ -23,7 +23,43 @@ export default function CarGallery({ schemaData }: { schemaData: any }) {
         .filter((k) => k.toLowerCase() !== "exterior")
         .sort((a, b) => a.localeCompare(b)),
     ];
-  }, [schemaData]);
+  }, [schemaData]);*/
+ // 1. Categorii sortate stabil ext primul 
+  const categories = useMemo(() => {
+  if (!schemaData) return [];
+
+  // extrage secțiunile care chiar au imagini
+  const keys = Object.keys(schemaData).filter(
+    (key) => schemaData[key]?.images?.length > 0
+  );
+
+  // normalizare la lowercase pentru comparație
+  const lower = keys.map((k) => k.toLowerCase());
+
+  // ordinea preferată
+  const preferred = [
+    "exterior",
+    "interior",
+    "engine",
+    "documents",
+    "others",
+    "other images",
+  ];
+
+  // 1️⃣ Secțiuni în ordinea preferată (dacă există)
+  const orderedPreferred = preferred
+    .map((name) => keys.find((k) => k.toLowerCase() === name))
+    .filter(Boolean);
+
+  // 2️⃣ Restul secțiunilor care nu sunt în preferred
+  const remaining = keys
+    .filter((k) => !preferred.includes(k.toLowerCase()))
+    .sort((a, b) => a.localeCompare(b));
+
+  // ORDINEA FINALĂ
+  return [...orderedPreferred, ...remaining];
+}, [schemaData]);
+
 
   // 🔹 2. SORTARE STABILĂ PENTRU IMAGINI
   const sortImages = (images: any[]) =>

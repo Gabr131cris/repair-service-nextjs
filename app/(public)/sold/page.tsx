@@ -6,7 +6,7 @@ import Image from "next/image";
 import { getCars } from "@/lib/firestore";
 import { Car } from "@/lib/types";
 import CarCardSold from "@/components/car/CarCardSold";
-import CarFilters from "@/components/filters/CarFilters";
+import CarFiltersSold from "@/components/filters/CarFiltersSold";
 import { getUserRole } from "@/lib/auth";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
@@ -301,7 +301,7 @@ function SoldPage() {
       {/* FILTERS */}
       <section className="w-full bg-gray-900 py-4 px-4 md:px-8 -mt-6 relative z-10">
         <div className="max-w-[1600px] mx-auto">
-          <CarFilters onFilter={setFilters} />
+          <CarFiltersSold onFilter={setFilters} />
         </div>
       </section>
 
