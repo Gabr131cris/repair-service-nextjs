@@ -14,7 +14,6 @@ export default function Navbar() {
   const [search, setSearch] = useState("");
   const [siteInfo, setSiteInfo] = useState<any>(null);
 
-  // 🔹 Load site info from Firestore
   useEffect(() => {
     const fetchSiteInfo = async () => {
       try {
@@ -22,17 +21,15 @@ export default function Navbar() {
         const snap = await getDoc(refDoc);
         if (snap.exists()) setSiteInfo(snap.data());
       } catch (err) {
-        console.error("Error loading site info:", err);
+        console.error(err);
       }
     };
     fetchSiteInfo();
   }, []);
 
-  // 🔍 Handle search (redirect + pass query param)
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (search.trim()) {
-      // Trimite către listings cu parametru de query
       router.push(`/listings?query=${encodeURIComponent(search.trim())}`);
       setSearch("");
       setOpen(false);
@@ -48,27 +45,18 @@ export default function Navbar() {
     { href: "/about", label: "About" },
   ];
 
-  // Funcție reutilizabilă pentru resetarea la pagina 1
-  // Funcție reutilizabilă pentru resetarea la pagina 1
-const handleNavClick = (href: string) => {
-  if (pathname === href) {
-    // ești deja pe aceeași pagină → forțează refresh real
-    router.push(`${href}?t=${Date.now()}`);
-  } else {
-    // altă pagină → navigare normală
-    router.push(href);
-  }
-
-  setOpen(false);
-};
-
-
+  const handleNavClick = (href: string) => {
+    if (pathname === href) {
+      window.location.reload(); // Hard refresh EXACT ca F5
+    } else {
+      router.push(href);
+    }
+    setOpen(false);
+  };
 
   return (
     <nav className="bg-white text-gray-800 shadow-sm sticky top-0 z-50 border-b border-gray-200">
       <div className="container mx-auto flex items-center justify-between px-4 py-3 md:py-4">
-
-        {/* LOGO */}
         <Link href="/" className="flex items-center space-x-2">
           {siteInfo?.logoUrl ? (
             <img
@@ -88,7 +76,6 @@ const handleNavClick = (href: string) => {
           )}
         </Link>
 
-        {/* DESKTOP SEARCH */}
         <form
           onSubmit={handleSearch}
           className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-4 py-1.5 w-[400px] lg:w-[500px] xl:w-[600px] border border-gray-200"
@@ -109,13 +96,15 @@ const handleNavClick = (href: string) => {
           </button>
         </form>
 
-        {/* DESKTOP LINKS */}
         <div className="hidden md:flex items-center space-x-6 font-medium">
           {navLinks.map((link) => (
             <Link
               key={link.href}
-              href={link.href}
-              onClick={() => handleNavClick(link.href)}
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleNavClick(link.href);
+              }}
               className={`transition ${
                 pathname === link.href
                   ? "text-blue-600 font-semibold"
@@ -134,7 +123,6 @@ const handleNavClick = (href: string) => {
           </Link>
         </div>
 
-        {/* MOBILE BUTTON */}
         <button
           onClick={() => setOpen(!open)}
           className="md:hidden text-gray-600 hover:text-blue-600"
@@ -143,11 +131,8 @@ const handleNavClick = (href: string) => {
         </button>
       </div>
 
-      {/* MOBILE DROPDOWN */}
       {open && (
         <div className="md:hidden bg-white border-t border-gray-200 shadow-sm">
-
-          {/* MOBILE SEARCH */}
           <form
             onSubmit={handleSearch}
             className="flex items-center bg-gray-100 rounded-full overflow-hidden px-3 py-2 m-4 border border-gray-200"
@@ -168,13 +153,15 @@ const handleNavClick = (href: string) => {
             </button>
           </form>
 
-          {/* MOBILE MENU LINKS */}
           <ul className="flex flex-col space-y-2 px-6 pb-4 font-medium">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <Link
-                  href={link.href}
-                  onClick={() => handleNavClick(link.href)}
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleNavClick(link.href);
+                  }}
                   className={`block py-2 transition ${
                     pathname === link.href
                       ? "text-blue-600 font-semibold"
