@@ -25,7 +25,7 @@ export async function DELETE(req: Request) {
     const carData = snap.data();
     const schemaData = carData?.schemaData || {};
 
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage;
 
     // 🔥 Colectăm toate imaginile + fișierele referite în schemaData
     const filesToDelete: string[] = [];

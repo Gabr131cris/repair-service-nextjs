@@ -14,30 +14,30 @@ export async function POST(req: Request) {
     if (!carId)
       return NextResponse.json({ error: "Missing carId" }, { status: 400 });
 
-    // 🔥 Citește datele mașinii din Firestore
     const snap = await adminDb.collection("cars").doc(carId).get();
     if (!snap.exists)
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
 
     const carData = snap.data();
     const schema = carData?.schemaData || {};
+    const tempId = carData?.tempId;
 
-    // Extrage numele mașinii pentru afișare
     const carName =
       schema?.General?.Title ||
       (schema?.General?.Make + " " + schema?.General?.Model) ||
       "Unnamed Car";
 
-    // tempId este folderul real local
-    const tempId = carData?.tempId;
-
     if (!tempId)
       return NextResponse.json({
-        error: "This car does not have tempId, cannot match local folder",
+        error: "This car does not have tempId → cannot match local folder",
       });
 
-    // 🟦 Caută folderul local corect: <PROJECT>/public/uploads/<tempId>
-    const localFolder = path.join(process.cwd(), "public", "uploads", tempId.toString());
+    const localFolder = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      tempId.toString()
+    );
 
     if (!fs.existsSync(localFolder)) {
       return NextResponse.json({
@@ -52,7 +52,6 @@ export async function POST(req: Request) {
     const log: string[] = [];
     const files: { fullPath: string; filename: string; section: string }[] = [];
 
-    // 🔍 Recursiv — citește toate fișierele și structura
     const walk = (dir: string, sections: string[] = []) => {
       const entries = fs.readdirSync(dir);
 
@@ -76,13 +75,9 @@ export async function POST(req: Request) {
 
     const uploadedPaths: Record<string, string> = {};
 
-    // 🟦 Upload fiecare fișier în Firebase Storage
     for (const f of files) {
       const buffer = fs.readFileSync(f.fullPath);
-
-      // ❗❗ AICI schimbăm carId → tempId !!!
       const storagePath = `cars/${tempId}/${f.section}/${f.filename}`;
-
       const fileRef = adminStorage.file(storagePath);
 
       await fileRef.save(buffer, { public: true });
@@ -93,7 +88,6 @@ export async function POST(req: Request) {
       log.push(`Uploaded: ${f.filename} → ${storagePath}`);
     }
 
-    // 🔥 Update schemaData cu noile linkuri
     function updateLinks(obj: any) {
       for (const key in obj) {
         if (typeof obj[key] === "string") {
@@ -110,12 +104,12 @@ export async function POST(req: Request) {
 
     updateLinks(schema);
 
-    // 🟦 Scrie în Firestore
     await adminDb.collection("cars").doc(carId).update({
       schemaData: schema,
+      moved: true,        // <-- ADĂUGAT
+      movedAt: Date.now() // <-- OPTIONAL
     });
 
-    // 🗑️ Șterge folderul local
     fs.rmSync(localFolder, { recursive: true, force: true });
 
     return NextResponse.json({

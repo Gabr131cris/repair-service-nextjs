@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing filePath" }, { status: 400 });
     }
 
-    const bucket = adminStorage.bucket();
+    const bucket = adminStorage;
 
     // 🔥 Extragem path-ul real din URL Firebase Storage
     // Exemplu URL:

@@ -1,5 +1,5 @@
 "use client";
-//sterge dupa
+
 import { useState, useEffect } from "react";
 
 export default function MovePage() {
@@ -27,6 +27,10 @@ export default function MovePage() {
 
     setLog(JSON.stringify(data, null, 2));
     setMovingCar(null);
+
+    // reîncarcă lista
+    const reload = await fetch("/api/move/list");
+    setCars((await reload.json()).cars);
   };
 
   if (loading) return <p>Loading...</p>;
@@ -39,22 +43,41 @@ export default function MovePage() {
 
       <ul className="mt-4 space-y-2">
         {cars.map((car) => (
-          <li key={car.id} className="p-3 border rounded flex justify-between">
-            <span>{car.id}</span>
+          <li
+  key={car.id}
+  className="p-3 border rounded flex justify-between items-center"
+>
+  <div className="flex flex-col">
+    <span className="text-gray-500 text-sm">ID: {car.id}</span>
+    <span className="font-semibold">{car.name}</span>
+    <span className="text-sm text-gray-600">
+      Local folder: {car.tempId || "unknown"}
+    </span>
+  </div>
 
-            <button
-              onClick={() => moveCar(car.id)}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-              disabled={movingCar === car.id}
-            >
-              {movingCar === car.id ? "Moving..." : "Move"}
-            </button>
-          </li>
+  <div className="flex items-center gap-4">
+    {car.moved ? (
+      <span className="text-green-600 font-bold text-xl">✔</span>
+    ) : (
+      <span className="text-red-600 font-bold text-xl">✗</span>
+    )}
+
+    <button
+      onClick={() => moveCar(car.id)}
+      className="bg-blue-600 text-white px-4 py-2 rounded"
+      disabled={movingCar === car.id || car.moved}
+    >
+      {movingCar === car.id ? "Moving..." : car.moved ? "Moved" : "Move"}
+    </button>
+  </div>
+</li>
+
         ))}
       </ul>
+      
 
       {log && (
-        <pre className="mt-6 p-4 bg-black text-green-400 rounded">
+        <pre className="mt-6 p-4 bg-black text-green-400 rounded overflow-x-auto text-sm">
           {log}
         </pre>
       )}
