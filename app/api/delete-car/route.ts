@@ -50,21 +50,26 @@ export async function DELETE(req: Request) {
 
     // 🔥 Ștergem toate fișierele din Firebase Storage
     for (const url of filesToDelete) {
-      try {
-        // extragem path-ul din URL-ul public
-        const decoded = decodeURIComponent(url);
-        const startIndex = decoded.indexOf("/o/") + 3;
-        const endIndex = decoded.indexOf("?");
+  try {
+    const decoded = decodeURIComponent(url);
 
-        const storagePath = decoded.substring(startIndex, endIndex).replace("%2F", "/");
+    // numele bucketului
+    const bucketName = process.env.FIREBASE_STORAGE_BUCKET;
 
-        await bucket.file(storagePath).delete();
+    // prefixul URL gcs
+    const prefix = `https://storage.googleapis.com/${bucketName}/`;
 
-        console.log("🗑️ Deleted from Storage:", storagePath);
-      } catch (err) {
-        console.error("⚠️ Failed to delete:", url, err);
-      }
-    }
+    // scoatem prefixul și rămâne doar path-ul
+    const storagePath = decoded.replace(prefix, "");
+
+    await bucket.file(storagePath).delete();
+
+    console.log("🗑️ Deleted:", storagePath);
+  } catch (err) {
+    console.error("⚠️ Failed to delete:", url, err);
+  }
+}
+
 
     // 🔹 Ștergem documentul Firestore
     await carRef.delete();
