@@ -552,3 +552,4 @@ function DynamicSections({ schemaData }: { schemaData: any }) {
     </>
   );
 }
+}
