@@ -78,7 +78,7 @@ export default function ConsignPage() {
         <div className="mt-12 w-full aspect-video rounded-xl overflow-hidden shadow-lg">
           <iframe
             className="w-full h-full"
-            src="https://www.youtube.com/embed/z2yCk8XGGo8"
+            src="https://www.youtube.com/embed/ED7-mdDkaY4?si=wwPeidKi9H6X6sAK"
             title="Consignment Video"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
