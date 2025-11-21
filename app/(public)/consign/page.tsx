@@ -115,7 +115,7 @@ export default function ConsignPage() {
       <section className="py-20 max-w-6xl mx-auto px-6">
         <div className="relative rounded-3xl overflow-hidden shadow-lg bg-black/20">
           <Image
-            src="/public/uploads/pages/consign-bottom.jpg"
+            src="/uploads/pages/consign-bottom.jpg"
             alt="Car Interior"
             fill
             className="object-cover opacity-50"
