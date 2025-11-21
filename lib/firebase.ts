@@ -15,7 +15,6 @@ let firestoreDb: ReturnType<typeof getFirestore> | null = null;
 export function getFirebaseApp() {
   // 🚫 Evită rularea pe server (SSR)
   if (typeof window === "undefined") {
-    
     return getApps().length ? getApp() : ({} as any);
   }
 
@@ -43,9 +42,10 @@ export function getFirebaseApp() {
       measurementId:
         process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ||
         (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+      storagebucket:
+        process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+        (import.meta as any)?.env?.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     };
-
-    
 
     // ❌ Dacă lipsesc variabile, log explicit
     if (!firebaseConfig.apiKey) {
@@ -85,7 +85,6 @@ export async function getFirebaseAuth() {
 }
 
 // 🔹 Exporturi compatibile pentru codul existent
-export const db =
-  typeof window !== "undefined" ? getDb() : (null as any);
+export const db = typeof window !== "undefined" ? getDb() : (null as any);
 export const appInstance =
   typeof window !== "undefined" ? getFirebaseApp() : ({} as any);

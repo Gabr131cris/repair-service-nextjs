@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const { firstName, lastName, email, phone, carTitle, pageUrl } = body;
 
     await resend.emails.send({
-      from: "Dariella Motors <noreply@dariellamotors.com>", // NEAPĂRAT domeniul tău verificat
+      from: "Dariella Motors <noreply@dariellamotors.com>", 
       to: "info@dariellamotors.com",
       subject: `${firstName} is interested in ${carTitle}`,
       html: `

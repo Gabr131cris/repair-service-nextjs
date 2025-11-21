@@ -1,8 +1,6 @@
 // app/api/delete-car/route.ts
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebaseAdmin"; // 🔹 folosim versiunea server-side
-import fs from "fs";
-import path from "path";
+import { adminDb, adminStorage } from "@/lib/firebaseAdmin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,43 +11,60 @@ export async function DELETE(req: Request) {
     const carId = searchParams.get("id");
 
     if (!carId) {
-      console.warn("❌ Missing carId in request");
       return NextResponse.json({ error: "Missing carId" }, { status: 400 });
     }
 
-    // 🔹 Citește documentul Firestore (Admin SDK)
+    // 🔹 Citește documentul Firestore
     const carRef = adminDb.collection("cars").doc(carId);
     const snap = await carRef.get();
 
     if (!snap.exists) {
-      console.warn("⚠️ Car not found in Firestore:", carId);
       return NextResponse.json({ error: "Car not found" }, { status: 404 });
     }
 
     const carData = snap.data();
-    const tempId = carData?.tempId || carId;
+    const schemaData = carData?.schemaData || {};
 
-    // 🔹 Construiește path-urile locale către foldere
-    const uploadDirFirestore = path.join(process.cwd(), "public", "uploads", carId);
-    const uploadDirTemp = path.join(process.cwd(), "public", "uploads", tempId);
+    const bucket = adminStorage.bucket();
 
-    // 🔹 Helper: șterge folderele dacă există
-    const tryDelete = (dir: string) => {
-      if (fs.existsSync(dir)) {
-        try {
-          fs.rmSync(dir, { recursive: true, force: true });
-          console.log(`🗑️ Deleted folder: ${dir}`);
-        } catch (err) {
-          console.error(`⚠️ Failed to delete folder: ${dir}`, err);
-        }
-      } else {
-        console.warn(`⚠️ Folder not found: ${dir}`);
+    // 🔥 Colectăm toate imaginile + fișierele referite în schemaData
+    const filesToDelete: string[] = [];
+
+    for (const section of Object.values(schemaData)) {
+      if (!section || typeof section !== "object") continue;
+
+      // 🔹 IMAGES
+      if (Array.isArray(section.images)) {
+        section.images.forEach((img: any) => {
+          if (img.src) filesToDelete.push(img.src);
+        });
       }
-    };
 
-    // 🔹 Ștergem folderele asociate mașinii
-    tryDelete(uploadDirFirestore);
-    if (tempId !== carId) tryDelete(uploadDirTemp);
+      // 🔹 FILES (PDF / DOC)
+      if (Array.isArray(section.files)) {
+        section.files.forEach((f: any) => {
+          if (f.src) filesToDelete.push(f.src);
+        });
+      }
+    }
+
+    // 🔥 Ștergem toate fișierele din Firebase Storage
+    for (const url of filesToDelete) {
+      try {
+        // extragem path-ul din URL-ul public
+        const decoded = decodeURIComponent(url);
+        const startIndex = decoded.indexOf("/o/") + 3;
+        const endIndex = decoded.indexOf("?");
+
+        const storagePath = decoded.substring(startIndex, endIndex).replace("%2F", "/");
+
+        await bucket.file(storagePath).delete();
+
+        console.log("🗑️ Deleted from Storage:", storagePath);
+      } catch (err) {
+        console.error("⚠️ Failed to delete:", url, err);
+      }
+    }
 
     // 🔹 Ștergem documentul Firestore
     await carRef.delete();
@@ -58,6 +73,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error("❌ Delete error:", err);
-    return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
