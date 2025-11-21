@@ -220,12 +220,26 @@ export default function VehicleInquiryForm() {
       {/* SUBMIT BUTTON */}
       <div className="flex justify-center mt-10">
         <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="px-10 py-3 rounded-full font-semibold text-black bg-gradient-to-b from-blue-300 to-blue-500 hover:opacity-90 transition disabled:opacity-50"
-        >
-          {loading ? "Submitting..." : "SUBMIT"}
-        </button>
+  onClick={handleSubmit}
+  disabled={loading}
+  className="
+    bg-blue-600 
+    hover:bg-blue-700 
+    text-white 
+    px-10 
+    py-3 
+    rounded-full 
+    font-semibold 
+    transition-all 
+    duration-200 
+    hover:shadow-lg 
+    hover:shadow-blue-300/50 
+    disabled:opacity-50
+  "
+>
+  {loading ? "Submitting..." : "SUBMIT"}
+</button>
+
       </div>
     </div>
   );
