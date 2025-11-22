@@ -32,17 +32,17 @@ interface AboutData {
 export default function AboutPage() {
   const [content, setContent] = useState<AboutData>({
     heroTitle: "A DECADE OF EXPERIENCE IN THE AUTOMOTIVE INDUSTRY",
-    heroSubtitle: "Dariella Motors",
+    heroSubtitle: "Repair Service",
     heroImage: "/images/hero-about.jpg",
     heroText:
-      "Dariella Motors has distinguished itself as a premier automotive retailer.",
+      "Repair Service has distinguished itself as a premier automotive retailer.",
     heroButtons: [
       { text: "CONTACT US", link: "" },
       { text: "VIEW OUR INVENTORY", link: "/listings" },
     ],
     section2Title: "WE PROVIDE CAR BUYING, SELLING & CONSIGNMENT SERVICES NATIONWIDE",
     section2Text:
-      "Dariella Motors is located in North Miami, Florida, and serves customers throughout the country and the world.",
+      "Repair Service is located in North Miami, Florida, and serves customers throughout the country and the world.",
     section2Quote:
       "We work hard every day to build a reputation as the most trusted car dealer. I personally inspect and handle each and every car sale.",
     section2Image: "/images/about-team.jpg",

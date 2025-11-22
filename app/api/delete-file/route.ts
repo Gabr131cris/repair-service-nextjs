@@ -16,7 +16,7 @@ export async function POST(req: Request) {
 
     // 🔥 Extragem path-ul real din URL Firebase Storage
     // Exemplu URL:
-    // https://firebasestorage.googleapis.com/v0/b/dariella-motors-storage.appspot.com/o/cars%2F123%2Ffiles%2Fdoc.pdf?alt=media&token=xyz
+    // https://firebasestorage.googleapis.com/v0/b/repair-service-storage.appspot.com/o/cars%2F123%2Ffiles%2Fdoc.pdf?alt=media&token=xyz
     const decoded = decodeURIComponent(filePath);
     const startIndex = decoded.indexOf("/o/") + 3;
     const endIndex = decoded.indexOf("?");

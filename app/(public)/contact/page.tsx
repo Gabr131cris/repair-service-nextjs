@@ -24,7 +24,7 @@ export default function ContactPage() {
       "We’d love to hear from you! Reach out to discuss your next vehicle purchase, or just say hello.",
     address: "",
     phone: "",
-    email: "info@dariellamotors.com",
+    email: "info@repairservice.com",
     hours: {
       "Monday - Friday": "9 AM - 5 PM",
       Saturday: "9 AM - 12 PM",
@@ -77,7 +77,7 @@ export default function ContactPage() {
       <section className="relative w-full h-[45vh] min-h-[420px]">
         <Image
           src="/images/hero-contact.jpg" // 👉 pune aici imaginea ta (ex: assets/hero-contact.jpg)
-          alt="Contact Dariella Motors"
+          alt="Contact Repair Service"
           fill
           priority
           className="object-cover"

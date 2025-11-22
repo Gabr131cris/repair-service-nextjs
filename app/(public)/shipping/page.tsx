@@ -25,9 +25,9 @@ export default function ShippingPage() {
     heroImage: "/images/shipping-hero.jpg",
     title: "Safe Shipping",
     description: [
-      "At Dariella Motors, we specialise in providing comprehensive transportation and shipping services for a wide range of vehicles, encompassing all makes, models and years of manufacture. Our highly experienced team is dedicated to ensuring the safe and careful transportation of your vehicle from one location to another.",
+      "At Repair Service, we specialise in providing comprehensive transportation and shipping services for a wide range of vehicles, encompassing all makes, models and years of manufacture. Our highly experienced team is dedicated to ensuring the safe and careful transportation of your vehicle from one location to another.",
       "We recognise the importance of your vehicle as a significant investment, and therefore we employ only the most advanced car transport equipment and techniques to ensure its proper and safe handling during transport.",
-      "From our enclosed shipping trailers that protect your car from the elements to our open trailer options which allow for direct loading and unloading, Dariella Motors has you covered when it comes to car transport.",
+      "From our enclosed shipping trailers that protect your car from the elements to our open trailer options which allow for direct loading and unloading, Repair Service has you covered when it comes to car transport.",
       "We also offer express delivery services on select vehicles, so you can rest assured that your car is arriving on-time and in perfect condition.",
       "Contact us today to learn more about our car transport services and how we can help you safely move your vehicle.",
     ],

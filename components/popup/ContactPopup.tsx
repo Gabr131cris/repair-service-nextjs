@@ -36,10 +36,10 @@ export default function ContactPopup({
             <h3 className="font-semibold text-sm text-gray-500">HOW TO REACH US</h3>
             <p>(786) 462-9941</p>
             <a
-              href="mailto:info@dariellamotors.com"
+              href="mailto:info@repairservice.com"
               className="text-blue-600 underline hover:text-blue-800"
             >
-              info@dariellamotors.com
+              info@repairservice.com
             </a>
           </div>
 

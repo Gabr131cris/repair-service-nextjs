@@ -8,8 +8,8 @@ export async function POST(req: Request) {
     const { firstName, lastName, email, phone, carTitle, pageUrl } = body;
 
     await resend.emails.send({
-      from: "Dariella Motors <noreply@dariellamotors.com>", 
-      to: "info@dariellamotors.com",
+      from: "Repair Service <noreply@repairservice.com>", 
+      to: "info@repairservice.com",
       subject: `${firstName} is interested in ${carTitle}`,
       html: `
         <h2>New Inquiry – Check Availability</h2>

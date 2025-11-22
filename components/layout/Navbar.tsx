@@ -67,10 +67,10 @@ export default function Navbar() {
           ) : (
             <>
               <span className="text-2xl font-bold text-blue-600">
-                {siteInfo?.siteName?.split(" ")[0] || "Dariella"}
+                {siteInfo?.siteName?.split(" ")[0] || "Repair"}
               </span>
               <span className="text-2xl font-bold text-gray-900">
-                {siteInfo?.siteName?.split(" ")[1] || "Motors"}
+                {siteInfo?.siteName?.split(" ")[1] || "Service"}
               </span>
             </>
           )}

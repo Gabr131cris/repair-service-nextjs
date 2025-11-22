@@ -6,8 +6,8 @@ export async function POST(req: Request) {
     const body = await req.json();
 
     await resend.emails.send({
-      from: "Dariella Motors <noreply@dariellamotors.com>",
-      to: "info@dariellamotors.com",
+      from: "Repair Service <noreply@repairservice.com>",
+      to: "info@repairservice.com",
       subject: `!!! Consign !!! New Vehicle Submission From ${body.firstName} ${body.lastName}`,
       html: `
         <h2>!!! Consign FROM ${body.firstName}</h2>
