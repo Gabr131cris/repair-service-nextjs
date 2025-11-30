@@ -98,22 +98,22 @@ export default function Footer() {
                   Facebook
                 </Link>
               )}
-              {siteInfo?.instagram && (
+              {siteInfo?.linkedin && (
                 <Link
-                  href={siteInfo.instagram}
+                  href={siteInfo.linkedin}
                   target="_blank"
                   className="hover:text-white transition"
                 >
-                  Instagram
+                  Linkedin
                 </Link>
               )}
-              {siteInfo?.youtube && (
+              {siteInfo?.website && (
                 <Link
-                  href={siteInfo.youtube}
+                  href={siteInfo.website}
                   target="_blank"
                   className="hover:text-white transition"
                 >
-                  YouTube
+                  Website
                 </Link>
               )}
             </div>

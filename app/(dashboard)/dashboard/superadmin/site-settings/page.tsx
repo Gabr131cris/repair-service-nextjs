@@ -18,7 +18,7 @@ export default function SiteSettingsPage() {
     city: "",
     country: "",
     facebook: "",
-    instagram: "",
+    linkedin: "",
     youtube: "",
   });
 
@@ -227,7 +227,7 @@ export default function SiteSettingsPage() {
       {/* 🔹 Social Media */}
       <h2 className="text-lg font-semibold mt-8 mb-4">Social Media Links</h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {["facebook", "instagram", "youtube"].map((key) => (
+        {["facebook", "linkedin", "website"].map((key) => (
           <div key={key}>
             <label className="block text-gray-700 font-medium mb-1 capitalize">
               {key}

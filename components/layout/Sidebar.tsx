@@ -1,5 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,6 +15,8 @@ import {
   Search,
   ListOrdered,
   BadgeInfo,
+  Building,
+  Factory,
 } from "lucide-react";
 import { logoutUser, getUserRole } from "@/lib/auth";
 
@@ -36,32 +39,94 @@ export default function Sidebar() {
     router.push("/auth/login");
   };
 
+  /* OLD LINKS (unchanged) */
   const baseLinks = [
-    { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+    {
+      href: "/dashboard",
+      label: "Dashboard",
+      icon: <LayoutDashboard size={18} />,
+    },
     { href: "/dashboard/cars", label: "My Cars", icon: <Car size={18} /> },
-    { href: "/dashboard/cars/new", label: "Add New", icon: <PlusCircle size={18} /> },
+    {
+      href: "/dashboard/cars/new",
+      label: "Add New",
+      icon: <PlusCircle size={18} />,
+    },
   ];
 
   const adminLinks =
     role === "admin" || role === "superadmin"
       ? [
-          { href: "/dashboard/admin/cars", label: "Approve Cars", icon: <CheckCircle size={18} /> },
-          { href: "/dashboard/admin/users", label: "Users", icon: <Users size={18} /> },
+          {
+            href: "/dashboard/admin/cars",
+            label: "Approve Cars",
+            icon: <CheckCircle size={18} />,
+          },
+          {
+            href: "/dashboard/admin/users",
+            label: "Users",
+            icon: <Users size={18} />,
+          },
         ]
       : [];
 
+  /* 🔥 SUPERADMIN - UPDATED WITH COMPANIES */
   const superLinks =
     role === "superadmin"
       ? [
-        { href: "/dashboard/superadmin/create-user", label: "Add new User", icon: <Users size={18} /> },
-          { href: "/dashboard/superadmin/stats", label: "Analytics", icon: <BarChart2 size={18} /> },
-          { href: "/dashboard/superadmin/schema-builder", label: "Schema Builder", icon: <ListOrdered size={18} /> },
-          { href: "/dashboard/superadmin/schema-order", label: "Section Order", icon: <ListOrdered size={18} /> },
-          { href: "/dashboard/superadmin/schema-field-order", label: "Fields Order", icon: <ListOrdered size={18} /> },
-          { href: "/dashboard/superadmin/schema-migrator", label: "Migrate Data", icon: <ListOrdered size={18} /> },
-          
-          { href: "/dashboard/tools/webp-converter", label: "Convertor WEBP", icon: <ListOrdered size={18} /> },
-          { href: "/dashboard/superadmin/site-settings", label: "Info Company", icon: <BadgeInfo size={18} /> },
+          /* --- Existing superadmin pages --- */
+          {
+            href: "/dashboard/superadmin/create-user",
+            label: "Add new User",
+            icon: <Users size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/stats",
+            label: "Analytics",
+            icon: <BarChart2 size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/schema-builder",
+            label: "Schema Builder",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/schema-order",
+            label: "Section Order",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/schema-field-order",
+            label: "Fields Order",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/schema-migrator",
+            label: "Migrate Data",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: "/dashboard/tools/webp-converter",
+            label: "Convertor WEBP",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/site-settings",
+            label: "Info Company",
+            icon: <BadgeInfo size={18} />,
+          },
+
+          /* --- NEW COMPANY SYSTEM --- */
+          {
+            href: "/dashboard/superadmin/companies",
+            label: "Companies - service",
+            icon: <Building size={18} />,
+          },
+          {
+            href: "/dashboard/superadmin/companies/create",
+            label: "Add Company - service",
+            icon: <Factory size={18} />,
+          },
         ]
       : [];
 
@@ -72,10 +137,12 @@ export default function Sidebar() {
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800">CarMarket</h2>
-        {role && <p className="text-sm text-gray-500 mt-1 capitalize">Role: {role}</p>}
+        {role && (
+          <p className="text-sm text-gray-500 mt-1 capitalize">Role: {role}</p>
+        )}
       </div>
 
-      {/* Search bar */}
+      {/* Search */}
       <div className="px-4 py-3 border-b border-gray-200">
         <div className="flex items-center bg-gray-100 rounded-md px-2 py-1">
           <Search size={16} className="text-gray-400" />
@@ -89,7 +156,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Nav Links */}
+      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
         {links.map((link) => {
           const isActive = pathname === link.href;
@@ -110,7 +177,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Logout button */}
+      {/* Logout */}
       <div className="p-4 border-t border-gray-200">
         <button
           onClick={handleLogout}
