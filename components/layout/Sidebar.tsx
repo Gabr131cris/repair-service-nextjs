@@ -18,42 +18,67 @@ import {
   Building,
   Factory,
 } from "lucide-react";
+
 import { logoutUser, getUserRole } from "@/lib/auth";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+
   const [role, setRole] = useState<string | null>(null);
+  const [companyId, setCompanyId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
+  /* ---------------------------------------------------------
+     Load USER ROLE + companyId (for company_admin only)
+  ---------------------------------------------------------- */
   useEffect(() => {
-    const fetchRole = async () => {
+    const load = async () => {
       const r = await getUserRole();
       setRole(r);
+
+      // Dacă userul e admin de companie — îi găsim companyId
+      if (r === "company_admin") {
+        const auth = await getFirebaseAuth();
+        const db = getDb();
+        const user = auth.currentUser;
+
+        if (user) {
+          const snap = await getDoc(doc(db, "companyUsers", user.uid));
+          if (snap.exists()) {
+            setCompanyId(snap.data().companyId);
+          }
+        }
+      }
     };
-    fetchRole();
+
+    load();
   }, []);
 
+  /* ---------------------------------------------------------
+     LOGOUT
+  ---------------------------------------------------------- */
   const handleLogout = async () => {
     await logoutUser();
     router.push("/auth/login");
   };
 
-  /* OLD LINKS (unchanged) */
+  /* ---------------------------------------------------------
+     BASE LINKS
+  ---------------------------------------------------------- */
   const baseLinks = [
     {
       href: "/dashboard",
       label: "Dashboard",
       icon: <LayoutDashboard size={18} />,
     },
-    { href: "/dashboard/cars", label: "My Cars", icon: <Car size={18} /> },
-    {
-      href: "/dashboard/cars/new",
-      label: "Add New",
-      icon: <PlusCircle size={18} />,
-    },
   ];
 
+  /* ---------------------------------------------------------
+     PLATFORM ADMIN LINKS
+  ---------------------------------------------------------- */
   const adminLinks =
     role === "admin" || role === "superadmin"
       ? [
@@ -70,11 +95,22 @@ export default function Sidebar() {
         ]
       : [];
 
-  /* 🔥 SUPERADMIN - UPDATED WITH COMPANIES */
+  /* ---------------------------------------------------------
+     SUPER ADMIN LINKS
+  ---------------------------------------------------------- */
   const superLinks =
     role === "superadmin"
       ? [
-          /* --- Existing superadmin pages --- */
+          {
+            href: "/dashboard/cars",
+            label: "My Cars",
+            icon: <Car size={18} />,
+          },
+          {
+            href: "/dashboard/cars/new",
+            label: "Add New",
+            icon: <PlusCircle size={18} />,
+          },
           {
             href: "/dashboard/superadmin/create-user",
             label: "Add new User",
@@ -116,7 +152,7 @@ export default function Sidebar() {
             icon: <BadgeInfo size={18} />,
           },
 
-          /* --- NEW COMPANY SYSTEM --- */
+          /* NEW company system */
           {
             href: "/dashboard/superadmin/companies",
             label: "Companies - service",
@@ -127,22 +163,72 @@ export default function Sidebar() {
             label: "Add Company - service",
             icon: <Factory size={18} />,
           },
+
+          
         ]
       : [];
 
-  const links = [...baseLinks, ...adminLinks, ...superLinks];
+  /* ---------------------------------------------------------
+     COMPANY ADMIN LINKS (special)
+  ---------------------------------------------------------- */
+  const companyAdminLinks =
+  role === "company_admin" && companyId
+    ? [
+        {
+          href: `/dashboard/company/${companyId}/schema-bill`,
+          label: "Factura Schema",
+          icon: <ListOrdered size={18} />,
+        },
+        {
+          href: `/dashboard/company/${companyId}/bill-prices`,
+          label: "Setare Prețuri",
+          icon: <ListOrdered size={18} />,
+        },
+        {
+          href: `/dashboard/company/${companyId}/create-bill`,
+          label: "Creare Factură",
+          icon: <PlusCircle size={18} />,
+        },
+        {
+  href: `/dashboard/company/${companyId}/settings/template`,
+  label: "Template Factură",
+  icon: <ListOrdered size={18} />,
+},
+
+        {
+          href: `/dashboard/company/${companyId}/bills`,
+          label: "Facturile Mele",
+          icon: <ListOrdered size={18} />,
+        },
+      ]
+    : [];
+
+  /* ---------------------------------------------------------
+     FINAL LINKS MERGE
+  ---------------------------------------------------------- */
+  const links = [
+    ...baseLinks,
+    ...adminLinks,
+    ...companyAdminLinks,
+    ...superLinks,
+  ];
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col min-h-screen shadow-sm">
-      {/* Header */}
+      {/* HEADER */}
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800">CarMarket</h2>
+
         {role && (
           <p className="text-sm text-gray-500 mt-1 capitalize">Role: {role}</p>
         )}
+
+        {companyId && (
+          <p className="text-xs text-blue-600 mt-1">Company ID: {companyId}</p>
+        )}
       </div>
 
-      {/* Search */}
+      {/* SEARCH */}
       <div className="px-4 py-3 border-b border-gray-200">
         <div className="flex items-center bg-gray-100 rounded-md px-2 py-1">
           <Search size={16} className="text-gray-400" />
@@ -156,10 +242,11 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Navigation */}
+      {/* NAVIGATION */}
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
         {links.map((link) => {
           const isActive = pathname === link.href;
+
           return (
             <Link
               key={link.href}
@@ -177,7 +264,7 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Logout */}
+      {/* LOGOUT */}
       <div className="p-4 border-t border-gray-200">
         <button
           onClick={handleLogout}

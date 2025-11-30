@@ -1,42 +1,13 @@
-"use client";
-//
 import "./globals.css";
-
-import TopBar from "@/components/layout/TopBar";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
-import ScrollToTopButton from "@/components/ui/ScrollToTopButton";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next"
+import ClientShell from "@/components/layout/ClientShell";
 
 export const dynamic = "force-static";
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
- 
-
+export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <body className="min-h-screen flex flex-col font-sans text-gray-900 bg-white antialiased overflow-x-hidden">
-        {/* 🔹 Bara de sus cu info */}
-        <TopBar />
-
-        {/* 🔹 Navbar principal */}
-        <Navbar />
-
-        {/* 🔹 Conținutul paginii — fără limitare globală de lățime */}
-        <main className="flex-1 w-full overflow-x-hidden">{children}</main>
-
-        {/* 🔹 Footer */}
-        <Footer />
-
-        {/* 🔹 Buton „scroll to top” */}
-        <ScrollToTopButton />
-        <SpeedInsights />
-        <Analytics />
+    <html lang="en">
+      <body>
+        <ClientShell>{children}</ClientShell>
       </body>
     </html>
   );

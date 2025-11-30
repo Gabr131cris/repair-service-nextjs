@@ -82,22 +82,15 @@ export async function listenToAuthChanges(callback: (user: User | null) => void)
 }
 
 /* ============================================================
-   🔹 Obține rolul utilizatorului curent din Firestore
+   🔹 Obține rolul utilizatorului curent din Firestore (FIXED)
    ============================================================ */
 export async function getUserRole(): Promise<string | null> {
-  // 🚫 Previne execuția în SSR (la build pe Vercel)
-  if (typeof window === "undefined") {
-    console.warn("getUserRole() called on server — skipped.");
-    return null;
-  }
+  if (typeof window === "undefined") return null;
 
   const auth = await getFirebaseAuth();
   const db = getDb();
 
-  if (!auth || !db) {
-    console.warn("Firebase not initialized properly in getUserRole()");
-    return null;
-  }
+  if (!auth || !db) return null;
 
   return new Promise((resolve) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -108,28 +101,34 @@ export async function getUserRole(): Promise<string | null> {
         return;
       }
 
-      try {
-        const ref = doc(db, "users", user.uid);
-        const snap = await getDoc(ref);
+      const uid = user.uid;
 
-        if (snap.exists()) {
-          const data = snap.data();
-          resolve(data.role || "user");
-        } else {
-          // Creează userul în Firestore dacă nu există
-          await setDoc(ref, {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName || "",
-            role: "user",
-            createdAt: new Date().toISOString(),
-          });
-          resolve("user");
+      try {
+        // 1️⃣ Verificăm colecția USERS (global users)
+        const userRef = doc(db, "users", uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          resolve(userSnap.data().role || "user");
+          return;
         }
-      } catch (error) {
-        console.error("Eroare la obținerea rolului utilizatorului:", error);
+
+        // 2️⃣ Verificăm colecția COMPANY USERS
+        const companyRef = doc(db, "companyUsers", uid);
+        const companySnap = await getDoc(companyRef);
+
+        if (companySnap.exists()) {
+          resolve(companySnap.data().role || "company_user");
+          return;
+        }
+
+        // 3️⃣ Nu există în nicio colecție → NU îl creăm în `users`
+        resolve(null);
+      } catch (err) {
+        console.error("Eroare la getUserRole:", err);
         resolve(null);
       }
     });
   });
 }
+

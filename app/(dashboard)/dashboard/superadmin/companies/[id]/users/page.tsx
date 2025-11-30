@@ -121,19 +121,31 @@ const router = useRouter();
                 DELETE USER
      ---------------------------------- */
   const deleteUser = async (id: string, email: string) => {
-    if (!confirm(`Ștergi utilizatorul ${email}?`)) return;
+  if (!confirm(`Ștergi utilizatorul ${email}?`)) return;
 
-    setDeleting(id);
+  setDeleting(id);
 
-    try {
-      await deleteDoc(doc(db, "companyUsers", id));
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    } catch (err) {
-      alert("Eroare la ștergere.");
-    } finally {
-      setDeleting(null);
-    }
-  };
+  try {
+    // 1️⃣ Ștergem din Firestore
+    await deleteDoc(doc(db, "companyUsers", id));
+
+    // 2️⃣ Ștergem și din Firebase Authentication prin API
+    await fetch("/api/delete-user", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: id }),
+    });
+
+    // 3️⃣ Actualizăm local
+    setUsers((prev) => prev.filter((u) => u.id !== id));
+  } catch (err) {
+    console.error(err);
+    alert("Eroare la ștergere.");
+  } finally {
+    setDeleting(null);
+  }
+};
+
 
   if (loading)
     return (

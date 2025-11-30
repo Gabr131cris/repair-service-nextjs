@@ -18,3 +18,4 @@ if (!admin.apps.length && privateKey && clientEmail && projectId && bucket) {
 
 export const adminDb = admin.apps.length ? admin.firestore() : null;
 export const adminStorage = admin.apps.length ? admin.storage().bucket() : null;
+export const adminAuth = admin.apps.length ? admin.auth() : null;
