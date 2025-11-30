@@ -11,36 +11,52 @@ export default function PrintBillPage() {
   const { companyId, billId } = useParams();
 
   const [bill, setBill] = useState<any>(null);
-  const [companySettings, setCompanySettings] = useState<any>(null);
+  const [company, setCompany] = useState<any>(null);
 
   useEffect(() => {
     const load = async () => {
-      const billSnap = await getDoc(
-        doc(db, "companyBills", companyId, "bills", billId)
+      /* 1. LOAD BILL CORECT */
+      const billRef = doc(db, "companyBills", companyId, "bills", billId);
+      const billSnap = await getDoc(billRef);
+      const billData = billSnap.data();
+
+      /* 2. COMPANY */
+      const companySnap = await getDoc(doc(db, "companies", companyId));
+      const companyData = companySnap.data();
+
+      /* 3. SCHEMA */
+      const schemaSnap = await getDoc(
+        doc(db, "companyBillSchemas", companyId)
       );
+      const schemaData = schemaSnap.data();
 
-      const settingsSnap = await getDoc(
-        doc(db, "companySettings", companyId)
+      /* 4. PRICES */
+      const pricesSnap = await getDoc(
+        doc(db, "companyBillPrices", companyId)
       );
+      const pricesData = pricesSnap.data();
 
-      setBill(billSnap.data());
-      setCompanySettings(settingsSnap.data());
+      /* BUILD OBJECT */
+      const finalCompany = {
+        ...companyData,
+        schema: schemaData,       // schema corectă
+        servicePrices: pricesData?.prices || {},
+        selectedTemplate: companyData?.selectedTemplate || "yellow",
+      };
 
-      // auto-print
-      setTimeout(() => {
-        window.print();
-      }, 500);
+      setBill({ ...billData, id: billId });
+      setCompany(finalCompany);
+
+      setTimeout(() => window.print(), 500);
     };
 
     load();
   }, []);
 
-  if (!bill || !companySettings) return <p>Loading...</p>;
+  if (!bill || !company) return <p>Loading...</p>;
 
-  // select template
   const SelectedTemplate =
-  Templates[companySettings.selectedTemplate] || Templates.yellow;
+    Templates[company.selectedTemplate] || Templates.yellow;
 
-
-  return <SelectedTemplate bill={bill} company={companySettings} />;
+  return <SelectedTemplate bill={bill} company={company} />;
 }

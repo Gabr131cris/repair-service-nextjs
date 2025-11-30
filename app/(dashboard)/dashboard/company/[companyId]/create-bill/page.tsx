@@ -3,13 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
-import {
-  doc,
-  getDoc,
-  addDoc,
-  collection,
-  Timestamp
-} from "firebase/firestore";
+import { doc, getDoc, addDoc, collection, Timestamp } from "firebase/firestore";
 
 /* -------------------------------------------------------
    INTERFEȚE COMPLETE – pentru TOATE tipurile de secțiune
@@ -91,9 +85,7 @@ export default function CreateBillPage() {
   -------------------------------------------------------- */
   useEffect(() => {
     const load = async () => {
-      const schemaSnap = await getDoc(
-        doc(db, "companyBillSchemas", companyId)
-      );
+      const schemaSnap = await getDoc(doc(db, "companyBillSchemas", companyId));
 
       if (!schemaSnap.exists()) {
         alert("Schema nu există!");
@@ -103,9 +95,7 @@ export default function CreateBillPage() {
 
       setSchema(schemaSnap.data().sections || []);
 
-      const priceSnap = await getDoc(
-        doc(db, "companyBillPrices", companyId)
-      );
+      const priceSnap = await getDoc(doc(db, "companyBillPrices", companyId));
 
       if (priceSnap.exists()) {
         setPrices(priceSnap.data() as PriceTable);
@@ -128,7 +118,7 @@ export default function CreateBillPage() {
       {
         companyId,
         form,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
       }
     );
 
@@ -146,6 +136,36 @@ export default function CreateBillPage() {
         [fieldId]: value,
       },
     });
+  };
+
+  const calculateTotal = () => {
+    let total = 0;
+
+    const priceTable = prices.prices;
+
+    // găsim secțiunea Tip Auto
+    const secTipAuto = schema.find((s) => s.type === "vehicle_categories");
+    const tipAuto = form[secTipAuto?.id || ""] || {};
+
+    const categoryId = tipAuto.category;
+    const size = tipAuto.size;
+
+    if (!categoryId || !size) return 0; // nu avem tot ce trebuie
+
+    // Secțiunea Servicii
+    const secServicii = schema.find((s) => s.type === "services");
+    const serviceValues = form[secServicii?.id || ""] || {};
+
+    // pentru fiecare serviciu completat
+    Object.entries(serviceValues).forEach(([serviceId, count]) => {
+      if (!count) return;
+
+      const price = priceTable?.[categoryId]?.[size]?.[serviceId] ?? 0;
+
+      total += price * count;
+    });
+
+    return total;
   };
 
   /* -------------------------------------------------------
@@ -170,9 +190,7 @@ export default function CreateBillPage() {
                   className="border p-2 rounded w-full"
                   type={f.type === "number" ? "number" : "text"}
                   value={form[sid]?.[f.id] || ""}
-                  onChange={(e) =>
-                    updateField(sid, f.id, e.target.value)
-                  }
+                  onChange={(e) => updateField(sid, f.id, e.target.value)}
                 />
               </div>
             ))}
@@ -303,7 +321,7 @@ export default function CreateBillPage() {
           <div
             className="border p-4 rounded mb-6 prose"
             dangerouslySetInnerHTML={{
-              __html: section.fields?.[0]?.value || ""
+              __html: section.fields?.[0]?.value || "",
             }}
           />
         );
@@ -382,6 +400,11 @@ export default function CreateBillPage() {
       {schema.map((section) => (
         <div key={section.id}>{renderSection(section)}</div>
       ))}
+
+      <div className="p-4 bg-gray-100 rounded-lg mb-6">
+        <h2 className="font-semibold text-lg mb-2">Total estimat</h2>
+        <p className="text-xl font-bold">{calculateTotal()} lei</p>
+      </div>
 
       {/* BUTTON SAVE */}
       <button

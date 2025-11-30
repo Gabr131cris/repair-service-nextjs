@@ -11,7 +11,7 @@ import {
   deleteDoc,
   doc,
   setDoc,
-  getDoc            // ✔️ NECESAR!
+  getDoc, // ✔️ NECESAR!
 } from "firebase/firestore";
 import { Plus, Trash2, Save, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -131,12 +131,11 @@ export default function SchemaBuilderPage() {
   // ====================================================================================
   const addSection = () => {
     const newSection: Section = {
+      id: crypto.randomUUID(), // <--- asta lipsea!!!
       title: "New Section",
       type: "custom",
       order: sections.length + 1,
       fields: [],
-
-      // 🔥 inițializăm și cele noi (gol)
       vehicleCategories: [],
       services: [],
       detailFields: [],
@@ -205,8 +204,13 @@ export default function SchemaBuilderPage() {
     try {
       const ordered = sections.map((s, si) => ({
         ...s,
+        id: s.id || crypto.randomUUID(), // <--- FIX pentru schema veche
         order: si + 1,
-        fields: s.fields.map((f, fi) => ({ ...f, order: fi + 1 })),
+        fields: s.fields.map((f, fi) => ({
+          ...f,
+          id: f.id || crypto.randomUUID(),
+          order: fi + 1,
+        })),
       }));
 
       await setDoc(
