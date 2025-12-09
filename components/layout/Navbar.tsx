@@ -37,12 +37,8 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/listings", label: "Find Your Car" },
-    { href: "/sold", label: "Sold" },
-    { href: "/finance", label: "Finance" },
-    { href: "/shipping", label: "Shipping" },
-    { href: "/about", label: "About" },
+    { href: "/dashboard", label: "Home" },
+    
   ];
 
   const handleNavClick = (href: string) => {
@@ -76,25 +72,7 @@ export default function Navbar() {
           )}
         </Link>
 
-        <form
-          onSubmit={handleSearch}
-          className="hidden md:flex items-center bg-gray-100 rounded-full overflow-hidden px-4 py-1.5 w-[400px] lg:w-[500px] xl:w-[600px] border border-gray-200"
-        >
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search cars (e.g. BMW, Audi, Ford)..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent outline-none text-sm text-gray-700 px-2 flex-1"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition ml-1"
-          >
-            <Search size={16} />
-          </button>
-        </form>
+        
 
         <div className="hidden md:flex items-center space-x-6 font-medium">
           {navLinks.map((link) => (

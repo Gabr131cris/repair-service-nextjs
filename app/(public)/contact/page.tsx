@@ -21,10 +21,10 @@ export default function ContactPage() {
   const [content, setContent] = useState<ContactData>({
     title: "Contact Us",
     intro:
-      "We’d love to hear from you! Reach out to discuss your next vehicle purchase, or just say hello.",
+      "",
     address: "",
     phone: "",
-    email: "info@repairservice.com",
+    email: "",
     hours: {
       "Monday - Friday": "9 AM - 5 PM",
       Saturday: "9 AM - 12 PM",
