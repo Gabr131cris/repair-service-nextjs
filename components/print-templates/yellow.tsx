@@ -376,32 +376,51 @@ export default function PrintTemplateYellow({ bill, company }) {
     </div>
   </div>
 
-  {/* Detalii Anvelopa */}
-  {Object.keys(detaliiAnvelopa).length > 0 && (
-    <table style={{ flex: 1, borderCollapse: "collapse" }}>
-      <thead>
-        <tr style={{ background: "#2d79ff", color: "white" }}>
-          <th style={{ padding: 6, textAlign: "left" }}>Detaliu</th>
-          <th style={{ padding: 6, textAlign: "left" }}>Valoare</th>
+  {/* DETALII ANVELOPA – TABEL ALINIAT DREAPTA */}
+{Object.keys(detaliiAnvelopa).length > 0 && (
+  <table
+    style={{
+      flex: 1,
+      borderCollapse: "collapse",
+      width: "100%",
+      maxWidth: "350px",
+      marginLeft: "auto",
+      fontSize: "14px",
+    }}
+  >
+    <thead>
+      <tr
+        style={{
+          background: "#2d79ff",
+          color: "white",
+          textAlign: "left",
+          borderBottom: "1px solid #ddd",
+        }}
+      >
+        <th style={{ padding: "8px" }}>Detaliu</th>
+        <th style={{ padding: "8px", textAlign: "left" }}>Valoare</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {Object.entries(detaliiAnvelopa).map(([k, v], index) => (
+        <tr
+          key={k}
+          style={{
+            background: index % 2 === 0 ? "#f9f9f9" : "#efefef",
+            borderBottom: "1px solid #ddd",
+          }}
+        >
+          <td style={{ padding: "8px" }}>
+            {getDetailFieldName(getSection("Detalii Anvelopa"), k)}
+          </td>
+          <td style={{ padding: "8px" }}>{v}</td>
         </tr>
-      </thead>
-      <tbody>
-        {Object.entries(detaliiAnvelopa).map(([k, v], index) => (
-          <tr
-            key={k}
-            style={{
-              background: index % 2 === 0 ? "#eef5ff" : "#dceaff",
-            }}
-          >
-            <td style={{ padding: 6 }}>
-              {getDetailFieldName(getSection("Detalii Anvelopa"), k)}
-            </td>
-            <td style={{ padding: 6 }}>{v}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
+      ))}
+    </tbody>
+  </table>
+)}
+
 </div>
 
 {/* TOTAL */}
@@ -456,7 +475,8 @@ export default function PrintTemplateYellow({ bill, company }) {
       }}
     />
     <p style={{ marginTop: "15px" }}>
-      Clientul confirmă prin semnătură că strângerea și echilibrarea roților au
+      Clientul confirmă prin semnătură că strângerea 
+      și echilibrarea roților au
       fost executate conform standardelor
     </p>
   </div>
@@ -502,7 +522,6 @@ export default function PrintTemplateYellow({ bill, company }) {
     </p>
   </div>
 </div>
-w
     </div>
   );
 }

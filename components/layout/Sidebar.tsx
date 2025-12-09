@@ -196,7 +196,7 @@ export default function Sidebar() {
 },
 
         {
-          href: `/dashboard/company/${companyId}/bills`,
+          href: `/dashboard/company/${companyId}/stats`,
           label: "Facturile Mele",
           icon: <ListOrdered size={18} />,
         },

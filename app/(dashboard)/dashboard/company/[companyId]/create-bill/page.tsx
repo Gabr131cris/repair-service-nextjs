@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
+import { getAuth } from "firebase/auth";
+import { getUserRole } from "@/lib/auth";
 import { doc, getDoc, addDoc, collection, Timestamp } from "firebase/firestore";
 
 /* -------------------------------------------------------
@@ -72,7 +74,7 @@ interface PriceTable {
 -------------------------------------------------------- */
 export default function CreateBillPage() {
   const { companyId } = useParams();
-
+  const user = getAuth().currentUser;
   const [schema, setSchema] = useState<Section[]>([]);
   const [prices, setPrices] = useState<PriceTable>({ prices: {} });
   const [loading, setLoading] = useState(true);
@@ -112,19 +114,40 @@ export default function CreateBillPage() {
   /* -------------------------------------------------------
         SALVARE FACTURĂ
   -------------------------------------------------------- */
-  const saveBill = async () => {
-    const ref = await addDoc(
-      collection(db, "companyBills", companyId as string, "bills"),
-      {
-        companyId,
-        form,
-        createdAt: Timestamp.now(),
-        //createdBy: user.uid,
-      }
-    );
+  const [saving, setSaving] = useState(false);
 
-    window.open(`/print/${companyId}/${ref.id}`, "_blank");
-  };
+const saveBill = async () => {
+  if (saving) return; // PREVINE DUBLA EXECUȚIE
+  setSaving(true);
+
+  const total = calculateTotal();
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) return alert("Nu ești autentificat.");
+
+  const role = await getUserRole();
+
+  const ref = await addDoc(
+    collection(db, "companyBills", companyId as string, "bills"),
+    {
+      companyId,
+      form: {
+        ...form,
+        calculatedTotal: total,
+      },
+      createdAt: Timestamp.now(),
+      createdBy: user.email || user.uid,
+      createdById: user.uid,
+      createdByRole: role,
+    }
+  );
+
+  window.open(`/print/${companyId}/${ref.id}`, "_blank");
+  setSaving(false);
+};
+
+
 
   /* -------------------------------------------------------
         HANDLER INPUT GENERIC

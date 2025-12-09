@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { db } from "@/lib/firebase";
 import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
@@ -13,33 +13,38 @@ export default function PrintBillPage() {
   const [bill, setBill] = useState<any>(null);
   const [company, setCompany] = useState<any>(null);
 
+  // ⛔ blocare print dublu chiar și în StrictMode
+  const hasPrintedRef = useRef(false);
+
   useEffect(() => {
+    // deja printat în această sesiune?
+    if (hasPrintedRef.current) return;
+
+    // deja printat în tab?
+    if (sessionStorage.getItem("alreadyPrinted") === "1") return;
+
     const load = async () => {
-      /* 1. LOAD BILL CORECT */
-      const billRef = doc(db, "companyBills", companyId, "bills", billId);
-      const billSnap = await getDoc(billRef);
+      const billSnap = await getDoc(
+        doc(db, "companyBills", companyId, "bills", billId)
+      );
       const billData = billSnap.data();
 
-      /* 2. COMPANY */
       const companySnap = await getDoc(doc(db, "companies", companyId));
       const companyData = companySnap.data();
 
-      /* 3. SCHEMA */
       const schemaSnap = await getDoc(
         doc(db, "companyBillSchemas", companyId)
       );
       const schemaData = schemaSnap.data();
 
-      /* 4. PRICES */
       const pricesSnap = await getDoc(
         doc(db, "companyBillPrices", companyId)
       );
       const pricesData = pricesSnap.data();
 
-      /* BUILD OBJECT */
       const finalCompany = {
         ...companyData,
-        schema: schemaData,       // schema corectă
+        schema: schemaData,
         servicePrices: pricesData?.prices || {},
         selectedTemplate: companyData?.selectedTemplate || "yellow",
       };
@@ -47,16 +52,34 @@ export default function PrintBillPage() {
       setBill({ ...billData, id: billId });
       setCompany(finalCompany);
 
-      setTimeout(() => window.print(), 500);
+      // 🔥 blocare DEFINITIVĂ
+      hasPrintedRef.current = true;
+      sessionStorage.setItem("alreadyPrinted", "1");
+
+      setTimeout(() => window.print(), 400);
     };
 
     load();
-  }, []);
+  }, [companyId, billId]);
 
   if (!bill || !company) return <p>Loading...</p>;
 
   const SelectedTemplate =
     Templates[company.selectedTemplate] || Templates.yellow;
 
-  return <SelectedTemplate bill={bill} company={company} />;
+  return (
+    <div className="print-wrapper">
+      <div className="copy-section client-copy">
+        <div className="copy-header">COPIA CLIENT</div>
+        <SelectedTemplate bill={bill} company={company} copyType="client" />
+      </div>
+
+      <div className="page-break"></div>
+
+      <div className="copy-section service-copy">
+        <div className="copy-header">COPIA SERVICE</div>
+        <SelectedTemplate bill={bill} company={company} copyType="service" />
+      </div>
+    </div>
+  );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getUserRole } from "@/lib/auth";
 import { useParams } from "next/navigation";
 import {
   collection,
@@ -34,7 +35,7 @@ export default function StatsPage() {
   const [filterDate, setFilterDate] = useState("");
   const [employeeFilter, setEmployeeFilter] = useState("all");
 
-  const [userRole, setUserRole] = useState("employee"); // "admin" or "employee"
+  const [userRole, setUserRole] = useState("company_admin");
 
   /* =====================================================
       LOAD ALL BILLS + EMPLOYEES
@@ -61,6 +62,13 @@ export default function StatsPage() {
 
     setFiltered(items);
   };
+
+  useEffect(() => {
+  (async () => {
+    const role = await getUserRole();
+    setUserRole(role);
+  })();
+}, []);
 
   useEffect(() => {
     loadData();
@@ -209,7 +217,7 @@ export default function StatsPage() {
               <th className="p-3 text-left">Creată la</th>
               <th className="p-3 text-left">Creată de</th>
               <th className="p-3 text-right">Total</th>
-              <th className="p-3 text-center">Acțiuni</th>
+              <th className="p-3 text-center">Actiuni</th>
             </tr>
           </thead>
 
@@ -235,7 +243,7 @@ export default function StatsPage() {
                 </td>
 
                 <td className="p-3 text-center">
-                  {userRole === "admin" && (
+                  {userRole === "company_admin" && (
                     <button
                       onClick={() => deleteBill(bill.id)}
                       className="text-red-600 hover:underline"

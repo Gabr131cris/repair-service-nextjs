@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  reactStrictMode: true,
-
+  //reactStrictMode: true,
+reactStrictMode: false,
   eslint: {
     // ✅ Ignoră erorile ESLint în build (altfel Vercel poate opri buildul)
     ignoreDuringBuilds: true,
