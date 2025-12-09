@@ -1,5 +1,5 @@
 "use client";
-
+//create user page for superadmin to manage company users
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
@@ -26,11 +26,16 @@ export default function CompanyUsersPage() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-const router = useRouter();
+  const router = useRouter();
 
-  // Form state
+  // Form state (extended)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("");
+
   const [userRole, setUserRole] = useState<"company_admin" | "company_user">(
     "company_user"
   );
@@ -61,10 +66,13 @@ const router = useRouter();
   }, [companyId]);
 
   /* ----------------------------------
-        CREATE USER (SAFE – Secondary App)
+        CREATE USER — EXTENDED DATA
      ---------------------------------- */
   const createUser = async () => {
-    if (!email || !password) return alert("Toate câmpurile sunt obligatorii.");
+    if (!email || !password || !firstName || !lastName) {
+      return alert("Toate câmpurile obligatorii trebuie completate.");
+    }
+
     if (password.length < 6) return alert("Parola minim 6 caractere.");
 
     setCreating(true);
@@ -91,9 +99,14 @@ const router = useRouter();
 
       const uid = userCred.user.uid;
 
+      // Save extended user data in Firestore
       await setDoc(doc(db, "companyUsers", uid), {
         companyId,
         email,
+        firstName,
+        lastName,
+        phone,
+        position,
         role: userRole,
         createdAt: serverTimestamp(),
       });
@@ -103,13 +116,27 @@ const router = useRouter();
 
       setUsers((prev) => [
         ...prev,
-        { id: uid, email, role: userRole, companyId },
+        {
+          id: uid,
+          email,
+          firstName,
+          lastName,
+          phone,
+          position,
+          role: userRole,
+          companyId,
+        },
       ]);
 
+      // Reset fields
       setEmail("");
       setPassword("");
+      setFirstName("");
+      setLastName("");
+      setPhone("");
+      setPosition("");
 
-      alert("Utilizator creat!");
+      alert("Utilizator creat cu succes!");
     } catch (err: any) {
       alert(err.message);
     } finally {
@@ -121,31 +148,27 @@ const router = useRouter();
                 DELETE USER
      ---------------------------------- */
   const deleteUser = async (id: string, email: string) => {
-  if (!confirm(`Ștergi utilizatorul ${email}?`)) return;
+    if (!confirm(`Ștergi utilizatorul ${email}?`)) return;
 
-  setDeleting(id);
+    setDeleting(id);
 
-  try {
-    // 1️⃣ Ștergem din Firestore
-    await deleteDoc(doc(db, "companyUsers", id));
+    try {
+      await deleteDoc(doc(db, "companyUsers", id));
 
-    // 2️⃣ Ștergem și din Firebase Authentication prin API
-    await fetch("/api/delete-user", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uid: id }),
-    });
+      await fetch("/api/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: id }),
+      });
 
-    // 3️⃣ Actualizăm local
-    setUsers((prev) => prev.filter((u) => u.id !== id));
-  } catch (err) {
-    console.error(err);
-    alert("Eroare la ștergere.");
-  } finally {
-    setDeleting(null);
-  }
-};
-
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Eroare la ștergere.");
+    } finally {
+      setDeleting(null);
+    }
+  };
 
   if (loading)
     return (
@@ -166,11 +189,55 @@ const router = useRouter();
       {/* CREATE USER CARD */}
       <div className="p-5 bg-white shadow rounded-xl border mb-6">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-          <UserPlus size={20} className="text-blue-600" /> Creează utilizator
-          nou
+          <UserPlus size={20} className="text-blue-600" /> Creează utilizator nou
         </h2>
 
         <div className="space-y-4">
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="font-medium">Prenume</label>
+              <input
+                type="text"
+                className="border px-3 py-2 rounded w-full mt-1"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="font-medium">Nume</label>
+              <input
+                type="text"
+                className="border px-3 py-2 rounded w-full mt-1"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="font-medium">Telefon</label>
+            <input
+              type="text"
+              className="border px-3 py-2 rounded w-full mt-1"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="07xx xxx xxx"
+            />
+          </div>
+
+          <div>
+            <label className="font-medium">Funcție</label>
+            <input
+              type="text"
+              className="border px-3 py-2 rounded w-full mt-1"
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              placeholder="Manager, Contabil..."
+            />
+          </div>
+
           <div>
             <label className="font-medium">Email</label>
             <input
@@ -231,12 +298,13 @@ const router = useRouter();
                 className="border rounded-lg p-3 flex justify-between items-center hover:bg-gray-50 transition"
               >
                 <div>
-                  <p className="font-medium">{u.email}</p>
-                  <p className="text-sm text-gray-600 capitalize">{u.role}</p>
+                  <p className="font-medium">{u.firstName} {u.lastName}</p>
+                  <p className="text-sm text-gray-600">{u.email}</p>
+                  <p className="text-sm text-gray-500">{u.position}</p>
                 </div>
 
                 <div className="flex gap-2">
-                  {/* EDIT USER BUTTON */}
+
                   <button
                     onClick={() =>
                       router.push(
@@ -249,7 +317,6 @@ const router = useRouter();
                     Edit
                   </button>
 
-                  {/* DELETE USER BUTTON */}
                   <button
                     onClick={() => deleteUser(u.id, u.email)}
                     className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md flex items-center gap-1 text-sm"

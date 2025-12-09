@@ -26,10 +26,17 @@ export default function EditCompanyUserPage() {
   const [role, setRole] = useState<string | null>(null);
 
   const [userData, setUserData] = useState<any>(null);
+
+  // Editable fields
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("");
   const [email, setEmail] = useState("");
   const [userRole, setUserRole] = useState<"company_admin" | "company_user">(
     "company_user"
   );
+
   const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
@@ -47,6 +54,11 @@ export default function EditCompanyUserPage() {
       if (snap.exists()) {
         const data = snap.data();
         setUserData(data);
+
+        setFirstName(data.firstName || "");
+        setLastName(data.lastName || "");
+        setPhone(data.phone || "");
+        setPosition(data.position || "");
         setEmail(data.email || "");
         setUserRole(data.role || "company_user");
       }
@@ -58,7 +70,7 @@ export default function EditCompanyUserPage() {
   }, [userId]);
 
   /* ---------------------------------------
-        UPDATE USER (ROLE + EMAIL)
+        UPDATE ALL USER FIELDS
   ---------------------------------------- */
   const saveChanges = async () => {
     if (!email) return alert("Email invalid!");
@@ -67,6 +79,10 @@ export default function EditCompanyUserPage() {
 
     try {
       await updateDoc(doc(db, "companyUsers", userId), {
+        firstName,
+        lastName,
+        phone,
+        position,
         email,
         role: userRole,
         updatedAt: serverTimestamp(),
@@ -97,14 +113,19 @@ export default function EditCompanyUserPage() {
       const { getAuth, updatePassword, signInWithEmailAndPassword, signOut } =
         await import("firebase/auth");
 
-      // Secondary app to avoid logout
-      const secondaryApp = initializeApp(mainApp.options, "SecondaryReset-" + Date.now());
+      const secondaryApp = initializeApp(
+        mainApp.options,
+        "SecondaryReset-" + Date.now()
+      );
       const secondaryAuth = getAuth(secondaryApp);
 
-      // Re-authenticate using old credentials
-      await signInWithEmailAndPassword(secondaryAuth, email, userData.tempPassword || "123456");
+      // ❗ Ai nevoie de parola veche – altfel trebuie resetare prin email.
+      await signInWithEmailAndPassword(
+        secondaryAuth,
+        email,
+        userData.tempPassword || "123456"
+      );
 
-      // Update password
       await updatePassword(secondaryAuth.currentUser!, newPassword);
 
       await signOut(secondaryAuth);
@@ -112,7 +133,6 @@ export default function EditCompanyUserPage() {
 
       alert("Parola a fost resetată cu succes!");
       setNewPassword("");
-
     } catch (err: any) {
       alert("Eroare resetare parolă: " + err.message);
     } finally {
@@ -143,11 +163,55 @@ export default function EditCompanyUserPage() {
         <ArrowLeft size={18} /> Înapoi
       </button>
 
-      <h1 className="text-2xl font-bold mb-6">
-        Editare utilizator
-      </h1>
+      <h1 className="text-2xl font-bold mb-6">Editare utilizator</h1>
 
       <div className="bg-white shadow border rounded-xl p-5 space-y-4">
+
+        {/* FIRST NAME */}
+        <div>
+          <label className="font-medium">Prenume</label>
+          <input
+            type="text"
+            className="border p-2 rounded w-full mt-1"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+
+        {/* LAST NAME */}
+        <div>
+          <label className="font-medium">Nume</label>
+          <input
+            type="text"
+            className="border p-2 rounded w-full mt-1"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+
+        {/* PHONE */}
+        <div>
+          <label className="font-medium">Telefon</label>
+          <input
+            type="text"
+            className="border p-2 rounded w-full mt-1"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="07xx xxx xxx"
+          />
+        </div>
+
+        {/* POSITION */}
+        <div>
+          <label className="font-medium">Funcție</label>
+          <input
+            type="text"
+            className="border p-2 rounded w-full mt-1"
+            value={position}
+            onChange={(e) => setPosition(e.target.value)}
+            placeholder="Manager, Contabil..."
+          />
+        </div>
 
         {/* EMAIL */}
         <div>
