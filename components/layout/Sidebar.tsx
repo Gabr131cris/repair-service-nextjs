@@ -74,6 +74,17 @@ export default function Sidebar() {
       label: "Dashboard",
       icon: <LayoutDashboard size={18} />,
     },
+    {
+            href: `/dashboard/company/${companyId}/create-bill`,
+            label: "Creare Factură",
+            icon: <PlusCircle size={18} />,
+          },
+
+          {
+            href: `/dashboard/company/${companyId}/stats`,
+            label: "Facturile Mele",
+            icon: <ListOrdered size={18} />,
+          },
   ];
 
   /* ---------------------------------------------------------
@@ -163,8 +174,6 @@ export default function Sidebar() {
             label: "Add Company - service",
             icon: <Factory size={18} />,
           },
-
-          
         ]
       : [];
 
@@ -172,36 +181,33 @@ export default function Sidebar() {
      COMPANY ADMIN LINKS (special)
   ---------------------------------------------------------- */
   const companyAdminLinks =
-  role === "company_admin" && companyId
-    ? [
-        {
-          href: `/dashboard/company/${companyId}/schema-bill`,
-          label: "Factura Schema",
-          icon: <ListOrdered size={18} />,
-        },
-        {
-          href: `/dashboard/company/${companyId}/bill-prices`,
-          label: "Setare Prețuri",
-          icon: <ListOrdered size={18} />,
-        },
-        {
-          href: `/dashboard/company/${companyId}/create-bill`,
-          label: "Creare Factură",
-          icon: <PlusCircle size={18} />,
-        },
-        {
-  href: `/dashboard/company/${companyId}/settings/template`,
-  label: "Template Factură",
-  icon: <ListOrdered size={18} />,
-},
+    role === "company_admin" && companyId
+      ? [
+          {
+            href: `/dashboard/company/${companyId}/schema-bill`,
+            label: "Factura Schema",
+            icon: <ListOrdered size={18} />,
+          },
+          {
+            href: `/dashboard/company/${companyId}/bill-prices`,
+            label: "Setare Prețuri",
+            icon: <ListOrdered size={18} />,
+          },
+          
+          {
+            href: `/dashboard/company/${companyId}/settings/template`,
+            label: "Template Factură",
+            icon: <ListOrdered size={18} />,
+          },
 
-        {
-          href: `/dashboard/company/${companyId}/stats`,
-          label: "Facturile Mele",
-          icon: <ListOrdered size={18} />,
-        },
-      ]
-    : [];
+          
+          {
+            href: `/dashboard/company/${companyId}/admin/users`,
+            label: "Utilizatori Companie",
+            icon: <ListOrdered size={18} />,
+          },
+        ]
+      : [];
 
   /* ---------------------------------------------------------
      FINAL LINKS MERGE

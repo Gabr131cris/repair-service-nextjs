@@ -78,7 +78,7 @@ export default function CreateBillPage() {
   const [schema, setSchema] = useState<Section[]>([]);
   const [prices, setPrices] = useState<PriceTable>({ prices: {} });
   const [loading, setLoading] = useState(true);
-
+  const [saving, setSaving] = useState(false);
   /* FORM STATE */
   const [form, setForm] = useState<any>({});
 
@@ -109,12 +109,13 @@ export default function CreateBillPage() {
     load();
   }, [companyId]);
 
+  
   if (loading) return <p className="text-center mt-10">Loading…</p>;
 
   /* -------------------------------------------------------
         SALVARE FACTURĂ
   -------------------------------------------------------- */
-  const [saving, setSaving] = useState(false);
+  
 
 const saveBill = async () => {
   if (saving) return; // PREVINE DUBLA EXECUȚIE

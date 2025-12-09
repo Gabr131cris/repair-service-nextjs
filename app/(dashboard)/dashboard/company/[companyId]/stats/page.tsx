@@ -36,6 +36,7 @@ export default function StatsPage() {
   const [employeeFilter, setEmployeeFilter] = useState("all");
 
   const [userRole, setUserRole] = useState("company_admin");
+  const [search, setSearch] = useState("");
 
   /* =====================================================
       LOAD ALL BILLS + EMPLOYEES
@@ -78,13 +79,12 @@ export default function StatsPage() {
       FILTER LOGIC
   ===================================================== */
   useEffect(() => {
-    let list = [...bills];
+  let list = [...bills];
 
-    if (!filterDate) {
-      setFiltered(list);
-      return;
-    }
-
+  /* ------------------------------
+     FILTRARE DUPĂ DATĂ
+  ------------------------------ */
+  if (filterDate) {
     const selected = new Date(filterDate);
 
     list = list.filter((bill) => {
@@ -98,38 +98,75 @@ export default function StatsPage() {
             date.getMonth() === selected.getMonth() &&
             date.getFullYear() === selected.getFullYear()
           );
-
         case "month":
           return (
             date.getMonth() === selected.getMonth() &&
             date.getFullYear() === selected.getFullYear()
           );
-
         case "year":
           return date.getFullYear() === selected.getFullYear();
-
         case "week": {
           const first = selected;
           const weekStart = new Date(first);
-          weekStart.setDate(first.getDate() - first.getDay() + 1); // Monday
-
+          weekStart.setDate(first.getDate() - first.getDay() + 1);
           const weekEnd = new Date(weekStart);
           weekEnd.setDate(weekStart.getDate() + 6);
-
           return date >= weekStart && date <= weekEnd;
         }
-
-        default:
-          return true;
       }
+
+      return true;
+    });
+  }
+
+  /* ------------------------------
+     FILTRARE ANGAJAT
+  ------------------------------ */
+  if (employeeFilter !== "all") {
+    list = list.filter((b) => b.createdBy === employeeFilter);
+  }
+
+  /* ------------------------------
+     FILTRARE TEXT (client + număr)
+  ------------------------------ */
+  /* ------------------------------
+   FILTRARE TEXT UNIVERSALĂ
+   (client, auto, număr înmatriculare)
+------------------------------ */
+if (search.trim() !== "") {
+  const s = search.toLowerCase();
+
+  list = list.filter((bill) => {
+    const form = bill.form || {};
+    let found = false;
+
+    Object.values(form).forEach((section: any) => {
+      if (typeof section !== "object") return;
+
+      Object.values(section).forEach((value: any) => {
+        if (!value) return;
+
+        const val = String(value).toLowerCase();
+
+        // 💥 MATCH DUPĂ VALOARE
+        if (val.includes(s)) found = true;
+
+        // 💥 MATCH SPECIAL PENTRU NUMĂR DE ÎNMATRICULARE
+        // detectează combinații litere+cifre
+        if (/^[a-z0-9]{2,10}$/i.test(val) && val.includes(s)) {
+          found = true;
+        }
+      });
     });
 
-    if (employeeFilter !== "all") {
-      list = list.filter((b) => b.createdBy === employeeFilter);
-    }
+    return found;
+  });
+}
 
-    setFiltered(list);
-  }, [filterDate, filterType, employeeFilter, bills]);
+
+  setFiltered(list);
+}, [filterDate, filterType, employeeFilter, bills, search]);
+
 
   /* =====================================================
       DELETE BILL
@@ -199,6 +236,17 @@ export default function StatsPage() {
             ))}
           </select>
         </div>
+
+        <div>
+  <label className="block font-medium mb-1">Căutare</label>
+  <input
+    type="text"
+    placeholder="Caută după nume client, număr înmatriculare..."
+    className="border p-2 rounded w-full"
+    value={search}
+    onChange={(e) => setSearch(e.target.value.toLowerCase())}
+  />
+</div>
 
         <div className="flex flex-col justify-end">
           <div className="text-lg font-bold">
