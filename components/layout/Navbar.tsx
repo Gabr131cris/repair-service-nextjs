@@ -37,7 +37,10 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: "/dashboard", label: "Home" },
+    { href: "/", label: "Home" },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/contact", label: "Contact" },
+
     
   ];
 
@@ -94,10 +97,10 @@ export default function Navbar() {
           ))}
 
           <Link
-            href="/contact"
+            href="/auth/login"
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-300/50"
           >
-            Contact
+            Login
           </Link>
         </div>
 
