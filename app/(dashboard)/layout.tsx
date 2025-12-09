@@ -66,10 +66,10 @@ export default function DashboardLayout({
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
-        <main className="flex-1 overflow-y-auto p-8">
-          <div className="max-w-6xl mx-auto">{children}</div>
-        </main>
+        {/* PAGE CONTENT  <div className="max-w-6xl mx-auto">{children}</div> */}
+        <main className="flex-1 overflow-y-auto p-4">
+    <div className="w-full">{children}</div>
+</main>
       </div>
     </div>
   );

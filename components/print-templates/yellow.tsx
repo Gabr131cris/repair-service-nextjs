@@ -277,111 +277,232 @@ export default function PrintTemplateYellow({ bill, company }) {
         </div>
       </div>
 
-      {/* SERVICII */}
+      {/* SERVICII – TABEL 4 COLOANE */}
       <div style={{ padding: "0 20px" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "14px",
+          }}
+        >
           <thead>
-            <tr style={{ background: "#2d79ff", color: "white" }}>
-              <th style={{ padding: 6 }}>Lucrare</th>
-              <th style={{ padding: 6 }}>Pret</th>
-              <th style={{ padding: 6 }}>Nr. roți</th>
+            <tr
+              style={{
+                background: "#2d79ff",
+                color: "white",
+                textAlign: "left",
+              }}
+            >
+              <th style={{ padding: "8px" }}>Lucrări solicitate</th>
+              <th
+                style={{ padding: "8px", width: "120px", textAlign: "center" }}
+              >
+                Preț / roată
+              </th>
+              <th
+                style={{ padding: "8px", width: "90px", textAlign: "center" }}
+              >
+                Nr. roți
+              </th>
+              <th
+                style={{ padding: "8px", width: "120px", textAlign: "right" }}
+              >
+                Total
+              </th>
             </tr>
           </thead>
 
           <tbody>
-            {Object.entries(servicii).map(([id, count]) => (
-              <tr key={id} style={{ background: "#f7f7f7" }}>
-                <td style={{ padding: 6 }}>{getServiceName(id)}</td>
-                <td style={{ padding: 6 }}>{getServicePrice(id)}</td>
-                <td style={{ padding: 6 }}>{count}</td>
-              </tr>
-            ))}
+            {Object.entries(servicii).map(([id, count], index) => {
+              const nume = getServiceName(id);
+              const pret = getServicePrice(id) || 0;
+              const total = pret * count;
+
+              return (
+                <tr
+                  key={id}
+                  style={{
+                    background: index % 2 === 0 ? "#f9f9f9" : "#efefef",
+                    borderBottom: "1px solid #ddd",
+                  }}
+                >
+                  {/* Lucrare */}
+                  <td style={{ padding: "8px" }}>{nume}</td>
+
+                  {/* Preț / roată */}
+                  <td style={{ padding: "8px", textAlign: "center" }}>
+                    {pret.toFixed(2)} lei
+                  </td>
+
+                  {/* Nr. roți */}
+                  <td style={{ padding: "8px", textAlign: "center" }}>
+                    {count}
+                  </td>
+
+                  {/* TOTAL */}
+                  <td
+                    style={{
+                      padding: "8px",
+                      textAlign: "right",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {total.toFixed(2)} lei
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
 
       {/* TIP AUTO + DETALII */}
-      <div style={{ display: "flex", padding: 20, gap: 40 }}>
-        {/* Tip Auto */}
-        <div>
-          <div
+<div style={{ display: "flex", padding: 20, gap: 40 }}>
+  {/* Tip Auto */}
+  <div style={{ flex: 1 }}>
+    <div
+      style={{
+        background: "#f2c200",
+        padding: "8px 12px",
+        fontWeight: "bold",
+      }}
+    >
+      Tip Auto
+    </div>
+
+    <div style={{ paddingTop: 10 }}>
+      {autoCategory?.name || "-"} — {tipAuto.size || "-"}
+    </div>
+  </div>
+
+  {/* Detalii Anvelopa */}
+  {Object.keys(detaliiAnvelopa).length > 0 && (
+    <table style={{ flex: 1, borderCollapse: "collapse" }}>
+      <thead>
+        <tr style={{ background: "#2d79ff", color: "white" }}>
+          <th style={{ padding: 6, textAlign: "left" }}>Detaliu</th>
+          <th style={{ padding: 6, textAlign: "left" }}>Valoare</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Object.entries(detaliiAnvelopa).map(([k, v], index) => (
+          <tr
+            key={k}
             style={{
-              background: "#f2c200",
-              padding: "8px 12px",
-              fontWeight: "bold",
+              background: index % 2 === 0 ? "#eef5ff" : "#dceaff",
             }}
           >
-            Tip Auto
-          </div>
+            <td style={{ padding: 6 }}>
+              {getDetailFieldName(getSection("Detalii Anvelopa"), k)}
+            </td>
+            <td style={{ padding: 6 }}>{v}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
 
-          <div style={{ paddingTop: 10 }}>
-            {autoCategory?.name || "-"} — {tipAuto.size || "-"}
-          </div>
-        </div>
+{/* TOTAL */}
+<div
+  style={{
+    padding: "0 20px 20px",
+    textAlign: "right",
+    fontSize: 16,
+  }}
+>
+  <p>
+    <b>Pret fara TVA:</b> {pretFaraTVA} lei
+  </p>
+  <p>
+    <b>Total manopera (cu TVA 19%):</b> {totalCuTVA} lei
+  </p>
+</div>
 
-        {/* Detalii Anvelopa */}
-        {Object.keys(detaliiAnvelopa).length > 0 && (
-          <table style={{ width: 260 }}>
-            <thead>
-              <tr style={{ background: "#2d79ff", color: "white" }}>
-                <th style={{ padding: 6 }}>Detaliu</th>
-                <th style={{ padding: 6 }}>Valoare</th>
-              </tr>
-            </thead>
+{/* SEMNATURI 1 — Executant + Semnatura client */}
+<div
+  style={{
+    display: "flex",
+    padding: "20px",
+    gap: "40px",
+    borderTop: "1px solid black",
+    paddingTop: "30px",
+  }}
+>
+  {/* Executant */}
+  <div style={{ flex: 1 }}>
+    <b style={{ fontSize: "20px" }}>Executant</b>
+    <div
+      style={{
+        width: "250px",
+        borderBottom: "2px solid black",
+        height: "40px",
+        marginTop: "10px",
+      }}
+    />
+  </div>
 
-            <tbody>
-              {Object.entries(detaliiAnvelopa).map(([k, v]) => (
-                <tr key={k} style={{ background: "#eef5ff" }}>
-                  <td style={{ padding: 6 }}>
-                    {getDetailFieldName(getSection("Detalii Anvelopa"), k)}
-                  </td>
-                  <td style={{ padding: 6 }}>{v}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+  {/* Semnatura client — text sub semnătura */}
+  <div style={{ flex: 1, textAlign: "right" }}>
+    <b style={{ fontSize: "20px" }}>Semnatura client</b>
+    <div
+      style={{
+        width: "250px",
+        borderBottom: "2px solid black",
+        height: "40px",
+        marginTop: "10px",
+        marginLeft: "auto",
+      }}
+    />
+    <p style={{ marginTop: "15px" }}>
+      Clientul confirmă prin semnătură că strângerea și echilibrarea roților au
+      fost executate conform standardelor
+    </p>
+  </div>
+</div>
 
-      
+{/* CERTIFICAT DE GARANTIE + A DOUA SEMNATURA CLIENT */}
+<div
+  style={{
+    display: "flex",
+    padding: "20px",
+    gap: "40px",
+    borderTop: "1px solid black",
+    paddingTop: "30px",
+  }}
+>
+  {/* Certificat de garantie */}
+  <div style={{ flex: 1 }}>
+    <h3 style={{ margin: 0, fontSize: "20px" }}>
+      <b>Certificat de garantie</b>
+    </h3>
 
-      
+    <p style={{ lineHeight: "1.4", marginTop: "10px" }}>
+      Se acordă garanție conform Legii nr. 449/2003 și Legii nr. 296/2004 pentru
+      serviciile prestate și manopera executată, în baza convenției stabilite
+      între părți.
+    </p>
+  </div>
 
-      {/* TOTAL – aliniat dreapta */}
-      <div style={{ padding: "0 20px 20px", textAlign: "right", fontSize: 16 }}>
-        <p><b>Pret fara TVA:</b> {pretFaraTVA} lei</p>
-        <p><b>Total manopera (cu TVA 19%):</b> {totalCuTVA} lei</p>
-      </div>
-
-      {/* SEMNATURI */}
-      <div style={{ display: "flex", padding: 20 }}>
-        <div style={{ flex: 1 }}>
-          <b>Executant</b>
-          <div style={{ width: 250, borderBottom: "1px solid black", height: 40, marginTop: 20 }} />
-        </div>
-
-        <div style={{ flex: 1, textAlign: "right" }}>
-          <p>
-            După parcurgerea a 50 km, este necesară verificarea strângerii roților.
-          </p>
-          <b>Semnatura client</b>
-          <div style={{ width: 250, borderBottom: "1px solid black", height: 40, marginTop: 20, marginLeft: "auto" }} />
-        </div>
-      </div>
-
-      {/* CERTIFICAT DE GARANTIE — 2 coloane */}
-      <div style={{ display: "flex", padding: 20, gap: 40 }}>
-        <div style={{ flex: 1 }}>
-          <b><h3>Certificat de garantie</h3></b>
-          <p>
-            Se acordă garanție conform Legii nr. 449/2003 și Legii nr. 296/2004<br></br>
-            pentru serviciile prestate și manopera executată, în baza convenției<br></br>
-            stabilite între părți.
-          </p>
-        </div>
-
-        
-      </div>
+  {/* Semnatura client 2 — text sub semnatura */}
+  <div style={{ flex: 1, textAlign: "right" }}>
+    <b style={{ fontSize: "20px" }}>Semnatura client</b>
+    <div
+      style={{
+        width: "250px",
+        borderBottom: "2px solid black",
+        height: "40px",
+        marginTop: "10px",
+        marginLeft: "auto",
+      }}
+    />
+    <p style={{ marginTop: "15px" }}>
+      După parcurgerea a 50 km, este necesară verificarea strângerii roților.
+    </p>
+  </div>
+</div>
+w
     </div>
   );
 }
