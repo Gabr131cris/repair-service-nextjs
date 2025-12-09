@@ -171,7 +171,7 @@ export default function SiteSettingsPage() {
             value={data.contactEmail}
             onChange={handleChange}
             className="w-full border border-gray-300 rounded-lg p-2"
-            placeholder="info@carmarket.com"
+            placeholder="office@nexora-software.com"
           />
         </div>
 

@@ -9,6 +9,8 @@ import {
   getDoc,
   updateDoc,
 } from "firebase/firestore";
+import { getUserRole } from "@/lib/auth";
+import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { db } from "@/lib/firebase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -23,7 +25,7 @@ export default function CompanyFormPage() {
 
   const [loading, setLoading] = useState(isEdit); // doar dacă edităm
   const [saving, setSaving] = useState(false);
-
+  const [accessAllowed, setAccessAllowed] = useState<boolean | null>(null);
   const [form, setForm] = useState({
     name: "",
     legalName: "",
@@ -83,6 +85,50 @@ export default function CompanyFormPage() {
 
     load();
   }, [companyId, router]);
+  // ---------------------------------------------------
+  // ACCESS CONTROL
+  // ---------------------------------------------------
+  useEffect(() => {
+    const checkAccess = async () => {
+      const role = await getUserRole();
+
+      // SUPERADMIN → acces total
+      if (role === "superadmin") {
+        setAccessAllowed(true);
+        return;
+      }
+
+      // COMPANY ADMIN → poate edita DOAR compania lui
+      if (role === "company_admin") {
+        const auth = await getFirebaseAuth();
+        const dbX = getDb();
+        const user = auth.currentUser;
+
+        if (!user) {
+          setAccessAllowed(false);
+          return;
+        }
+
+        const userSnap = await getDoc(doc(dbX, "companyUsers", user.uid));
+        const userCompanyId = userSnap.data()?.companyId;
+
+        // dacă este în mod edit și ID-ul companiei se potrivește
+        if (isEdit && userCompanyId === companyId) {
+          setAccessAllowed(true);
+          return;
+        }
+
+        // orice altceva → acces interzis
+        setAccessAllowed(false);
+        return;
+      }
+
+      // restul rolurilor nu au acces
+      setAccessAllowed(false);
+    };
+
+    checkAccess();
+  }, [companyId, isEdit]);
 
   /* ---------------------------------------------------
         SAVE COMPANY (Create OR Edit)
@@ -113,7 +159,13 @@ export default function CompanyFormPage() {
         });
       }
 
-      router.push("/dashboard/superadmin/companies");
+      const role = await getUserRole();
+
+      if (role === "superadmin") {
+        router.push("/dashboard/superadmin/companies");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (err) {
       console.error("Error saving company:", err);
       alert("Eroare la salvare, încearcă din nou.");
@@ -121,6 +173,21 @@ export default function CompanyFormPage() {
       setSaving(false);
     }
   };
+  if (accessAllowed === false) {
+    return (
+      <p className="text-center text-red-500 mt-20 text-lg">
+        ❌ Access denied.
+      </p>
+    );
+  }
+
+  if (accessAllowed === null) {
+    return (
+      <p className="text-center text-gray-500 mt-20 text-lg">
+        Verificare acces...
+      </p>
+    );
+  }
 
   if (loading)
     return (
@@ -131,13 +198,11 @@ export default function CompanyFormPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-
       <h1 className="text-3xl font-bold mb-8 text-gray-800">
         {isEdit ? "✏️ Editează Compania" : "🏢 Adaugă Companie"}
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-
         {/* SECȚIUNEA 1 - DATE GENERALE */}
         <Section title="Date Generale">
           <Input
@@ -274,7 +339,14 @@ function Section({ title, children }: any) {
   );
 }
 
-function Input({ label, value, onChange, placeholder, required, type = "text" }: any) {
+function Input({
+  label,
+  value,
+  onChange,
+  placeholder,
+  required,
+  type = "text",
+}: any) {
   return (
     <div>
       <label className="block font-medium mb-1">{label}</label>

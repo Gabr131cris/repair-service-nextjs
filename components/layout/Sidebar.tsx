@@ -26,7 +26,7 @@ import { doc, getDoc } from "firebase/firestore";
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-
+const [companyName, setCompanyName] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -35,27 +35,35 @@ export default function Sidebar() {
      Load USER ROLE + companyId (for company_admin only)
   ---------------------------------------------------------- */
   useEffect(() => {
-    const load = async () => {
-      const r = await getUserRole();
-      setRole(r);
+  const load = async () => {
+    const r = await getUserRole();
+    setRole(r);
 
-      // Dacă userul e admin de companie — îi găsim companyId
-      if (r === "company_admin") {
-        const auth = await getFirebaseAuth();
-        const db = getDb();
-        const user = auth.currentUser;
+    const auth = await getFirebaseAuth();
+    const db = getDb();
+    const user = auth.currentUser;
 
-        if (user) {
-          const snap = await getDoc(doc(db, "companyUsers", user.uid));
-          if (snap.exists()) {
-            setCompanyId(snap.data().companyId);
-          }
-        }
+    if (!user) return;
+
+    // Citim compania din companyUsers
+    const userSnap = await getDoc(doc(db, "companyUsers", user.uid));
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      const cid = data.companyId;
+      setCompanyId(cid);
+
+      // Acum citim numele companiei
+      const companySnap = await getDoc(doc(db, "companies", cid));
+      if (companySnap.exists()) {
+        setCompanyName(companySnap.data().name || null);
       }
-    };
+    }
+  };
 
-    load();
-  }, []);
+  load();
+}, []);
+
 
   /* ---------------------------------------------------------
      LOGOUT
@@ -200,7 +208,13 @@ export default function Sidebar() {
             icon: <ListOrdered size={18} />,
           },
 
-          
+          {
+            href: `/dashboard/company/${companyId}/admin/edit`,
+            label: "Editare Companie",
+            icon: <ListOrdered size={18} />,
+          },
+
+
           {
             href: `/dashboard/company/${companyId}/admin/users`,
             label: "Utilizatori Companie",
@@ -223,15 +237,24 @@ export default function Sidebar() {
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col min-h-screen shadow-sm">
       {/* HEADER */}
       <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">CarMarket</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Repair Service</h2>
 
         {role && (
           <p className="text-sm text-gray-500 mt-1 capitalize">Role: {role}</p>
         )}
 
         {companyId && (
-          <p className="text-xs text-blue-600 mt-1">Company ID: {companyId}</p>
-        )}
+  <p className="text-xs text-blue-600 mt-1">
+    Company ID: {companyId}
+  </p>
+)}
+
+{companyName && (
+  <p className="text-sm text-gray-700 font-medium mt-1">
+    {companyName}
+  </p>
+)}
+
       </div>
 
       {/* SEARCH */}

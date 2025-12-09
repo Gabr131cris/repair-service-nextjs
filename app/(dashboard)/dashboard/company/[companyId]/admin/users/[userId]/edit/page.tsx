@@ -3,12 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { getUserRole } from "@/lib/auth";
 
@@ -16,8 +11,12 @@ export default function EditCompanyUserPage() {
   const params = useParams();
   const router = useRouter();
 
-  const companyId = params.id as string;
-  const userId = params.userId as string;
+  const { userId } = useParams();
+
+  // Extragem companyId din URL deoarece Next nu îl aduce aici
+  const pathname =
+    typeof window !== "undefined" ? window.location.pathname : "";
+  const companyId = pathname.split("/")[3];
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -148,13 +147,10 @@ export default function EditCompanyUserPage() {
     );
 
   if (role !== "company_admin")
-    return (
-      <p className="text-center mt-20 text-red-500">❌ Acces interzis.</p>
-    );
+    return <p className="text-center mt-20 text-red-500">❌ Acces interzis.</p>;
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-
       {/* Back Button */}
       <button
         onClick={() => router.back()}
@@ -166,7 +162,6 @@ export default function EditCompanyUserPage() {
       <h1 className="text-2xl font-bold mb-6">Editare utilizator</h1>
 
       <div className="bg-white shadow border rounded-xl p-5 space-y-4">
-
         {/* FIRST NAME */}
         <div>
           <label className="font-medium">Prenume</label>

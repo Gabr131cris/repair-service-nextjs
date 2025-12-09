@@ -18,8 +18,8 @@ import { useRouter } from "next/navigation";
 
 export default function CompanyUsersPage() {
   const params = useParams();
-  const companyId = params.id as string;
-
+  const companyId = params.companyId as string;
+  
   const [company, setCompany] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [role, setRole] = useState<string | null>(null);
