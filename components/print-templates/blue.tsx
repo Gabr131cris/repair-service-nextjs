@@ -1,4 +1,5 @@
 import { getTemplateData, money, TemplateProps } from "./template-data";
+import LegalSignatures from "./LegalSignatures";
 
 const cell = { padding: "9px 10px", borderBottom: "1px solid #dbeafe" };
 
@@ -53,7 +54,7 @@ export default function PrintTemplateBlue({ bill, company, copyType }: TemplateP
 
       <section style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}><div style={{ width: 285, background: "#eff6ff", borderRadius: 12, padding: 16 }}><TotalLine label="Subtotal fără TVA" value={money(data.subtotal)} /><TotalLine label="TVA 19%" value={money(data.vat)} /><div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, paddingTop: 12, borderTop: "2px solid #2563eb", color: "#0f2a5f", fontSize: 17 }}><b>Total</b><b>{money(data.total)}</b></div></div></section>
 
-      <footer className="avoid-break" style={{ marginTop: 28 }}><p style={{ fontSize: 10, color: "#64748b" }}>Executant document: <b>{String(data.createdBy)}</b></p><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 45 }}><Signature label="Executant" /><Signature label="Semnătură client" /></div><div style={{ marginTop: 24, borderTop: "1px solid #64748b", paddingTop: 13, color: "#475569", fontSize: 10, lineHeight: 1.5 }}>Clientul confirmă că serviciile au fost executate conform solicitării. Pentru lucrările efectuate se acordă garanție conform legislației în vigoare. După 50 km se recomandă verificarea strângerii roților.</div></footer>
+      <LegalSignatures accent="#1d4ed8" soft="#eff6ff" border="#475569" createdBy={data.createdBy} />
     </article>
   );
 }
@@ -61,4 +62,3 @@ export default function PrintTemplateBlue({ bill, company, copyType }: TemplateP
 function InfoCard({ title, children }: { title: string; children: React.ReactNode }) { return <div style={{ border: "1px solid #dbeafe", borderRadius: 12, overflow: "hidden" }}><h2 style={{ margin: 0, background: "#eff6ff", color: "#1d4ed8", padding: "9px 12px", fontSize: 14 }}>{title}</h2><div style={{ padding: 12 }}>{children}</div></div>; }
 function Line({ label, value }: { label: string; value: unknown }) { return <div style={{ display: "flex", gap: 8, marginBottom: 6, fontSize: 12 }}><b style={{ minWidth: 72, color: "#475569" }}>{label}:</b><span>{String(value || "-")}</span></div>; }
 function TotalLine({ label, value }: { label: string; value: string }) { return <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 7, fontSize: 12 }}><span style={{ color: "#64748b" }}>{label}</span><b>{value}</b></div>; }
-function Signature({ label }: { label: string }) { return <div><b style={{ color: "#0f2a5f", fontSize: 13 }}>{label}</b><div style={{ height: 38, borderBottom: "1px solid #64748b" }} /></div>; }

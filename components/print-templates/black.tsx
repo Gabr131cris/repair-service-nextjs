@@ -1,4 +1,5 @@
 import { getTemplateData, money, TemplateProps } from "./template-data";
+import LegalSignatures from "./LegalSignatures";
 
 export default function PrintTemplateBlack({ bill, company, copyType }: TemplateProps) {
   const data = getTemplateData(bill, company);
@@ -24,11 +25,10 @@ export default function PrintTemplateBlack({ bill, company, copyType }: Template
         <div style={{ border: "2px solid #111", padding: 15 }}><Amount label="Subtotal fără TVA" value={money(data.subtotal)} /><Amount label="TVA 19%" value={money(data.vat)} /><div style={{ display: "flex", justifyContent: "space-between", background: "#111", color: "white", margin: "12px -15px -15px", padding: 15, fontSize: 16 }}><b>TOTAL</b><b>{money(data.total)}</b></div></div>
       </section>
 
-      <footer className="avoid-break" style={{ marginTop: 35 }}><p style={{ fontSize: 10 }}>Executant document: <b>{String(data.createdBy)}</b></p><div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60 }}><Sign label="Executant" /><Sign label="Semnătură client" /></div><div style={{ marginTop: 30, borderTop: "2px solid #111", paddingTop: 12, fontSize: 9, lineHeight: 1.55, color: "#444" }}><b>Certificat de garanție.</b> Se acordă garanție pentru serviciile prestate și manopera executată conform legislației în vigoare. Clientul confirmă prin semnătură executarea serviciilor. După parcurgerea a 50 km este necesară verificarea strângerii roților.</div></footer>
+      <LegalSignatures accent="#111111" soft="#f3f4f6" border="#111111" createdBy={data.createdBy} />
     </article>
   );
 }
 
 function Party({ title, values }: { title: string; values: Record<string, unknown> }) { return <div><h2 style={{ margin: "0 0 12px", fontSize: 13, textTransform: "uppercase", letterSpacing: "1px" }}>{title}</h2>{Object.entries(values).map(([label, value]) => <div key={label} style={{ display: "flex", marginBottom: 6, fontSize: 11 }}><b style={{ width: 80 }}>{label}</b><span>{String(value || "-")}</span></div>)}</div>; }
 function Amount({ label, value }: { label: string; value: string }) { return <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 11 }}><span>{label}</span><b>{value}</b></div>; }
-function Sign({ label }: { label: string }) { return <div><b style={{ fontSize: 12, textTransform: "uppercase" }}>{label}</b><div style={{ height: 45, borderBottom: "1px solid #111" }} /></div>; }

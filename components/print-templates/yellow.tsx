@@ -1,4 +1,5 @@
 import { getTemplateData, money, TemplateProps } from "./template-data";
+import LegalSignatures from "./LegalSignatures";
 
 const border = "1px solid #1f2937";
 
@@ -32,10 +33,7 @@ export default function PrintTemplateYellow({ bill, company, copyType }: Templat
         <div className="avoid-break" style={{ alignSelf: "start", border: "2px solid #111827" }}><div style={{ background: "#f4c430", borderBottom: "2px solid #111827", padding: 9, fontWeight: 700, textTransform: "uppercase", fontSize: 12 }}>Total document</div><div style={{ padding: 12 }}><Amount label="Subtotal fără TVA" value={money(data.subtotal)} /><Amount label="TVA 19%" value={money(data.vat)} /><div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 10, paddingTop: 10, borderTop: "2px solid #111827", fontSize: 16 }}><b>Total</b><b>{money(data.total)}</b></div></div></div>
       </section>
 
-      <footer className="avoid-break" style={{ marginTop: 25, borderTop: "2px solid #111827", paddingTop: 18 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 55 }}><Signature label="Executant" /><Signature label="Semnătură client" /></div>
-        <div style={{ marginTop: 24, border: border, padding: 11, fontSize: 9, lineHeight: 1.5 }}><b>Certificat de garanție și confirmare.</b> Clientul confirmă că serviciile înscrise în document au fost executate conform solicitării. Se acordă garanție pentru serviciile prestate și manopera executată conform legislației în vigoare. După parcurgerea a 50 km este necesară verificarea strângerii roților.</div>
-      </footer>
+      <LegalSignatures accent="#8a6500" soft="#fff8cf" border="#111827" createdBy={data.createdBy} />
     </article>
   );
 }
@@ -44,4 +42,3 @@ function Meta({ label, value }: { label: string; value: unknown }) { return <div
 function Party({ title, values, right = false }: { title: string; values: Record<string, unknown>; right?: boolean }) { const entries = Object.entries(values).filter(([, value]) => value !== "" && value !== null && value !== undefined); return <section style={{ padding: 14, borderLeft: right ? "2px solid #111827" : undefined }}><h2 style={{ margin: "0 0 9px", display: "inline-block", background: "#f4c430", border: border, padding: "4px 8px", fontSize: 12, textTransform: "uppercase" }}>{title}</h2>{entries.map(([label, value]) => <div key={label} style={{ display: "flex", gap: 8, marginBottom: 5, fontSize: 11, overflowWrap: "anywhere" }}><b style={{ minWidth: 86 }}>{label}:</b><span>{String(value || "-")}</span></div>)}</section>; }
 function InfoSection({ title, values }: { title: string; values: Record<string, unknown> }) { return <section className="avoid-break" style={{ marginBottom: 12, border: border }}><h3 style={{ margin: 0, background: "#fff8cf", borderBottom: border, padding: "7px 9px", fontSize: 12 }}>{title}</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "5px 14px", padding: 9 }}>{Object.entries(values).map(([label, value]) => <div key={label} style={{ fontSize: 10, overflowWrap: "anywhere" }}><b>{label}:</b> {String(value)}</div>)}</div></section>; }
 function Amount({ label, value }: { label: string; value: string }) { return <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 7, fontSize: 11 }}><span>{label}</span><b>{value}</b></div>; }
-function Signature({ label }: { label: string }) { return <div><b style={{ fontSize: 11, textTransform: "uppercase" }}>{label}</b><div style={{ height: 40, borderBottom: border }} /></div>; }
