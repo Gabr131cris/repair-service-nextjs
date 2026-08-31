@@ -1,6 +1,29 @@
-import PremiumTemplate from "./PremiumTemplate";
-import { TemplateProps } from "./template-data";
+import LegalSignatures from "./LegalSignatures";
+import { getTemplateData, money, TemplateProps } from "./template-data";
 
-export default function PrintTemplateBurgundy(props: TemplateProps) {
-  return <PremiumTemplate {...props} accent="#881337" soft="#fff1f2" label="Burgundy Executive" />;
+const wine = "#881337";
+
+export default function PrintTemplateBurgundy({ bill, company, copyType }: TemplateProps) {
+  const data = getTemplateData(bill, company);
+  return (
+    <article className="print-document" style={{ background: "#fff", color: "#2d1820", fontFamily: "Georgia, 'Times New Roman', serif", padding: 32 }}>
+      <header style={{ textAlign: "center", borderTop: `2px solid ${wine}`, borderBottom: `2px solid ${wine}`, padding: "17px 10px" }}><p style={{ margin: 0, color: wine, fontFamily: "Arial, sans-serif", fontSize: 9, letterSpacing: "3px", textTransform: "uppercase" }}>Comandă de lucru</p><h1 style={{ margin: "7px 0 4px", fontSize: 31, fontWeight: 500 }}>{company?.name || "Service Auto"}</h1><p style={{ margin: 0, color: "#765864", fontFamily: "Arial, sans-serif", fontSize: 10 }}>{company?.legalName || "Document de service"}</p></header>
+
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", background: "#fff1f2", borderBottom: `1px solid ${wine}`, padding: "10px 14px", fontFamily: "Arial, sans-serif", fontSize: 10 }}><Meta label="Număr" value={data.invoiceNumber} /><Meta label="Data" value={data.date} center /><Meta label="Exemplar" value={copyType === "client" ? "Client" : "Service"} right /></section>
+
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, marginTop: 22 }}><Party title="Prestator" values={{ Reprezentant: company?.representative, Adresă: [company?.address, company?.city, company?.county].filter(Boolean).join(", "), Telefon: company?.phone, Email: company?.email, Website: company?.website, "CIF / CUI": company?.cif, IBAN: company?.iban, Banca: company?.bankName }} /><Party title="Client / Beneficiar" values={Object.keys(data.client).length ? data.client : { Nume: "-" }} /></section>
+
+      <div style={{ margin: "22px 0 8px", display: "flex", justifyContent: "space-between", alignItems: "end" }}><h2 style={{ margin: 0, color: wine, fontSize: 16, fontWeight: 500 }}>Detaliile lucrării</h2><span style={{ fontFamily: "Arial, sans-serif", fontSize: 9.5 }}>Autovehicul: <b>{data.vehicle}</b></span></div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Arial, sans-serif", fontSize: 10.5 }}><thead><tr style={{ background: wine, color: "white", textAlign: "left" }}><th style={{ padding: 9 }}>Serviciu prestat</th><th style={{ padding: 9, textAlign: "right" }}>Preț unitar</th><th style={{ padding: 9, textAlign: "center" }}>Cantitate</th><th style={{ padding: 9, textAlign: "right" }}>Total</th></tr></thead><tbody>{data.rows.length ? data.rows.map((row, index) => <tr key={row.id} style={{ background: index % 2 ? "#fff7f8" : "white", borderBottom: "1px solid #c8aab4" }}><td style={{ padding: 9 }}>{row.name}</td><td style={{ padding: 9, textAlign: "right" }}>{money(row.price)}</td><td style={{ padding: 9, textAlign: "center" }}>{row.quantity}</td><td style={{ padding: 9, textAlign: "right", fontWeight: 700 }}>{money(row.total)}</td></tr>) : <tr><td colSpan={4} style={{ padding: 18, textAlign: "center" }}>Nu există servicii selectate.</td></tr>}</tbody></table>
+
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 280px", gap: 24, marginTop: 18 }}><div>{data.details.length > 0 && <Notes title="Detalii tehnice" values={Object.fromEntries(data.details.map((item) => [item.name, item.value]))} />}{data.additionalSections.map((section) => <Notes key={section.title} title={section.title} values={section.values} />)}</div><div className="avoid-break" style={{ alignSelf: "start", borderTop: `3px double ${wine}`, borderBottom: `3px double ${wine}`, padding: "11px 3px", fontFamily: "Arial, sans-serif" }}><Amount label="Subtotal fără TVA" value={money(data.subtotal)} /><Amount label="TVA 19%" value={money(data.vat)} /><div style={{ display: "flex", justifyContent: "space-between", marginTop: 9, paddingTop: 9, borderTop: `1px solid ${wine}`, color: wine, fontSize: 15 }}><b>Total document</b><b>{money(data.total)}</b></div></div></section>
+
+      <LegalSignatures accent={wine} soft="#fff1f2" border="#59313f" createdBy={data.createdBy} />
+    </article>
+  );
 }
+
+function Meta({ label, value, center, right }: { label: string; value: unknown; center?: boolean; right?: boolean }) { return <div style={{ textAlign: center ? "center" : right ? "right" : "left" }}><span style={{ color: "#765864" }}>{label}: </span><b>{String(value || "-")}</b></div>; }
+function Party({ title, values }: { title: string; values: Record<string, unknown> }) { return <div><h2 style={{ margin: "0 0 10px", color: wine, fontSize: 14, fontWeight: 500, borderBottom: "1px solid #c8aab4", paddingBottom: 5 }}>{title}</h2>{Object.entries(values).filter(([, value]) => value !== "" && value !== null && value !== undefined).map(([key, value]) => <div key={key} style={{ display: "grid", gridTemplateColumns: "85px 1fr", gap: 7, marginBottom: 4, fontFamily: "Arial, sans-serif", fontSize: 9.5, overflowWrap: "anywhere" }}><b>{key}</b><span>{String(value || "-")}</span></div>)}</div>; }
+function Notes({ title, values }: { title: string; values: Record<string, unknown> }) { return <div className="avoid-break" style={{ marginBottom: 11 }}><h3 style={{ margin: "0 0 7px", color: wine, fontSize: 12, fontWeight: 500 }}>{title}</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6, fontFamily: "Arial, sans-serif" }}>{Object.entries(values).map(([key, value]) => <div key={key} style={{ fontSize: 9.5 }}><b>{key}:</b> {String(value)}</div>)}</div></div>; }
+function Amount({ label, value }: { label: string; value: string }) { return <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 6, fontSize: 10 }}><span>{label}</span><b>{value}</b></div>; }

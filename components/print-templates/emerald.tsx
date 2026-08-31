@@ -1,6 +1,29 @@
-import PremiumTemplate from "./PremiumTemplate";
-import { TemplateProps } from "./template-data";
+import LegalSignatures from "./LegalSignatures";
+import { getTemplateData, money, TemplateProps } from "./template-data";
 
-export default function PrintTemplateEmerald(props: TemplateProps) {
-  return <PremiumTemplate {...props} accent="#047857" soft="#ecfdf5" label="Emerald Professional" />;
+const emerald = "#047857";
+
+export default function PrintTemplateEmerald({ bill, company, copyType }: TemplateProps) {
+  const data = getTemplateData(bill, company);
+  return (
+    <article className="print-document" style={{ background: "white", color: "#13231d", fontFamily: "Arial, sans-serif", padding: 30, borderTop: `9px solid ${emerald}` }}>
+      <header style={{ display: "grid", gridTemplateColumns: "1fr 210px", gap: 28, alignItems: "start" }}>
+        <div><p style={{ margin: 0, color: emerald, fontSize: 11, fontWeight: 700, letterSpacing: "2px", textTransform: "uppercase" }}>Comandă de lucru</p><h1 style={{ margin: "8px 0 5px", fontSize: 30, lineHeight: 1.05 }}>{company?.name || "Service Auto"}</h1><p style={{ margin: 0, color: "#52645d", fontSize: 11 }}>{company?.legalName || [company?.address, company?.city].filter(Boolean).join(", ")}</p></div>
+        <div style={{ borderLeft: `4px solid ${emerald}`, background: "#ecfdf5", padding: "12px 14px" }}><Meta label="Număr document" value={data.invoiceNumber} /><Meta label="Data emiterii" value={data.date} />{copyType && <div style={{ marginTop: 9, fontSize: 9, fontWeight: 700, textTransform: "uppercase" }}>Copia {copyType === "client" ? "client" : "service"}</div>}</div>
+      </header>
+
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 25 }}><Identity title="Date service" accent={emerald} values={{ Reprezentant: company?.representative, Adresă: [company?.address, company?.city, company?.county].filter(Boolean).join(", "), Telefon: company?.phone, Email: company?.email, Website: company?.website, "CIF / CUI": company?.cif, IBAN: company?.iban, Banca: company?.bankName }} /><Identity title="Date client" accent={emerald} values={Object.keys(data.client).length ? data.client : { Nume: "-" }} /></section>
+
+      <section style={{ marginTop: 22 }}><div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", borderBottom: `2px solid ${emerald}`, paddingBottom: 7 }}><h2 style={{ margin: 0, fontSize: 15 }}>Servicii efectuate</h2><span style={{ fontSize: 10, color: "#52645d" }}>Autovehicul: <b style={{ color: "#13231d" }}>{data.vehicle}</b></span></div><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11 }}><thead><tr style={{ color: "#52645d", textAlign: "left", borderBottom: "1px solid #94a3b8" }}><th style={{ padding: "9px 5px", width: 30 }}>#</th><th style={{ padding: "9px 5px" }}>Serviciu</th><th style={{ padding: "9px 5px", textAlign: "right" }}>Preț</th><th style={{ padding: "9px 5px", textAlign: "center" }}>Cant.</th><th style={{ padding: "9px 5px", textAlign: "right" }}>Valoare</th></tr></thead><tbody>{data.rows.length ? data.rows.map((row, index) => <tr key={row.id} style={{ borderBottom: "1px solid #d1d5db" }}><td style={{ padding: "10px 5px", color: emerald, fontWeight: 700 }}>{String(index + 1).padStart(2, "0")}</td><td style={{ padding: "10px 5px", fontWeight: 600 }}>{row.name}</td><td style={{ padding: "10px 5px", textAlign: "right" }}>{money(row.price)}</td><td style={{ padding: "10px 5px", textAlign: "center" }}>{row.quantity}</td><td style={{ padding: "10px 5px", textAlign: "right", fontWeight: 700 }}>{money(row.total)}</td></tr>) : <tr><td colSpan={5} style={{ padding: 18, textAlign: "center" }}>Nu există servicii selectate.</td></tr>}</tbody></table></section>
+
+      <section style={{ display: "grid", gridTemplateColumns: "1fr 265px", gap: 20, marginTop: 18 }}><div>{data.details.length > 0 && <DataBlock title="Detalii tehnice" values={Object.fromEntries(data.details.map((item) => [item.name, item.value]))} />}{data.additionalSections.map((section) => <DataBlock key={section.title} title={section.title} values={section.values} />)}</div><div className="avoid-break" style={{ alignSelf: "start", background: "#ecfdf5", borderLeft: `5px solid ${emerald}`, padding: 15 }}><Total label="Subtotal" value={money(data.subtotal)} /><Total label="TVA 19%" value={money(data.vat)} /><div style={{ display: "flex", justifyContent: "space-between", gap: 12, borderTop: `2px solid ${emerald}`, marginTop: 11, paddingTop: 11, fontSize: 16 }}><b>Total</b><b>{money(data.total)}</b></div></div></section>
+
+      <LegalSignatures accent={emerald} soft="#ecfdf5" border="#334155" createdBy={data.createdBy} />
+    </article>
+  );
 }
+
+function Meta({ label, value }: { label: string; value: unknown }) { return <div style={{ marginBottom: 8 }}><span style={{ display: "block", color: "#52645d", fontSize: 9 }}>{label}</span><b style={{ fontSize: 12 }}>{String(value || "-")}</b></div>; }
+function Identity({ title, values, accent }: { title: string; values: Record<string, unknown>; accent: string }) { return <div style={{ border: "1px solid #94a3b8", padding: 13 }}><h2 style={{ margin: "0 0 10px", color: accent, fontSize: 12, textTransform: "uppercase" }}>{title}</h2>{Object.entries(values).filter(([, value]) => value !== "" && value !== null && value !== undefined).map(([key, value]) => <div key={key} style={{ display: "grid", gridTemplateColumns: "85px 1fr", gap: 7, marginBottom: 4, fontSize: 9.5, overflowWrap: "anywhere" }}><b>{key}</b><span>{String(value || "-")}</span></div>)}</div>; }
+function DataBlock({ title, values }: { title: string; values: Record<string, unknown> }) { return <div className="avoid-break" style={{ marginBottom: 10, borderBottom: "1px solid #94a3b8", paddingBottom: 9 }}><h3 style={{ margin: "0 0 7px", color: emerald, fontSize: 11 }}>{title}</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 6 }}>{Object.entries(values).map(([key, value]) => <div key={key} style={{ fontSize: 9.5 }}><b>{key}:</b> {String(value)}</div>)}</div></div>; }
+function Total({ label, value }: { label: string; value: string }) { return <div style={{ display: "flex", justifyContent: "space-between", gap: 10, marginBottom: 7, fontSize: 10 }}><span>{label}</span><b>{value}</b></div>; }
