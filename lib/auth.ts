@@ -7,6 +7,7 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile,
+  sendPasswordResetEmail,
   User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -53,6 +54,13 @@ export async function loginUser(email: string, password: string) {
   const auth = await getFirebaseAuth();
   const { user } = await signInWithEmailAndPassword(auth, email, password);
   return user;
+}
+
+export async function resetUserPassword(email: string) {
+  if (typeof window === "undefined") return;
+  const auth = await getFirebaseAuth();
+  if (!auth) throw new Error("Serviciul de autentificare nu este disponibil.");
+  await sendPasswordResetEmail(auth, email);
 }
 
 /* ============================================================

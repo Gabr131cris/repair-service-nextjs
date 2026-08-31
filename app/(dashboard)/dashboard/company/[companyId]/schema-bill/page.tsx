@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { Plus, Trash2, Save, GripVertical } from "lucide-react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import PageHelpDropdown from "@/components/dashboard/PageHelpDropdown";
 
 /* ----------------------------------------------------------------------------
     🔥 TIPURI EXISTENTE (NU LE-AM ȘTERS, DOAR AM ADĂUGAT TIPURI NOI)
@@ -259,6 +260,7 @@ export default function SchemaBuilderPage() {
   ============================================================================ */
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl shadow-md">
+      <PageHelpDropdown steps={["Adaugă secțiunile care trebuie să apară în formularul facturii.", "Alege tipul secțiunii și completează câmpurile, serviciile sau categoriile auto.", "Trage secțiunile și câmpurile pentru a schimba ordinea lor.", "Salvează schema după ce ai terminat modificările."]} note="Setarea prețurilor și șabloanele folosesc categoriile și serviciile definite aici." />
       <div className="flex justify-between mb-6">
         <h1 className="text-2xl font-semibold">Schema Builder</h1>
         <button

@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { Save } from "lucide-react";
+import PageHelpDropdown from "@/components/dashboard/PageHelpDropdown";
 
 /* ============================
     TYPES MATCH SCHEMA-BILL
@@ -149,6 +150,7 @@ export default function BillPriceForm() {
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-md">
+      <PageHelpDropdown steps={["Găsește categoria auto și dimensiunea pentru care vrei să introduci tarifele.", "Completează prețul unitar pentru fiecare serviciu.", "Verifică valorile și apasă butonul de salvare de la final."]} note="Dacă lipsește o categorie, o dimensiune sau un serviciu, adaugă-l mai întâi în Factura Schema." />
       <h1 className="text-2xl font-semibold mb-6">
         Introducere prețuri servicii
       </h1>

@@ -6,12 +6,13 @@ import { useParams } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 
 import Templates from "@/components/print-templates";
+import type { TemplateName } from "@/components/print-templates";
 
 export default function PrintBillPage() {
   const { companyId, billId } = useParams();
 
-  const [bill, setBill] = useState<any>(null);
-  const [company, setCompany] = useState<any>(null);
+  const [bill, setBill] = useState<Record<string, unknown> | null>(null);
+  const [company, setCompany] = useState<Record<string, unknown> | null>(null);
 
   // ⛔ blocare print dublu chiar și în StrictMode
   const hasPrintedRef = useRef(false);
@@ -42,11 +43,14 @@ export default function PrintBillPage() {
       );
       const pricesData = pricesSnap.data();
 
+      const templateSnap = await getDoc(doc(db, "companySettings", companyId));
+      const templateData = templateSnap.data();
+
       const finalCompany = {
         ...companyData,
         schema: schemaData,
         servicePrices: pricesData?.prices || {},
-        selectedTemplate: companyData?.selectedTemplate || "yellow",
+        selectedTemplate: templateData?.selectedTemplate || companyData?.selectedTemplate || "yellow",
       };
 
       setBill({ ...billData, id: billId });
@@ -62,10 +66,10 @@ export default function PrintBillPage() {
     load();
   }, [companyId, billId]);
 
-  if (!bill || !company) return <p>Loading...</p>;
+  if (!bill || !company) return <p>Se pregătește documentul...</p>;
 
-  const SelectedTemplate =
-    Templates[company.selectedTemplate] || Templates.yellow;
+  const templateName = company.selectedTemplate as TemplateName;
+  const SelectedTemplate = Templates[templateName] || Templates.yellow;
 
   return (
     <div className="print-wrapper">

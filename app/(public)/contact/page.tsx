@@ -17,18 +17,29 @@ interface ContactData {
   mapEmbed: string;
 }
 
+const translateDay = (day: string) => ({
+  "Monday - Friday": "Luni - Vineri",
+  Saturday: "Sâmbătă",
+  Sunday: "Duminică",
+} as Record<string, string>)[day] || day;
+
+const translateHours = (hours: string) => ({
+  "9 AM - 5 PM": "09:00 - 17:00",
+  "9 AM - 12 PM": "09:00 - 12:00",
+  "By Appointment Only": "Doar cu programare",
+} as Record<string, string>)[hours] || hours;
+
 export default function ContactPage() {
   const [content, setContent] = useState<ContactData>({
-    title: "Contact Us",
-    intro:
-      "",
+    title: "Contactează-ne",
+    intro: "Spune-ne cum lucrează service-ul tău, iar noi îți arătăm cum poate fi configurată aplicația pentru echipa ta.",
     address: "",
     phone: "",
     email: "",
     hours: {
-      "Monday - Friday": "9 AM - 5 PM",
-      Saturday: "9 AM - 12 PM",
-      Sunday: "By Appointment Only",
+      "Luni - Vineri": "09:00 - 17:00",
+      Sâmbătă: "09:00 - 12:00",
+      Duminică: "Doar cu programare",
     },
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3038.503161324587!2d-89.20474632348264!3d40.72392817138439!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880a776d6a3bfb6d%3A0x420c70309d1a1433!2sMidwest%20Classic%20Cars!5e0!3m2!1sen!2sus!4v1705000000000",
@@ -46,7 +57,15 @@ export default function ContactPage() {
       const docRef = doc(db, "pages", "contact");
       const snap = await getDoc(docRef, { source: "server" });
 
-      if (snap.exists()) setContent(snap.data() as ContactData);
+      if (snap.exists()) {
+        const saved = snap.data() as ContactData;
+        setContent((current) => ({
+          ...current,
+          ...saved,
+          title: saved.title === "Contact Us" ? current.title : saved.title,
+          intro: saved.intro || current.intro,
+        }));
+      }
       else await setDoc(docRef, content);
     };
     fetchData();
@@ -56,19 +75,14 @@ export default function ContactPage() {
     const docRef = doc(db, "pages", "contact");
     try {
       await updateDoc(docRef, content);
-    } catch (err: any) {
-      if (err.message.includes("No document to update")) {
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.includes("No document to update")) {
         await setDoc(docRef, content);
       } else throw err;
     }
     setIsEditing(false);
-    setStatus("✅ Content updated successfully!");
+    setStatus("Conținutul a fost actualizat cu succes.");
     setTimeout(() => setStatus(""), 3000);
-  };
-
-  const openWhatsApp = () => {
-    const phoneClean = content.phone.replace(/[^0-9+]/g, "");
-    window.open(`https://wa.me/${phoneClean}`, "_blank");
   };
 
   return (
@@ -85,11 +99,10 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-white via-white/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
           <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 drop-shadow-md">
-            Get in Touch with Us
+            Hai să discutăm
           </h1>
           <p className="mt-3 text-gray-700 max-w-2xl mx-auto">
-            Have questions about a car, financing, or selling your vehicle?
-            We’re happy to help.
+            Solicită o demonstrație și află cum poți administra mai simplu clienții, serviciile și facturile.
           </p>
         </div>
       </section>
@@ -122,7 +135,7 @@ export default function ContactPage() {
                   : "bg-gray-100 hover:bg-gray-200 text-gray-700"
               }`}
             >
-              {isEditing ? "💾 Save Changes" : "✏️ Edit Page"}
+              {isEditing ? "Salvează modificările" : "Editează pagina"}
             </button>
           )}
         </div>
@@ -150,7 +163,7 @@ export default function ContactPage() {
               {/* Address */}
               <div>
                 <h3 className="font-semibold text-gray-900 uppercase text-sm mb-1">
-                  Sale office
+                  Adresă
                 </h3>
                 {isEditing ? (
                   <input
@@ -168,7 +181,7 @@ export default function ContactPage() {
               {/* Contact Info */}
               <div>
                 <h3 className="font-semibold text-gray-900 uppercase text-sm mb-1">
-                  How to Reach Us
+                  Date de contact
                 </h3>
                 {isEditing ? (
                   <>
@@ -189,8 +202,8 @@ export default function ContactPage() {
                   </>
                 ) : (
                   <>
-                    <p className="font-medium">{content.phone}</p>
-                    <p className="text-blue-600">{content.email}</p>
+                    <a href={`tel:${content.phone.replace(/\s/g, "")}`} className="block font-medium hover:text-blue-600">{content.phone}</a>
+                    <a href={`mailto:${content.email.trim()}`} className="block text-blue-600 hover:underline">{content.email.trim()}</a>
                   </>
                 )}
               </div>
@@ -198,7 +211,7 @@ export default function ContactPage() {
               {/* Hours */}
               <div>
                 <h3 className="font-semibold text-gray-900 uppercase text-sm mb-2">
-                  Hours
+                  Program
                 </h3>
                 <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
                   {Object.entries(content.hours).map(([day, hours]) => (
@@ -206,7 +219,7 @@ export default function ContactPage() {
                       key={day}
                       className="flex justify-between py-2 px-3 text-sm"
                     >
-                      <span className="font-medium">{day}</span>
+                      <span className="font-medium">{translateDay(day)}</span>
                       {isEditing ? (
                         <input
                           value={hours}
@@ -222,7 +235,7 @@ export default function ContactPage() {
                           className="border border-gray-300 rounded px-2"
                         />
                       ) : (
-                        <span>{hours}</span>
+                        <span>{translateHours(hours)}</span>
                       )}
                     </div>
                   ))}
@@ -254,6 +267,7 @@ export default function ContactPage() {
             ) : (
               <iframe
                 src={content.mapEmbed}
+                title="Harta locației Repair Service"
                 width="100%"
                 height="400"
                 style={{ border: 0 }}

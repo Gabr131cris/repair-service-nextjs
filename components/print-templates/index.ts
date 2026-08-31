@@ -8,4 +8,6 @@ const Templates = {
   black: Black,
 };
 
+export type TemplateName = keyof typeof Templates;
+
 export default Templates;

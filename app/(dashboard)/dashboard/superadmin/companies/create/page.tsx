@@ -14,6 +14,7 @@ import { getFirebaseAuth, getDb } from "@/lib/firebase";
 import { db } from "@/lib/firebase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import PageHelpDropdown from "@/components/dashboard/PageHelpDropdown";
 
 export default function CompanyFormPage() {
   const router = useRouter();
@@ -198,6 +199,7 @@ export default function CompanyFormPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
+      {isEdit && <PageHelpDropdown steps={["Actualizează datele generale și reprezentantul companiei.", "Verifică adresa și informațiile de contact.", "Completează cu atenție CIF-ul, IBAN-ul și banca.", "Apasă „Salvează Modificările” pentru a păstra informațiile."]} note="Datele companiei pot apărea pe comenzile de lucru și documentele tipărite ulterior." />}
       <h1 className="text-3xl font-bold mb-8 text-gray-800">
         {isEdit ? "✏️ Editează Compania" : "🏢 Adaugă Companie"}
       </h1>

@@ -123,16 +123,15 @@ export default function RegisterForm() {
   return (
     <div className="max-w-sm w-full mx-auto mt-16 bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center">
       <h2 className="text-3xl font-semibold text-gray-800 mb-4">
-        Registration Disabled
+        Înregistrarea este dezactivată
       </h2>
       <p className="text-gray-600 text-sm mb-6">
-        Account creation is currently restricted.  
-        Only administrators can create new users at this time.
+        Crearea conturilor este momentan restricționată. Doar administratorii pot adăuga utilizatori noi.
       </p>
 
       <div className="bg-blue-50 border border-blue-100 text-blue-700 text-sm p-4 rounded-lg mb-6">
         <p>
-          If you need access, please contact our support team for assistance.
+          Dacă ai nevoie de acces, contactează echipa noastră pentru asistență.
         </p>
       </div>
 
@@ -141,11 +140,11 @@ export default function RegisterForm() {
         className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition"
       >
         <Mail className="w-4 h-4" />
-        Contact Support
+        Contactează echipa
       </button>
 
       <p className="text-xs text-gray-400 mt-4">
-        — Registration temporarily disabled by administration —
+        Înregistrarea este temporar dezactivată de administrator.
       </p>
     </div>
   );

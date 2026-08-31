@@ -15,6 +15,7 @@ import {
 import { Loader2, UserPlus, Trash2, Pencil } from "lucide-react";
 import { getUserRole } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import PageHelpDropdown from "@/components/dashboard/PageHelpDropdown";
 
 export default function CompanyUsersPage() {
   const params = useParams();
@@ -182,6 +183,7 @@ export default function CompanyUsersPage() {
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
+      <PageHelpDropdown steps={["Completează datele persoanei pe care vrei să o adaugi.", "Alege rolul potrivit în funcție de accesul necesar.", "Creează utilizatorul, apoi îl poți edita sau șterge din lista de mai jos."]} note="Acordă rolul de administrator doar persoanelor care trebuie să gestioneze compania și utilizatorii." />
       <h1 className="text-2xl font-bold mb-6">
         👥 Utilizatori — <span className="text-blue-600">{company?.name}</span>
       </h1>
