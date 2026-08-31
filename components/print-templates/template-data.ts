@@ -15,7 +15,15 @@ interface TemplateRow {
 }
 
 const normalize = (value: unknown) =>
-  String(value || "").trim().replace(/\s+/g, " ").toLowerCase();
+  String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().replace(/\s+/g, " ").toLowerCase();
+
+const hasAny = (title: unknown, words: string[]) => {
+  const value = normalize(title);
+  return words.some((word) => value.includes(normalize(word)));
+};
+
+const compactEntries = (values: Record<string, any>) =>
+  Object.fromEntries(Object.entries(values).filter(([, value]) => value !== "" && value !== null && value !== undefined));
 
 const asNumber = (value: unknown) => {
   const number = Number(value);
@@ -46,8 +54,16 @@ export function getTemplateData(bill: Record<string, any>, company: Record<strin
     return raw;
   };
 
-  const invoiceValues = getValues("Numar Factura");
-  const client = getValues("Detalii Client");
+  const mapCustomSection = (section: any, removeEmpty = true) => {
+    const raw = form[section?.id] || {};
+    const values = Object.fromEntries((section?.fields || []).map((field: any) => [field.name, raw[field.id]]));
+    return removeEmpty ? compactEntries(values) : values;
+  };
+
+  const invoiceSection = sections.find((section) => section.type === "custom" && hasAny(section.title, ["numar factura", "numar document", "numar comanda", "factura number"]));
+  const clientSection = sections.find((section) => section.type === "custom" && hasAny(section.title, ["client", "customer", "beneficiar", "cumparator"]));
+  const invoiceValues = invoiceSection ? mapCustomSection(invoiceSection, false) : getValues("Numar Factura");
+  const client = clientSection ? mapCustomSection(clientSection, false) : getValues("Detalii Client");
   const vehicleSection = getSection("Tip Auto", "vehicle_categories");
   const vehicleValues = form[vehicleSection?.id] || {};
   const category = vehicleSection?.vehicleCategories?.find((item: any) => item.id === vehicleValues.category);
@@ -71,18 +87,42 @@ export function getTemplateData(bill: Record<string, any>, company: Record<strin
     value,
   }));
   const total = rows.reduce((sum, row) => sum + row.total, 0);
-  const invoiceNumber = invoiceValues.Numar || invoiceValues.Număr || bill.number || bill.id || "---";
+  const invoiceNumber = invoiceValues.Numar || invoiceValues.Număr || Object.values(invoiceValues)[0] || bill.number || bill.id || "---";
+  const additionalSections = sections
+    .filter((section) => section.type === "custom" && section.id !== invoiceSection?.id && section.id !== clientSection?.id)
+    .map((section) => ({ title: section.title, values: mapCustomSection(section) }))
+    .filter((section) => Object.keys(section.values).length > 0);
+
+  const directClient = compactEntries({
+    Nume: bill.customer || bill.customerName || bill.clientName,
+    Telefon: bill.customerPhone || bill.phone,
+    Email: bill.customerEmail || bill.email,
+    "Număr auto": bill.registrationNumber || bill.plate,
+  });
+  const clientFallback = (label: string) => {
+    if (hasAny(label, ["nume", "name"])) return directClient.Nume;
+    if (hasAny(label, ["telefon", "phone", "mobil"])) return directClient.Telefon;
+    if (hasAny(label, ["email", "e-mail"])) return directClient.Email;
+    if (hasAny(label, ["numar auto", "inmatriculare", "registration", "plate"])) return directClient["Număr auto"];
+    return undefined;
+  };
+  const completedClient = Object.fromEntries(Object.entries(client).map(([label, value]) => [label, value || clientFallback(label) || "-"]));
+  const finalClient = Object.keys(completedClient).length ? completedClient : directClient;
+  const calculatedTotal = asNumber(form.calculatedTotal || bill.calculatedTotal);
+  const finalTotal = total || calculatedTotal;
 
   return {
     invoiceNumber,
     date: formatDate(bill.createdAt || bill.date),
-    client,
+    client: finalClient,
     vehicle: `${category?.name || bill.vehicle || "-"}${vehicleValues.size ? ` — ${vehicleValues.size}` : ""}`,
     rows,
     details,
-    total,
-    subtotal: total / 1.19,
-    vat: total - total / 1.19,
+    additionalSections,
+    createdBy: bill.createdBy || bill.employeeName || bill.createdByName || "-",
+    total: finalTotal,
+    subtotal: finalTotal / 1.19,
+    vat: finalTotal - finalTotal / 1.19,
   };
 }
 

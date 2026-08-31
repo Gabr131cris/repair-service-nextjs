@@ -126,11 +126,30 @@ img, video {
 @media print {
   @page {
     size: A4;
-    margin: 5;
+    margin: 8mm;
   }
 
   body {
     margin: 0;
     padding: 0;
+  }
+
+  .print-document {
+    width: 100%;
+    max-width: 100%;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .avoid-break,
+  .print-document header,
+  .print-document footer,
+  .print-document tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-document thead {
+    display: table-header-group;
   }
 }

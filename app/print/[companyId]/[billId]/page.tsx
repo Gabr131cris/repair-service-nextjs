@@ -74,14 +74,10 @@ export default function PrintBillPage() {
   return (
     <div className="print-wrapper">
       <div className="copy-section client-copy">
-        <div className="copy-header">COPIA CLIENT</div>
         <SelectedTemplate bill={bill} company={company} copyType="client" />
       </div>
 
-      <div className="page-break"></div>
-
       <div className="copy-section service-copy">
-        <div className="copy-header">COPIA SERVICE</div>
         <SelectedTemplate bill={bill} company={company} copyType="service" />
       </div>
     </div>
